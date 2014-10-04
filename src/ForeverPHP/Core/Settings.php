@@ -15,10 +15,10 @@ class Settings {
      */
     private static function load() {
         if (!static::$loaded) {
-            $path = basename(APPS_ROOT) . DS . 'settings.php';
+            $path = APPS_ROOT . DS . 'settings.php';
 
             if (!file_exists($path)) {
-                exit("El archivo de configuración $filename.php no existe.");
+                exit("El archivo de configuración settings.php no existe.");
             }
 
             static::$settings = require $path;

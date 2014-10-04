@@ -46,8 +46,6 @@ class ClassLoader {
             $class = substr($class, 1);
         }
 
-        $class = str_replace(array('CorePHP', 'corephp'), COREPHP_DIR, $class);
-
         return str_replace(array('\\', '_'), DS, $class) . '.php';
     }
 
@@ -58,7 +56,7 @@ class ClassLoader {
      */
     public function register() {
         if (!static::$registered) {
-            static::$registered = spl_autoload_register(array('CorePHP\ClassLoader', 'load'));
+            static::$registered = spl_autoload_register(array('ForeverPHP\Core\ClassLoader', 'load'));
         }
     }
 

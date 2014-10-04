@@ -1,5 +1,6 @@
 <?php namespace ForeverPHP\Routing;
 
+use ForeverPHP\Core\App;
 use ForeverPHP\Core\Exceptions\AppException;
 use ForeverPHP\Core\Exceptions\CoreException;
 use ForeverPHP\Core\Exceptions\RouterException;

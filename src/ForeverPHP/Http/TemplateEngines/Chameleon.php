@@ -206,8 +206,8 @@ class Chameleon implements TemplateInterface {
     }
 
     private function inFor($data) {
-        $valueVar = $data[1];
-        $arrayExpr = $data[2];
+        $arrayExpr = $data[1];
+        $valueVar = $data[2];
         $content = $data[3];
 
         // Se valida que exista el $array_expr en el $this->data para seguir

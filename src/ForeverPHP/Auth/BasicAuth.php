@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Auth;
+<?php namespace ForeverPHP\Auth;
 
 /**
  * Autentificacion basica HTTP.

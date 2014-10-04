@@ -1,7 +1,6 @@
-<?php
-namespace ForeverPHP\Libs;
+<?php namespace ForeverPHP\Mail;
 
-use ForeverPHP\Bootstrap\ClassLoader;
+use ForeverPHP\Core\ClassLoader;
 use ForeverPHP\Core\Settings;
 use ForeverPHP\Core\Setup;
 use PHPMailer;

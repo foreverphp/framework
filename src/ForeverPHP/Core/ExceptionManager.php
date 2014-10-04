@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Core;
+<?php namespace ForeverPHP\Core;
 
 use ForeverPHP\Http\Response;
 use ForeverPHP\Routing\Redirect;

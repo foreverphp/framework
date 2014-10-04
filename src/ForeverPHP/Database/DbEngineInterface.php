@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Database;
+<?php namespace ForeverPHP\Database;
 
 /**
  * Interface que deben implementar si o si todos los motores de datos.

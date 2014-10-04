@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Http\TemplateEngines;
+<?php namespace ForeverPHP\Http\TemplateEngines;
 
 use ForeverPHP\Core\Settings;
 use ForeverPHP\Http\TemplateEngines\TemplateInterface;
@@ -243,7 +242,7 @@ class Chameleon implements TemplateInterface {
     }
 
     private function forsTemplate() {
-        $regex = "#\{\% for ([0-9A-Za-z\-_]*) in ([0-9A-Za-z\-_]*) \%\}([\w|\t|\r|\W]*?)\{\% endfor \%\}#";
+        $regex = "#\{\% for ([0-9A-Za-z\-_]*) as ([0-9A-Za-z\-_]*) \%\}([\w|\t|\r|\W]*?)\{\% endfor \%\}#";
         $results = array();
 
         preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);

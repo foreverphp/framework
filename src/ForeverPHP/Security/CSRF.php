@@ -1,5 +1,4 @@
-﻿<?php
-namespace ForeverPHP\Security;
+﻿<?php namespace ForeverPHP\Security;
 
 /**
  * Controla y evita los ataques de tipo Cross Site Request Forgery.

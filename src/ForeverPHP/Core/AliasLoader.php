@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Bootstrap;
+<?php namespace ForeverPHP\Core;
 
 /**
  * Realiza la carga de los alias de clases.
@@ -27,7 +26,7 @@ class AliasLoader {
     /**
      * Instancia singleton del gestor de alias.
      *
-     * @var ForeverPHP\Core\AutoLoader
+     * @var \ForeverPHP\Core\AliasLoader
      */
     private static $instance;
 
@@ -45,7 +44,7 @@ class AliasLoader {
      * Obtiene o crea la instancia singleton del gestor de alias.
      *
      * @param  array $aliases
-     * @return ForeverPHP\Core\AutoLoader
+     * @return \ForeverPHP\Core\AliasLoader
      */
     public static function getInstance($aliases) {
         if (is_null(static::$instance)) {

@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\View;
+<?php namespace ForeverPHP\View;
 
 /**
  * Permite administrar de forma mas amigable la variables a trabajar

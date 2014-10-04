@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Security;
+<?php namespace ForeverPHP\Security;
 
 use ForeverPHP\Core\Exceptions\SecurityException;
 

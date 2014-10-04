@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Http;
+<?php namespace ForeverPHP\Http;
 
 /**
  * Contiene parametros he informacion del request.

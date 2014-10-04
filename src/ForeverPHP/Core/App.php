@@ -1,7 +1,6 @@
-<?php
-namespace ForeverPHP\Core;
+<?php namespace ForeverPHP\Core;
 
-use ForeverPHP\Bootstrap\ClassLoader;
+use ForeverPHP\Core\ClassLoader;
 use ForeverPHP\Core\Setup;
 
 /**

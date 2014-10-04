@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Database\Engines;
+<?php namespace ForeverPHP\Database\Engines;
 
 /**
  * Clase base para los motores de base de datos.
@@ -54,16 +53,4 @@ class BaseEngine  {
     public function get() {
         echo $this->dbSetting;
     }
-
-/* If we have to retrieve large amount of data we use MYSQLI_USE_RESULT */
-//if ($result = mysqli_query($link, "SELECT * FROM City", MYSQLI_USE_RESULT)) {
-
-    /* Note, that we can't execute any functions which interact with the
-       server until result set was closed. All calls will return an
-       'out of sync' error */
-  /*  if (!mysqli_query($link, "SET @a:='this will not work'")) {
-        printf("Error: %s\n", mysqli_error($link));
-    }
-    mysqli_free_result($result);
-}*/
 }

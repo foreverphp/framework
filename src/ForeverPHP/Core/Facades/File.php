@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Core\Facades;
+<?php namespace ForeverPHP\Core\Facades;
 
 /**
  * @see \ForeverPHP\Core\Filesystem.

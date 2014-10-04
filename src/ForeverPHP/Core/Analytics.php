@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Core;
+<?php namespace ForeverPHP\Core;
 
 class Analytics {
 

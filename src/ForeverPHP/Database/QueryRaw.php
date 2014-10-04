@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Database;
+<?php namespace ForeverPHP\Database;
 
 use ForeverPHP\Core\Settings;
 
@@ -118,9 +117,9 @@ class QueryRaw {
 		$dbEngine = $selectDb[self::$dbSetting]['engine'];
 
 		if ($dbEngine == 'mariadb') {
-			$db = namespace\Database\Engines\MariaDB::getInstance(self::$dbSetting);
+			$db = namespace\Database\MariaDB::getInstance(self::$dbSetting);
 		} elseif ($dbEngine == 'postgresql') {
-			$db = namespace\Database\Engines\PostgreSQL::getInstance(self::$dbSetting);
+			$db = namespace\Database\PostgreSQL::getInstance(self::$dbSetting);
 		} else {
 			self::$error = 'Database engine not found.';
 		}

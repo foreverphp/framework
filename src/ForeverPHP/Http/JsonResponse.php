@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Http;
+<?php namespace ForeverPHP\Http;
 
 use ForeverPHP\Http\ResponseInterface;
 use ForeverPHP\View\Context;
@@ -14,7 +13,7 @@ class JsonResponse implements ResponseInterface {
     /**
      * Objeto de tipo Context.
      *
-     * @var ForeverPHP\View\Context|array
+     * @var \ForeverPHP\View\Context|array
      */
     private $content;
 

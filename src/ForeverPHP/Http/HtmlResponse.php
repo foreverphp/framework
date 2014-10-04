@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Http;
+<?php namespace ForeverPHP\Http;
 
 use ForeverPHP\Core\App;
 use ForeverPHP\Core\Exceptions\SecurityException;
@@ -27,7 +26,7 @@ class HtmlResponse implements ResponseInterface {
     /**
      * Objeto de tipo Context.
      *
-     * @var ForeverPHP\View\Context
+     * @var \ForeverPHP\View\Context
      */
     private $context;
 

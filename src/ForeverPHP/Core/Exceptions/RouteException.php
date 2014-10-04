@@ -1,7 +1,4 @@
-<?php
-namespace ForeverPHP\Core\Exceptions;
-
-use Exception;
+<?php namespace ForeverPHP\Core\Exceptions;
 
 /**
  * Excepcion ocurrida dentro de Router.
@@ -9,4 +6,4 @@ use Exception;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.2.0
  */
-class RouteException extends Exception {}
+class RouteException extends \Exception {}

@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Cache;
+<?php namespace ForeverPHP\Cache;
 
 /**
  * Realiza cache con archivos en disco, es la forma basica del cache.

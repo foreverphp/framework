@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Http;
+<?php namespace ForeverPHP\Http;
 
 use ForeverPHP\Http\HtmlResponse;
 use ForeverPHP\Http\JsonResponse;
@@ -35,7 +34,7 @@ class Response {
      *
      * @param  string $template
      * @param  array  $context
-     * @return ForeverPHP\Http\HtmlResponse
+     * @return \ForeverPHP\Http\HtmlResponse
      */
     public static function make($template, $context = null) {
         return new HtmlResponse($template, $context);
@@ -44,8 +43,8 @@ class Response {
     /**
      * Devuelve una respuesta en formato JSON.
      *
-     * @param  ForeverPHP\View\Context|array $context
-     * @return ForeverPHP\Http\JsonResponse
+     * @param  \ForeverPHP\View\Context|array $context
+     * @return \ForeverPHP\Http\JsonResponse
      */
     public static function json($content) {
         if (!is_null($content)) {

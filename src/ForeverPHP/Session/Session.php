@@ -1,7 +1,6 @@
-<?php
-namespace ForeverPHP\Core;
+<?php namespace ForeverPHP\Session;
 
-use Settings;
+use ForeverPHP\Core\Settings;
 
 /**
  * Controla y gestiona las sessiones en el framework.

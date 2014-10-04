@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Database\Engines;
+<?php namespace ForeverPHP\Database\Engines;
 
 use ForeverPHP\Core\Settings;
 use ForeverPHP\Database\DbEngineInterface;

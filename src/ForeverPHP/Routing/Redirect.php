@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Routing;
+<?php namespace ForeverPHP\Routing;
 
 class Redirect {
 
@@ -11,7 +10,6 @@ class Redirect {
         // Debo agregar el texto correcto al encabezado
         // no Forbidden
         header("HTTP/1.0 $errno Forbidden", true, $errno);
-        include "../error/$errno.html";
         exit();
     }
 }

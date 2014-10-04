@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\Bootstrap;
+<?php namespace ForeverPHP\Core;
 
 class ClassLoader {
     /**
@@ -26,7 +25,6 @@ class ClassLoader {
         $class = static::normalizeClass($class);
 
         foreach (static::$directories as $directory) {
-
             if (file_exists($path = $directory . DS . $class)) {
                 require_once $path;
 
@@ -48,6 +46,8 @@ class ClassLoader {
             $class = substr($class, 1);
         }
 
+        $class = str_replace(array('CorePHP', 'corephp'), COREPHP_DIR, $class);
+
         return str_replace(array('\\', '_'), DS, $class) . '.php';
     }
 
@@ -58,7 +58,7 @@ class ClassLoader {
      */
     public function register() {
         if (!static::$registered) {
-            static::$registered = spl_autoload_register(array('ForeverPHP\Bootstrap\ClassLoader', 'load'));
+            static::$registered = spl_autoload_register(array('CorePHP\ClassLoader', 'load'));
         }
     }
 

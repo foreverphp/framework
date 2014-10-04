@@ -1,5 +1,4 @@
-<?php
-namespace ForeverPHP\View;
+<?php namespace ForeverPHP\View;
 
 /**
  * Todas las vistas deben heredar de este archivo, para ser tratadas como tal.

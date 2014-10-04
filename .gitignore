@@ -1,0 +1,10 @@
+# Sublime Text
+*.sublime-*
+# Composer
+composer.phar
+# Binarios y comprimidos
+*.rar
+*.zip
+# Directorios
+docs/*
+resources/*

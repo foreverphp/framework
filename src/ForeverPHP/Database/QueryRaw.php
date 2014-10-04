@@ -117,9 +117,9 @@ class QueryRaw {
 		$dbEngine = $selectDb[self::$dbSetting]['engine'];
 
 		if ($dbEngine == 'mariadb') {
-			$db = namespace\Database\MariaDB::getInstance(self::$dbSetting);
+			$db = namespace\Engines\MariaDB::getInstance(self::$dbSetting);
 		} elseif ($dbEngine == 'postgresql') {
-			$db = namespace\Database\PostgreSQL::getInstance(self::$dbSetting);
+			$db = namespace\Engines\PostgreSQL::getInstance(self::$dbSetting);
 		} else {
 			self::$error = 'Database engine not found.';
 		}

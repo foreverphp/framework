@@ -14,7 +14,7 @@ class Settings {
     private $settings;
 
     /**
-     * Contiene la instancia unica del objeto.
+     * Contiene la instancia singleton de Settings.
      *
      * @var \ForeverPHP\Core\Settings
      */
@@ -23,7 +23,7 @@ class Settings {
     private function __construct() {}
 
     /**
-     * Obtiene o crea la instancia unica de Settings.
+     * Obtiene o crea la instancia singleton de Settings.
      *
      * @return \ForeverPHP\Core\Settings
      */

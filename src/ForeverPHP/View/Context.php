@@ -4,7 +4,6 @@
  * Permite administrar de forma mas amigable la variables a trabajar
  * en el template.
  *
- * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.2.0
  */
 class Context {

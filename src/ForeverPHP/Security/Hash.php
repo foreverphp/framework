@@ -5,7 +5,6 @@ use ForeverPHP\Core\Exceptions\SecurityException;
 /**
  * Permite generar diversos tipos de hash.
  *
- * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.2.0
  */
 class Hash {

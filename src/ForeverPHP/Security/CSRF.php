@@ -49,7 +49,7 @@ class CSRF {
         }
 
         if (!empty($token)) {
-            $tokenRequest = base64_decode(Settings::get('csrfToken'));
+            $tokenRequest = base64_decode(Settings::getInstance()->get('csrfToken'));
 
             // Verifica que los tokens coincidan
             if ($tokenRequest === $token) {

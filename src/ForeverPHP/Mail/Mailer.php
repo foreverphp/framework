@@ -8,7 +8,6 @@ use PHPMailer;
 /**
  * Permite enviar correos ya sea en formato texto como HTML.
  *
- * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
 class Mailer {
@@ -21,7 +20,7 @@ class Mailer {
     }
 
     public function send() {
-        $settings = Settings::get('mail');
+        $settings = Settings::getInstance()->get('mail');
 
         $this->mail->isSMTP();
         $this->mail->Host = $settings['server'];

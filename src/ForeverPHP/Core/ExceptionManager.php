@@ -37,13 +37,13 @@ class ExceptionManager {
             }
         }
 
-        if (Settings::inDebug()) {
+        if (Settings::getInstance()->inDebug()) {
             $ctx = new Context();
             $ctx->set('exception', 'Excepción');
             $ctx->set('details', $message);
 
             // Le indico a la vista que haga render usando los templates del framework
-            Settings::set('ForeverPHPTemplate', true);
+            Settings::getInstance()->set('ForeverPHPTemplate', true);
 
             Response::make('foreverphp_exception', $ctx)->render();
         } else {

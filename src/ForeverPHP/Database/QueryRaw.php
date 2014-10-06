@@ -5,7 +5,6 @@ use ForeverPHP\Core\Settings;
 /**
  * Permite la ejecucion de consultas en bruto a la base de datos.
  *
- * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
 class QueryRaw {
@@ -112,7 +111,7 @@ class QueryRaw {
 		$return = false;
 
 		// Obtengo la configuracion de la base de datos a utilizar
-		$selectDb = Settings::get('dbs');
+		$selectDb = Settings::getInstance()->get('dbs');
 		$selectDb[self::$dbSetting];
 		$dbEngine = $selectDb[self::$dbSetting]['engine'];
 

@@ -39,8 +39,8 @@ class HtmlResponse implements ResponseInterface {
         $data = array();
 
         // Valido el token CSRF, el cual solo esta disponible en GET o POST
-        if (Settings::inDebug()) {
-            if (Settings::exists('csrfToken')) {
+        if (Settings::getInstance()->inDebug()) {
+            if (Settings::getInstance()->exists('csrfToken')) {
                 if (!CSRF::validateToken()) {
                     throw new SecurityException('Acceso denegado, token inválido. Es imposible procesar tu solicitud vuelve al inicio o cierra esta página.');
                 }
@@ -67,7 +67,7 @@ class HtmlResponse implements ResponseInterface {
         //if ($only_debug) {
         //    Router::redirectToError(500);
         //} else {
-            $tplEngine = Settings::get('templateEngine');
+            $tplEngine = Settings::getInstance()->get('templateEngine');
 
             if ($tplEngine == 'chameleon') {
                 $tpl = new Chameleon();
@@ -86,6 +86,6 @@ class HtmlResponse implements ResponseInterface {
          * haber rendereado.
          */
         // NOTA: al paracer esto ya no es necesario, validar despues
-        Settings::set('viewState', 'render_ok');
+        Settings::getInstance()->set('viewState', 'render_ok');
     }
 }

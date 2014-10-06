@@ -12,7 +12,7 @@ use ForeverPHP\Database\DbEngineInterface;
  */
 class MariaDB extends BaseEngine implements DbEngineInterface {
 	public function connect() {
-		$db = Settings::get('dbs');
+		$db = Settings::getInstance()->get('dbs');
         $db = $db[$this->dbSetting];
 
         // Me conecto a la base de datos

@@ -1,9 +1,10 @@
 <?php namespace ForeverPHP\Http;
 
+use ForeverPHP\Core\Settings;
+
 /**
  * Contiene parametros he informacion del request.
  *
- * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
 class Request {
@@ -53,7 +54,7 @@ class Request {
             foreach($requestParams as $name => $value) {
                 if ($name == 'csrfToken') {
                     // Almaceno el token CSRF para luego validarlo
-                    Settings::set($name, $value);
+                    Settings::getInstance()->set($name, $value);
                 } else {
                     self::$params[$name] = $value;
                 }

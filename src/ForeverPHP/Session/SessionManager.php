@@ -9,7 +9,7 @@ use ForeverPHP\Core\Settings;
  */
 class SessionManager {
     /**
-     * Contiene la instancia unica del objeto.
+     * Contiene la instancia singleton de SessionManager.
      *
      * @var \ForeverPHP\Session\SessionManager
      */
@@ -18,7 +18,7 @@ class SessionManager {
     private function __construct() {}
 
     /**
-     * Obtiene o crea la instancia unica del administrador de sesiones.
+     * Obtiene o crea la instancia singleton de SessionManager.
      *
      * @return \ForeverPHP\Session\SessionManager
      */
@@ -44,7 +44,7 @@ class SessionManager {
     }
 
     private function sessionStart() {
-        session_name(Settings::get('sessionName'));
+        session_name(Settings::getInstance()->get('sessionName'));
 
         if (!$this->isSessionStarted()) {
             session_start();

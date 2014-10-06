@@ -7,7 +7,6 @@ use ForeverPHP\Security\CSRF;
 /**
  * Chameleon es el motor estandar de rendereo de templates
  *
- * @author  Daniel Nuñez S. <dnunez@emarva.com>
  * @since   Version 0.1.0
  */
 class Chameleon implements TemplateInterface {
@@ -305,7 +304,7 @@ class Chameleon implements TemplateInterface {
     }
 
     private function loadTemplate() {
-        if (Settings::get('ForeverPHPTemplate')) {
+        if (Settings::getInstance()->get('ForeverPHPTemplate')) {
             // Se usaran templates de foreverPHP
             $this->templatesDir = FOREVERPHP_TEMPLATES_PATH;
             $this->staticDir = str_replace(DS, '/', FOREVERPHP_STATIC_PATH);
@@ -374,7 +373,7 @@ class Chameleon implements TemplateInterface {
         }
 
         // Se verifica si hay que minificar el resultado
-        if (Settings::get('minifyTemplate') && !Settings::inDebug()) {
+        if (Settings::getInstance()->get('minifyTemplate') && !Settings::getInstance()->inDebug()) {
             //$tpl_ready = str_replace("\n", ' ', $tpl_ready);
             //$tpl_ready = ereg_replace('[[:space:]]+', ' ', $tpl_ready);
             $tplReady = preg_replace(array('/<!--(.*)-->/Uis', "/[[:blank:]]+/"), array('', ' '), str_replace(array("\n", "\r", "\t"), '', $tplReady));

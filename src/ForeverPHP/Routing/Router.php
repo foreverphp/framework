@@ -16,7 +16,6 @@ use ForeverPHP\View\View;
  * Almacena todas las rutas en una matriz para luego ejecutar la ruta
  * solicitada.
  *
- * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
 class Router {
@@ -202,13 +201,13 @@ class Router {
     }
 
     private static function notView() {
-        if (Settings::inDebug()) {
+        if (Settings::getInstance()->inDebug()) {
             $ctx = new Context();
             $ctx->set('exception', 'Framework MVT');
             $ctx->set('details', 'Hurra ForlightPHP esta corriendo, ahora genera una vista.');
 
             // Le indico a la vista que haga render usando los templates del framework
-            Settings::set('ForeverPHPTemplate', true);
+            Settings::getInstance()->set('ForeverPHPTemplate', true);
 
             Response::make('foreverphp_exception', $ctx)->render();
         } else {

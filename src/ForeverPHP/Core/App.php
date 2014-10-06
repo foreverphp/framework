@@ -42,7 +42,7 @@ class App {
     }
 
     public function exists($app) {
-        $apps = Settings::get('apps');
+        $apps = Settings::getInstance()->get('apps');
 
         if (in_array($app, $apps)) {
             return true;

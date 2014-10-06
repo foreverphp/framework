@@ -3,7 +3,6 @@
 /**
  * Todas las vistas deben heredar de este archivo, para ser tratadas como tal.
  *
- * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
 class View {

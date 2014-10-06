@@ -1,6 +1,7 @@
 {
 	"name": "foreverphp/framework",
 	"description": "ForeverPHP Framework.",
+    "version": "0.3.0-beta",
 	"keywords": ["framework", "foreverphp"],
 	"license": "MIT",
     "authors": [
@@ -9,7 +10,6 @@
             "email": "dnunezse@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",
 		"phpoffice/phpexcel": "1.8.*",
@@ -19,5 +19,6 @@
         "psr-0": {
             "ForeverPHP": "src/"
         }
-    }
+    },
+    "minimum-stability": "stable",
 }

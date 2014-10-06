@@ -11,12 +11,17 @@ use ForeverPHP\View\Context;
  */
 class JsonResponse implements ResponseInterface {
     /**
-     * Objeto de tipo Context.
+     * Objeto de tipo Context o array que sera convertido a JSON.
      *
      * @var \ForeverPHP\View\Context|array
      */
     private $content;
 
+    /**
+     * Codigo de estado de la respuesta.
+     *
+     * @var integer
+     */
     private $statusCode;
 
     public function __construct($content, $statusCode = 200) {
@@ -24,7 +29,7 @@ class JsonResponse implements ResponseInterface {
         $this->statusCode = $statusCode;
     }
 
-    public function render() {
+    public function make() {
         $data = array();
 
         if (is_array($this->content)) {

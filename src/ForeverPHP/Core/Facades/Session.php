@@ -1,7 +1,7 @@
 <?php namespace ForeverPHP\Core\Facades;
 
 /**
- * @see \ForeverPHP\Core\Filesystem.
+ * @see \ForeverPHP\Session\SessionManager.
  */
 class File extends Facade {
     /**
@@ -9,5 +9,5 @@ class File extends Facade {
      *
      * @return mixed
      */
-    protected static function getComponent() { return new \ForeverPHP\Core\Filesystem; }
+    protected static function getComponent() { return \ForeverPHP\Session\SessionManager::getInstance(); }
 }

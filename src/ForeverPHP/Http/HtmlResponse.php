@@ -35,7 +35,7 @@ class HtmlResponse implements ResponseInterface {
         $this->context = $context;
     }
 
-    public function render() {
+    public function make() {
         $data = array();
 
         // Valido el token CSRF, el cual solo esta disponible en GET o POST

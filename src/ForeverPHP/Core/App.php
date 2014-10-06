@@ -109,7 +109,7 @@ class App {
         Setup::toDefine('STATIC_PATH', APPS_ROOT . DS . 'static' . DS);
 
         // Verifico que la vista hereda de View
-        if ($view instanceof ForeverPHP\View\View) {
+        if ($view instanceof \ForeverPHP\View\View) {
             throw new ViewException("La vista ($view) no hereda de View.");
         }
 
@@ -120,8 +120,8 @@ class App {
         $returnValue = $v->$function();
 
         // Valida si el valor de retorno de la funcion, contiene la funcion render
-        if (method_exists($returnValue, 'render')) {
-            $returnValue->render();
+        if ($returnValue instanceof \ForeverPHP\Http\ResponseInterface) {
+            $returnValue->make();
         }
     }
 

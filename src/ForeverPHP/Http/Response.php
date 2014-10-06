@@ -7,12 +7,16 @@ use ForeverPHP\Http\JsonResponse;
  * Se encarga de devolver la respuesta adecuada al cliente.
  * solicitada.
  *
- * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.2.0
  */
 class Response {
-     //Los response_states deberian ir en otra parte ejemplo en Router o Constants
-    private static $responseStates = array(
+    /**
+     * Contiene los textos de estados los cuales se recuperar con su
+     * respectivo codigo.
+     *
+     * @var array
+     */
+    private $responseStatus = array(
         200 => 'OK',
         201 => 'Created',
         202 => 'Accepted',
@@ -30,13 +34,13 @@ class Response {
     );
 
     /**
-     * Devuelve una respuesta en formato HTML.
+     * Devuelve una respuesta del rendereo de un template.
      *
      * @param  string $template
      * @param  array  $context
      * @return \ForeverPHP\Http\HtmlResponse
      */
-    public static function make($template, $context = null) {
+    public function render($template, $context = null) {
         return new HtmlResponse($template, $context);
     }
 
@@ -46,7 +50,7 @@ class Response {
      * @param  \ForeverPHP\View\Context|array $context
      * @return \ForeverPHP\Http\JsonResponse
      */
-    public static function json($content) {
+    public function json($content) {
         if (!is_null($content)) {
             return new JsonResponse($content);
         }
@@ -60,11 +64,11 @@ class Response {
      * @param  string $url
      * @return mixed
      */
-    public static function download($url) {
+    public function download($url) {
 
     }
 
-    public static function getResponseState($statusCode) {
-        return static::$responseStates[$statusCode];
+    public function getResponseStatus($status) {
+        return $this->responseStatus[$status];
     }
 }

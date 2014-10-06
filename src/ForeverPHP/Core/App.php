@@ -52,7 +52,7 @@ class App {
     }
 
     private function loadOptional($optional) {
-        $optionalPath = APPS_ROOT . DS . $this->appName . DS . $optional . '.php';
+        $optionalPath = APPS_ROOT . DS . $optional . '.php';
 
         if (file_exists($optionalPath)) {
             require_once $optionalPath;
@@ -62,9 +62,8 @@ class App {
     public function load($app) {
         $this->appName = $app;
 
-        // Carga de archivos opcionales
+        // Carga los archivos opcionales de las apps
         $this->loadOptional('contexts');
-        $this->loadOptional('start');
 
         // Agrego los directorias al cargador de clases
         ClassLoader::addDirectories(array(

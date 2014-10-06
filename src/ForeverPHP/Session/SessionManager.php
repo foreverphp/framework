@@ -17,8 +17,13 @@ class SessionManager {
 
     private function __construct() {}
 
+    /**
+     * Obtiene o crea la instancia unica del administrador de sesiones.
+     *
+     * @return \ForeverPHP\Session\SessionManager
+     */
     public static function getInstance() {
-        if (is_null($instance)) {
+        if (is_null(static::$instance)) {
             static::$instance = new static();
         }
 

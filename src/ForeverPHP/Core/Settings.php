@@ -3,34 +3,54 @@
 /**
  * Permite administrar la configuracion del sistema y de las aplicaciones.
  *
- * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
 class Settings {
-    private static $loaded = false;
-    private static $settings = array();
+    /**
+     * Almacena todos los elementos de configuracion.
+     *
+     * @var array
+     */
+    private $settings;
+
+    /**
+     * Contiene la instancia unica del objeto.
+     *
+     * @var \ForeverPHP\Core\Settings
+     */
+    private static $instance;
+
+    private function __construct() {}
+
+    /**
+     * Obtiene o crea la instancia unica de Settings.
+     *
+     * @return \ForeverPHP\Core\Settings
+     */
+    public static function getInstance() {
+        if (is_null(static::$instance)) {
+            static::$instance = new static();
+            static::$instance->load();
+        }
+
+        return static::$instance;
+    }
 
     /*
      * Carga una vez el archivo de configuracion
      */
-    private static function load() {
-        if (!static::$loaded) {
-            $path = APPS_ROOT . DS . 'settings.php';
+    private function load() {
+        $path = APPS_ROOT . DS . 'settings.php';
 
-            if (!file_exists($path)) {
-                exit("El archivo de configuración settings.php no existe.");
-            }
-
-            static::$settings = require $path;
-
-            if (!is_array(static::$settings)) {
-                exit('El archivo de configuración no tiene el formato correcto.');
-            }
-
-            static::$loaded = true;
+        if (!file_exists($path)) {
+            exit("El archivo de configuración settings.php no existe.");
         }
 
-        return true;
+        static::$settings = require $path;
+
+        if (!is_array(static::$settings)) {
+            exit('El archivo de configuración no tiene el formato correcto.');
+        }
     }
 
     /**
@@ -39,10 +59,8 @@ class Settings {
      * @param  string $name Nombre del item.
      * @return boolean
      */
-    public static function exists($name) {
-        self::load();
-
-        if (array_key_exists($name, self::$settings)) {
+    public function exists($name) {
+        if (array_key_exists($name, $this->settings)) {
             return true;
         }
 
@@ -56,14 +74,12 @@ class Settings {
      * @param mixed  $value Valor a asignar al item
      * @return boolean
      */
-    public static function set($name, $value = null) {
-        self::load();
-
+    public function set($name, $value = null) {
         if ($value == null) {
             return false;
         }
 
-        self::$settings[$name] = $value;
+        $this->settings[$name] = $value;
     }
 
     /**
@@ -72,11 +88,9 @@ class Settings {
      * @param  string $item Nombre del item a obtener.
      * @return mixed        Retorna el valor del item.
      */
-    public static function get($name) {
-        self::load();
-
-        if (self::exists($name)) {
-            return self::$settings[$name];
+    public function get($name) {
+        if ($this->exists($name)) {
+            return $this->settings[$name];
         }
 
         return false;
@@ -87,9 +101,7 @@ class Settings {
      *
      * @return boolean
      */
-    public static function inDebug() {
-        self::load();
-
-        return self::get('debug');
+    public function inDebug() {
+        return $this->get('debug');
     }
 }

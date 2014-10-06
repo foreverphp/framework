@@ -46,9 +46,9 @@ class Settings {
             exit("El archivo de configuración settings.php no existe.");
         }
 
-        static::$settings = require $path;
+        $this->settings = require $path;
 
-        if (!is_array(static::$settings)) {
+        if (!is_array($this->settings)) {
             exit('El archivo de configuración no tiene el formato correcto.');
         }
     }

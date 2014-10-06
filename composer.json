@@ -1,7 +1,6 @@
 {
 	"name": "foreverphp/framework",
 	"description": "ForeverPHP Framework.",
-    "version": "0.3.0-beta",
 	"keywords": ["framework", "foreverphp"],
 	"license": "MIT",
     "authors": [
@@ -20,5 +19,5 @@
             "ForeverPHP": "src/"
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "dev"
 }

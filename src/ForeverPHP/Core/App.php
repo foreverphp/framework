@@ -119,7 +119,10 @@ class App {
         // Ejecuta la funcion y almacena su valor de retorno
         $returnValue = $v->$function();
 
-        // Valida si el valor de retorno de la funcion, contiene la funcion render
+        /*
+         * Valida si el valor de retorno de la funcion, es un objeto que
+         * implemente ResponseInterface
+         */
         if ($returnValue instanceof \ForeverPHP\Http\ResponseInterface) {
             $returnValue->make();
         }

@@ -219,7 +219,15 @@ class Router {
     private static function runFunction($function) {
         if (!is_string($function)) {
             // Ejecuta la funcion anonima
-            call_user_func($function);
+            $returnValue = call_user_func($function);
+
+            /*
+             * Valida si el valor de retorno de la funcion, es un objeto que
+             * implemente ResponseInterface
+             */
+            if ($returnValue instanceof \ForeverPHP\Http\ResponseInterface) {
+                $returnValue->make();
+            }
         } else {
             self::notView();
         }

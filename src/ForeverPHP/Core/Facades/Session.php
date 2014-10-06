@@ -3,7 +3,7 @@
 /**
  * @see \ForeverPHP\Session\SessionManager.
  */
-class File extends Facade {
+class Session extends Facade {
     /**
      * Obtiene el nombre registrado del componente o una instancia de el.
      *

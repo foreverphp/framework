@@ -16,7 +16,7 @@ class Response {
      *
      * @var array
      */
-    private $responseStatus = array(
+    private static $responseStatus = array(
         200 => 'OK',
         201 => 'Created',
         202 => 'Accepted',
@@ -68,7 +68,7 @@ class Response {
 
     }
 
-    public function getResponseStatus($status) {
-        return $this->responseStatus[$status];
+    public static function getResponseStatus($status) {
+        return static::$responseStatus[$status];
     }
 }

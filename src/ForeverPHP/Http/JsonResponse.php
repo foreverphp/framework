@@ -41,7 +41,7 @@ class JsonResponse implements ResponseInterface {
             }
         }
 
-        header('HTTP/1.0 ' . $this->statusCode . ' ' . Response::getResponseState($this->statusCode), true, $this->statusCode);
+        header('HTTP/1.0 ' . $this->statusCode . ' ' . Response::getResponseStatus($this->statusCode), true, $this->statusCode);
         header('Content-type: application/json; charset: utf-8');
         header('Accept-Charset: utf-8');
 

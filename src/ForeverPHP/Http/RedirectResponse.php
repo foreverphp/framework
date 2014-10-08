@@ -47,13 +47,13 @@ class RedirectResponse implements ResponseInterface {
 
     public function with($key, $value = null) {
         if (is_array($key)) {
-            foreach ($key as $name => $value) {
-                $this->with($name, $value);
+            foreach ($key as $k => $value) {
+                $this->with($k, $value);
             }
         } elseif ($key instanceof \ForeverPHP\View\Context) {
             $this->with($key->all());
         } else {
-            $this->session->set($name, $value, 'redirect');
+            $this->session->set($key, $value, 'redirect');
         }
 
         return $this;

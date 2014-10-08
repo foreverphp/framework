@@ -1,6 +1,7 @@
 <?php namespace ForeverPHP\Http;
 
-use \ForeverPHP\Session\SessionManager;
+use ForeverPHP\Core\Settings;
+use ForeverPHP\Session\SessionManager;
 
 /**
  * Devuelve una respuesta de tipo de redireccion.

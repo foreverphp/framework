@@ -1,6 +1,5 @@
 <?php namespace ForeverPHP\Http;
 
-use ForeverPHP\Core\Settings;
 use ForeverPHP\Session\SessionManager;
 
 /**
@@ -71,8 +70,8 @@ class RedirectResponse implements ResponseInterface {
          * para luego utilizarlos al construir la redireccion
          */
         if (count($this->headers) > 0) {
-            if (!Settings::getInstance()->exists('headersInRedirect') || !Settings::getInstance()->get('headersInRedirect')) {
-                Settings::getInstance()->set('headersInRedirect', $headers);
+            if (!$this->session->exists('headersInRedirect') || !$this->session->get('headersInRedirect')) {
+                $this->session->set('headersInRedirect', $headers);
             }
         }
 

@@ -9,6 +9,7 @@ use ForeverPHP\Core\Settings;
 use ForeverPHP\Core\Setup;
 use ForeverPHP\Http\Request;
 use ForeverPHP\Http\Response;
+use ForeverPHP\Session\SessionManager;
 use ForeverPHP\View\Context;
 use ForeverPHP\View\View;
 
@@ -234,14 +235,14 @@ class Router {
     }
 
     private static function addHeadersToResponse() {
-        $headers = Settings::getInstance()->get('headersInRedirect');
+        $headers = SessionManager::getInstance()->get('headersInRedirect');
 
         if ($headers != false) {
             foreach ($headers as $key => $value) {
                 header($key . ': ' . $value);
             }
 
-            Settings::getInstance()->set('headersInRedirect', false);
+            SessionManager::getInstance()->set('headersInRedirect', false);
         }
     }
 
@@ -305,7 +306,7 @@ class Router {
             self::notView();
         }
 
-        if (Settings::getInstance()->exists('headersInRedirect')) {
+        if (SessionManager::getInstance()->exists('headersInRedirect')) {
             static::addHeadersToResponse();
         }
     }

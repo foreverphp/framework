@@ -235,14 +235,16 @@ class Router {
     }
 
     private static function addHeadersToResponse() {
-        $headers = SessionManager::getInstance()->get('headersInRedirect');
+        if (SessionManager::getInstance()->exists('headersInRedirect')) {
+            $headers = SessionManager::getInstance()->get('headersInRedirect');
 
-        if ($headers != false) {
-            foreach ($headers as $key => $value) {
-                header($key . ': ' . $value);
+            if ($headers != false) {
+                foreach ($headers as $key => $value) {
+                    header($key . ': ' . $value);
+                }
+
+                SessionManager::getInstance()->set('headersInRedirect', false);
             }
-
-            SessionManager::getInstance()->set('headersInRedirect', false);
         }
     }
 
@@ -306,8 +308,7 @@ class Router {
             self::notView();
         }
 
-        if (SessionManager::getInstance()->exists('headersInRedirect')) {
-            static::addHeadersToResponse();
-        }
+        // Agrega los encabezados a la respuesta de existir
+        static::addHeadersToResponse();
     }
 }

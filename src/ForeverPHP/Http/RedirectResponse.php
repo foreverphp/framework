@@ -71,7 +71,7 @@ class RedirectResponse implements ResponseInterface {
          */
         if (count($this->headers) > 0) {
             if (!$this->session->exists('headersInRedirect') || !$this->session->get('headersInRedirect')) {
-                $this->session->set('headersInRedirect', $headers);
+                $this->session->set('headersInRedirect', $this->headers);
             }
         }
 

@@ -292,5 +292,7 @@ class Router {
         } else {
             self::notView();
         }
+
+        //static::addHeaders
     }
 }

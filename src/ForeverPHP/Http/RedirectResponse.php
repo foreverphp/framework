@@ -65,10 +65,13 @@ class RedirectResponse implements ResponseInterface {
      * @return void
      */
     public function make() {
-        // Se agregan los encabezados si es que hay
-        if (count($this->headers)) {
-            foreach ($this->headers as $header) {
-                header($header);
+        /*
+         * Se guardan los headers si es que hay en la configuracion
+         * para luego utilizarlos al construir la redireccion
+         */
+        if (count($this->headers) > 0) {
+            if (!Settings::getInstance()->exists('headersInRedirect') || !Settings::getInstance()->get('headersInRedirect')) {
+                Settings::getInstance()->set('headersInRedirect', $headers);
             }
         }
 

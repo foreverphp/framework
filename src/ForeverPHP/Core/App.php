@@ -125,13 +125,6 @@ class App {
         if ($returnValue instanceof \ForeverPHP\Http\ResponseInterface) {
             $returnValue->make();
         }
-
-        /*
-         * Limpia las cabeceras despues de haber efectuado una redireccion.
-         */
-        if (!$returnValue instanceof \ForeverPHP\Http\RedirectResponse) {
-            SessionManager::getInstance()->set('headersInRedirect', false);
-        }
     }
 
     public function getAppName() {

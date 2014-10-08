@@ -70,8 +70,9 @@ class RedirectResponse implements ResponseInterface {
          * para luego utilizarlos al construir la redireccion
          */
         if (count($this->headers) > 0) {
-            if (!$this->session->exists('headersInRedirect') || !$this->session->get('headersInRedirect')) {
-                $this->session->set('headersInRedirect', $this->headers);
+            if (!$this->session->exists('headersInRedirect', 'redirect') || !$this->session->get('headersInRedirect', 'redirect')) {
+                $this->session->set('redirectPath', $this->path, 'redirect');
+                $this->session->set('headersInRedirect', $this->headers, 'redirect');
             }
         }
 

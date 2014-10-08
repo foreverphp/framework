@@ -229,26 +229,26 @@ class Router {
             if ($returnValue instanceof \ForeverPHP\Http\ResponseInterface) {
                 $returnValue->make();
             }
-
-            /*
-             * Limpia las cabeceras despues de haber efectuado una redireccion.
-             */
-            if (!$returnValue instanceof \ForeverPHP\Http\RedirectResponse) {
-                SessionManager::getInstance()->set('headersInRedirect', false);
-            }
         } else {
             self::notView();
         }
     }
 
     private static function addHeadersToResponse() {
-        if (SessionManager::getInstance()->exists('headersInRedirect')) {
-            $headers = SessionManager::getInstance()->get('headersInRedirect');
+        if (SessionManager::getInstance()->exists('headersInRedirect', 'redirect')) {
+            $redirectPath = SessionManager::getInstance()->exists('redirectPath', 'redirect');
+            $requestURI = $_SERVER['REQUEST_URI'];
 
-            if ($headers != false) {
-                foreach ($headers as $key => $value) {
-                    header($key . ': ' . $value);
+            if ($redirectPath != $requestURI) {
+                $headers = SessionManager::getInstance()->get('headersInRedirect', 'redirect');
+
+                if ($headers != false) {
+                    foreach ($headers as $key => $value) {
+                        header($key . ': ' . $value);
+                    }
                 }
+            } else {
+                SessionManager::getInstance()->set('headersInRedirect', false, 'redirect');
             }
         }
     }

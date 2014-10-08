@@ -236,10 +236,10 @@ class Router {
 
     private static function addHeadersToResponse() {
         if (SessionManager::getInstance()->exists('headersInRedirect', 'redirect')) {
-            $redirectPath = SessionManager::getInstance()->exists('redirectPath', 'redirect');
+            $redirectPath = SessionManager::getInstance()->get('redirectPath', 'redirect');
             $requestURI = $_SERVER['REQUEST_URI'];
 
-            if ($redirectPath != $requestURI) {
+            if ($redirectPath == $requestURI) {
                 $headers = SessionManager::getInstance()->get('headersInRedirect', 'redirect');
 
                 if ($headers != false) {

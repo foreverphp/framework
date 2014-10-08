@@ -20,6 +20,7 @@ use ForeverPHP\View\View;
  * @since       Version 0.1.0
  */
 class Router {
+    private static $uriBase = '/';
     private static $routes = array();
     private static $complexRoutes = array();
 
@@ -46,6 +47,10 @@ class Router {
         }
 
         return $url;
+    }
+
+    private static function getUriBase() {
+        static::$uriBase = str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
     }
 
     private static function parseRoute($route, &$paramsUrl) {
@@ -131,20 +136,25 @@ class Router {
      * @return string        Retorna la ruta con el formato correcto
      */
     private static function getRoute() {
-        $url = $_SERVER['REQUEST_URI'];
+        $uri = $_SERVER['REQUEST_URI'];
 
-        // Busco el caracter ? por si se pasaron parametros por GET
-        $pos = strpos($url, '?');
-
-        if ($pos !== false) {
-            $url = substr($url, 0, $pos);
+        // Extraigo la URI base si esta es diferente a /
+        if (static::$uriBase != '/') {
+            $uri = str_replace(static::$uriBase, '/', $uri);
         }
 
-        // Agrega un slash a url para evitar error en la busqueda de ultimo slash
-        $url = self::addSlash($url);
+        // Busco el caracter ? por si se pasaron parametros por GET
+        $pos = strpos($uri, '?');
+
+        if ($pos !== false) {
+            $uri = substr($uri, 0, $pos);
+        }
+
+        // Agrega un slash a uri para evitar error en la busqueda de ultimo slash
+        $uri = self::addSlash($uri);
 
         // Retorno la ruta correcta
-        return $url;
+        return $uri;
     }
 
     private static function loadParamsRoute($route, &$routeContent) {
@@ -210,7 +220,8 @@ class Router {
             // Le indico a la vista que haga render usando los templates del framework
             Settings::getInstance()->set('ForeverPHPTemplate', true);
 
-            Response::make('foreverphp_exception', $ctx)->render();
+            $response = new Response();
+            $response->render('foreverphp_exception', $ctx)->make();
         } else {
             // Si esta en produccion muestra un error 404
             self::redirectToError(404);
@@ -257,6 +268,9 @@ class Router {
      * Ejecuta la ruta solicitada
      */
     public static function run() {
+        // Obtiene la Url base
+        static::getUriBase();
+
         // Obtiene la ruta actual
         $route = self::getRoute();
 
@@ -267,6 +281,7 @@ class Router {
         set_exception_handler("ExceptionManager::exceptionHandler");
 
         // Defino la ruta de los templates y estaticos del framework
+        Setup::toDefine('FOREVERPHP_ROOT', dirname(dirname(__FILE__)));
         Setup::toDefine('FOREVERPHP_TEMPLATES_PATH', FOREVERPHP_ROOT . DS . 'static' . DS . 'templates' . DS);
         Setup::toDefine('FOREVERPHP_STATIC_PATH', basename(FOREVERPHP_ROOT) . DS . 'static' . DS);
 

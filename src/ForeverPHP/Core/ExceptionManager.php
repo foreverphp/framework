@@ -45,9 +45,11 @@ class ExceptionManager {
             // Le indico a la vista que haga render usando los templates del framework
             Settings::getInstance()->set('ForeverPHPTemplate', true);
 
-            Response::make('foreverphp_exception', $ctx)->render();
+            $response = new Response();
+            $response->render('foreverphp_exception', $ctx)->make();
         } else {
-            Redirect::redirectToError(500);
+            $redirect = new Redirect();
+            $redirect->error(500)->make();
         }
     }
 

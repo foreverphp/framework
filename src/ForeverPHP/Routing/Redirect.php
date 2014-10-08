@@ -45,7 +45,7 @@ class Redirect {
     }
 
     public function makeRedirect($path, $status, $headers) {
-        $redirect = new RedirectResponse($path, $status, $header);
+        $redirect = new RedirectResponse($path, $status, $headers);
 
         return $redirect;
     }

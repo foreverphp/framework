@@ -76,5 +76,6 @@ class RedirectResponse implements ResponseInterface {
         }
 
         header("Location: $this->path");
+        exit();
     }
 }

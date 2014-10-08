@@ -229,6 +229,13 @@ class Router {
             if ($returnValue instanceof \ForeverPHP\Http\ResponseInterface) {
                 $returnValue->make();
             }
+
+            /*
+             * Limpia las cabeceras despues de haber efectuado una redireccion.
+             */
+            if (!$returnValue instanceof \ForeverPHP\Http\RedirectResponse) {
+                SessionManager::getInstance()->set('headersInRedirect', false);
+            }
         } else {
             self::notView();
         }
@@ -242,8 +249,6 @@ class Router {
                 foreach ($headers as $key => $value) {
                     header($key . ': ' . $value);
                 }
-
-                SessionManager::getInstance()->set('headersInRedirect', false);
             }
         }
     }
@@ -289,6 +294,9 @@ class Router {
             }
         }
 
+        // Agrega las cabeceras a la respuesta de existir
+        static::addHeadersToResponse();
+
         if (is_array($routeContent)) {
             if ($appName == null) {
                 $appName = $routeContent['app'];
@@ -307,8 +315,5 @@ class Router {
         } else {
             self::notView();
         }
-
-        // Agrega los encabezados a la respuesta de existir
-        static::addHeadersToResponse();
     }
 }

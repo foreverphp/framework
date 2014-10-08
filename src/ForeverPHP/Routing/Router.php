@@ -233,6 +233,18 @@ class Router {
         }
     }
 
+    private static function addHeadersToResponse() {
+        $headers = Settings::getInstance()->get('headersInRedirect');
+
+        if ($headers != false) {
+            foreach ($headers as $key => $value) {
+                header($key . ': ' . $value);
+            }
+
+            Settings::getInstance()->set('headersInRedirect', false);
+        }
+    }
+
     /**
      * Ejecuta la ruta solicitada
      */
@@ -293,6 +305,8 @@ class Router {
             self::notView();
         }
 
-        //static::addHeaders
+        if (Settings::getInstance()->exists('headersInRedirect')) {
+            static::addHeadersToResponse();
+        }
     }
 }

@@ -57,7 +57,7 @@ class HtmlResponse implements ResponseInterface {
         }
 
         // Valida si hay contextos globales y de ser asi se conbinan con el contexto
-        $globalContexts = App::getGlobalContexts();
+        $globalContexts = App::getInstance()->getGlobalContexts();
 
         if (count($globalContexts) > 0) {
             $data = array_merge($globalContexts, $data);

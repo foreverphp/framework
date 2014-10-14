@@ -23,6 +23,7 @@ class Router {
     private static $uriBase = '/';
     private static $routes = array();
     private static $complexRoutes = array();
+    private static $nameForRoute = null;
 
     private static function addSlash($route) {
         $url = $route;
@@ -86,7 +87,7 @@ class Router {
         return $newRoute;
     }
 
-    public static function add($route, $view) {
+    public static function add($route, $view, $decorators = null) {
         $app = null;        // Aplicacion donde esta la vista
         $v = null;          // Vista a buscar
         $function = 'run';  // Funcion por defecto a ejecutar
@@ -106,6 +107,33 @@ class Router {
             if (count($view) == 3) {
                 $function = $view[2];
             }
+        } elseif (is_array($view)) {
+            /*
+             * Definicion de una vista con matriz.
+             *
+             * $view = array(
+             *     'name' => 'nombre_vista',
+             *     'app.vista' o 'view' => 'app.view.function' o function() {}
+             * );
+             */
+
+            // Si el numero de items de la matriz es menor a dos no es valido
+            if (count($view) < 2) {
+                throw new RouterException('Definición de vista invalida.');
+            }
+
+            if (!array_key_exists('name', $view)) {
+                throw new RouterException("No existe el atributo 'name' de la vista en la matriz.");
+            }
+
+            /*
+             * Almacena temporalmente el nombre de la ruta para que al volver a
+             * llamar a add se agregue el nombre a la ruta.
+             */
+            static::$nameForRoute = $view['name'];
+
+            // Vuelve a llamar a add para agregar la ruta
+            return static::add($route, $view[0], $decorators);
         } else {
             $function = $view;
         }
@@ -119,7 +147,9 @@ class Router {
             'app' => $app,
             'view' => $v,
             'function' => $function,
-            'paramsUrl' => $paramsUrl
+            'paramsUrl' => $paramsUrl,
+            'name' => static::$nameForRoute,
+            'decorators' => $decorators
         );
 
         // Valida si es ruta normal o compleja
@@ -157,7 +187,16 @@ class Router {
         return $uri;
     }
 
-    private static function loadParamsRoute($route, &$routeContent) {
+    /**
+     * Obtiene el nombre de la ruta actual si es que se le definio uno.
+     *
+     * @return string
+     */
+    public static function getRouteName() {
+        return static::$nameForRoute;
+    }
+
+    private static function loadParamsRoute(&$route, &$routeContent) {
         $noMatch = true; // Indica si hay o no coincidencias de ruta
 
         if (count(self::$complexRoutes) > 0) {
@@ -194,6 +233,12 @@ class Router {
                     } else {
                         $routeContent = $_routeContent['function'];
                     }
+
+                    /*
+                     * Devuelvo la ruta compleja para obtener su nombre y
+                     * decoradores.
+                     */
+                    $route = $_routeContent;
 
                     $noMatch = false;
                     break;
@@ -245,7 +290,7 @@ class Router {
         }
     }
 
-    private static function addHeadersToResponse() {
+    private static function setHeadersToResponse() {
         if (SessionManager::getInstance()->exists('headersInRedirect', 'redirect')) {
             $redirectPath = SessionManager::getInstance()->get('redirectPath', 'redirect');
             $requestURI = $_SERVER['REQUEST_URI'];
@@ -310,7 +355,22 @@ class Router {
         }
 
         // Agrega las cabeceras a la respuesta de existir
-        static::addHeadersToResponse();
+        static::setHeadersToResponse();
+
+        /*
+         * Almacena el nombre de la ruta actual si es que lo tiene, dependiendo
+         * si es una ruta normal o compleja y si es funcion o vista.
+         */
+        if (is_array($route)) {
+            static::$nameForRoute = $route['name'];
+        } elseif (is_array($routeContent)) {
+            static::$nameForRoute = $routeContent['name'];
+        }
+
+        /*
+         * NOTA: Los decoradores solo pueden ser utilizados en rutas con vistas
+         *       no en rutas con funciones anonimas.
+         */
 
         if (is_array($routeContent)) {
             if ($appName == null) {
@@ -321,11 +381,21 @@ class Router {
             $app = App::getInstance();
             if ($app->exists($appName)) {
                 $app->load($appName);
+
+                // Ejecuta los decoradores de la ruta si es que hay
+                $decorators = $routeContent['decorators'];
+
+                if (!is_null($decorators)) {
+                    foreach ($decorators as $decorator) {
+                        $app->getDecorator($decorator);
+                    }
+                }
+
                 $app->run($routeContent);
             } else {
                 throw new AppException("La aplicación ($appName) a la que pertenece la vista no esta cargada en settings.php.");
             }
-        } elseif (is_object($routeContent)) {
+        } elseif (is_callable($routeContent)) {
             self::runFunction($routeContent);
         } else {
             self::notView();

@@ -25,14 +25,41 @@ use ForeverPHP\Core\Setup;
 class AppException extends \Exception {}
 
 class App {
+    /**
+     * Nombre de la aplicación actual.
+     *
+     * @var string
+     */
     private $appName;
 
-    private static $globalContexts = array();
+    /**
+     * Almacena los decoradores agregados.
+     *
+     * @var array
+     */
+    private $decorators = array();
 
+    /**
+     * Almacena los contextos globales agregados.
+     *
+     * @var array
+     */
+    private $globalContexts = array();
+
+    /**
+     * Contiene la instancia singleton de App.
+     *
+     * @var \ForeverPHP\Core\App
+     */
     private static $instance;
 
     public function __construct() {}
 
+    /**
+     * Obtiene o crea la instancia singleton de App.
+     *
+     * @return \ForeverPHP\Core\App
+     */
     public static function getInstance() {
         if (is_null(static::$instance)) {
             static::$instance = new static();
@@ -64,6 +91,7 @@ class App {
 
         // Carga los archivos opcionales de las apps
         $this->loadOptional('contexts');
+        $this->loadOptional('decorators');
 
         // Agrego los directorias al cargador de clases
         ClassLoader::addDirectories(array(
@@ -73,25 +101,74 @@ class App {
     }
 
     /**
-     * Agrega uno o mas contextos globales los cuales seran usados
-     * luego por el Response.
+     * Valida si existe un decorador.
      *
-     * @param mixed $contexts
+     * @param  string $name
+     * @return boolean
      */
-    public static function addGlobalContexts($contexts) {
-        if (is_array($contexts)) {
-            foreach ($contexts as $context) {
-                $ctx = new $context;
-                self::$globalContexts = array_merge(self::$globalContexts, $ctx->all());
+    public function existsDecorator($name) {
+        if (array_key_exists($name, $this->decorators)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Agrega un decorador.
+     *
+     * @param string $name
+     * @param clousure
+     * @return boolean
+     */
+    public function setDecorator($name, $function) {
+        if (!is_callable($function)) {
+            return false;
+        }
+
+        $this->decorators[$name] = $function;
+    }
+
+    /**
+     * Ejecuta un decorador.
+     *
+     * @param  string $name
+     * @param  array  $arguments
+     * @return mixed
+     */
+    public function getDecorator($name, $arguments = null) {
+        if ($this->existsDecorator($name)) {
+            return $this->decorators[$name]();
+        }
+
+        return false;
+    }
+
+    /**
+     * Agrega uno o mas contextos globales los cuales seran usados
+     * luego por al aplicacion en ejecucion.
+     *
+     * @param mixed $context
+     */
+    public function setGlobalContext($context) {
+        if (is_array($context)) {
+            foreach ($context as $c) {
+                $ctx = new $c;
+                $this->globalContexts = array_merge($this->globalContexts, $ctx->all());
             }
         } else {
-            $ctx = new $contexts;
-            self::$globalContexts = array_merge(self::$globalContexts, $ctx->all());
+            $ctx = new $context;
+            $this->globalContexts = array_merge($this->globalContexts, $ctx->all());
         }
     }
 
-    public static function getGlobalContexts() {
-        return self::$globalContexts;
+    /**
+     * Obtiene todos los nombres de los contextos globales.
+     *
+     * @return array
+     */
+    public function getGlobalContexts() {
+        return $this->globalContexts;
     }
 
     /**

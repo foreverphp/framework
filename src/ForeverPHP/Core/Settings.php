@@ -104,4 +104,38 @@ class Settings {
     public function inDebug() {
         return $this->get('debug');
     }
+
+    /**
+     * Controla las llamadas a métodos no estáticos cuando no se esta
+     * utilizando el decorador de Settings.
+     *
+     * @param  string $name
+     * @param  array  $arguments
+     * @return mixed
+     */
+    public static function __callStatic($name, $arguments) {
+        $numArgs = count($arguments);
+
+        if ($name === 'exists') {
+            if ($numArgs == 1) {
+                return static::getInstance()->exists($arguments[0]);
+            }
+        } elseif ($name === 'set') {
+            if (count($arguments) == 2) {
+                return static::getInstance()->set($arguments[0], $arguments[1]);
+            }
+        } elseif ($name === 'get') {
+            if (count($arguments) == 1) {
+                return static::getInstance()->get($arguments[0]);
+            }
+        } else {
+            throw new \RuntimeException("El método ($name) no existe.");
+        }
+
+        /*
+         * Si los argumentos entregados no son los correctos se lanza una
+         * excepción
+         */
+        throw new \RuntimeException("El número de argumentos para ($name), no es valido.");
+    }
 }

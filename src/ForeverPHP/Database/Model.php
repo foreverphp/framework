@@ -4,6 +4,9 @@
  *
  * Model:
  *
+ * ORM: para bases de datos relacionales.
+ * ODM: para bases de datos no relacionales basadas en documentos.
+ *
  * Model es el motor ORM estandar del framework, por el momento solo trabaja con
  * bases de datos relacionales.
  *

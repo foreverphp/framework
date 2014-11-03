@@ -1,5 +1,6 @@
-# Sublime Text
+vendor/
+.DS_Store
 *.sublime-*
-# Binarios y comprimidos
-*.rar
-*.zip
+composer.lock
+composer.phar
+Thumbs.db

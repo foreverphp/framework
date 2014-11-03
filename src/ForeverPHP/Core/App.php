@@ -171,6 +171,16 @@ class App {
         return $this->globalContexts;
     }
 
+    private function makeResponse($response) {
+        /*
+         * Valida si el valor de retorno de la funcion, es un objeto que
+         * implemente ResponseInterface
+         */
+        if ($response instanceof \ForeverPHP\Http\ResponseInterface) {
+            $response->make();
+        }
+    }
+
     /**
      * Ejecuta la vista solicitada.
      *
@@ -178,6 +188,10 @@ class App {
      * @return void
      */
     public function run($route) {
+        if (!is_array($route)) {
+            $this->makeResponse($route);
+        }
+
         $view = $route['view'];
         $function = $route['function'];
 
@@ -195,13 +209,8 @@ class App {
         // Ejecuta la funcion y almacena su valor de retorno
         $returnValue = $v->$function();
 
-        /*
-         * Valida si el valor de retorno de la funcion, es un objeto que
-         * implemente ResponseInterface
-         */
-        if ($returnValue instanceof \ForeverPHP\Http\ResponseInterface) {
-            $returnValue->make();
-        }
+        // Se construye la respuesta
+        $this->makeResponse($returnValue);
     }
 
     public function getAppName() {

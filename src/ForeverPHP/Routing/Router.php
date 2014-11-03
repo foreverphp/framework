@@ -387,7 +387,12 @@ class Router {
 
                 if (!is_null($decorators)) {
                     foreach ($decorators as $decorator) {
-                        $app->getDecorator($decorator);
+                        $returnValue = $app->getDecorator($decorator);
+
+                        // Valida si el decorador retorna un Response
+                        if ($returnValue instanceof \ForeverPHP\Http\ResponseInterface) {
+                            $app->run($returnValue);
+                        }
                     }
                 }
 

@@ -1,7 +1,7 @@
 <?php namespace ForeverPHP\Core\Facades;
 
 /**
- * @see \ForeverPHP\Session\App.
+ * @see \ForeverPHP\Core\App.
  */
 class App extends Facade {
     /**
@@ -9,5 +9,5 @@ class App extends Facade {
      *
      * @return mixed
      */
-    protected static function getComponent() { return \ForeverPHP\Session\App::getInstance(); }
+    protected static function getComponent() { return \ForeverPHP\Core\App::getInstance(); }
 }

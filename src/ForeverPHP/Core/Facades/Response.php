@@ -1,7 +1,7 @@
 <?php namespace ForeverPHP\Core\Facades;
 
 /**
- * @see \ForeverPHP\Http\Response.
+ * @see \ForeverPHP\Http\Response
  */
 class Response extends Facade {
     /**

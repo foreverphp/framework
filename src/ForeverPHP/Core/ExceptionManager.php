@@ -1,7 +1,7 @@
 <?php namespace ForeverPHP\Core;
 
+use ForeverPHP\Core\Facades\Redirect;
 use ForeverPHP\Http\Response;
-use ForeverPHP\Routing\Redirect;
 use ForeverPHP\View\Context;
 
 /**
@@ -46,10 +46,9 @@ class ExceptionManager {
             Settings::getInstance()->set('ForeverPHPTemplate', true);
 
             $response = new Response();
-            $response->render('foreverphp_exception', $ctx)->make();
+            $response->render('exception', $ctx)->make();
         } else {
-            $redirect = new Redirect();
-            $redirect->error(500)->make();
+            Redirect::error(500);
         }
     }
 

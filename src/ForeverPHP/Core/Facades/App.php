@@ -1,7 +1,7 @@
 <?php namespace ForeverPHP\Core\Facades;
 
 /**
- * @see \ForeverPHP\Core\App.
+ * @see \ForeverPHP\Core\App
  */
 class App extends Facade {
     /**

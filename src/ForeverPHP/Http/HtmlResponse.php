@@ -39,15 +39,15 @@ class HtmlResponse implements ResponseInterface {
         $data = array();
 
         // Valido el token CSRF, el cual solo esta disponible en GET o POST
-        if (Settings::getInstance()->inDebug()) {
-            if (Settings::getInstance()->exists('csrfToken')) {
-                if (!CSRF::validateToken()) {
-                    throw new SecurityException('Acceso denegado, token inválido. Es imposible procesar tu solicitud vuelve al inicio o cierra esta página.');
-                }
+        //if (Settings::getInstance()->inDebug()) {
+        if (Settings::getInstance()->exists('csrfToken')) {
+            if (!CSRF::validateToken()) {
+                throw new SecurityException('Acceso denegado, token inválido. Es imposible procesar tu solicitud vuelve al inicio o cierra esta página.');
             }
-        } else {
-            Redirect::toError(500);
         }
+        /*} else {
+            Redirect::toError(500);
+        }*/
 
         // Obtiene los datos del contexto
         if ($this->context != null) {

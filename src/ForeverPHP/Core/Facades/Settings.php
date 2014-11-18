@@ -1,7 +1,7 @@
 <?php namespace ForeverPHP\Core\Facades;
 
 /**
- * @see \ForeverPHP\Core\Settings.
+ * @see \ForeverPHP\Core\Settings
  */
 class Settings extends Facade {
     /**

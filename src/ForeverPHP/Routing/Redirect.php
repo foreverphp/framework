@@ -1,7 +1,9 @@
 <?php namespace ForeverPHP\Routing;
 
+use ForeverPHP\Core\Facades\Settings;
 use ForeverPHP\Http\RedirectResponse;
 use ForeverPHP\Http\Response;
+use ForeverPHP\View\Context;
 
 /**
  * Permite la redireccion con multiples opciones.
@@ -42,6 +44,15 @@ class Redirect {
         $response = new Response();
 
         header("HTTP/1.0 $errno " . $response->getResponseStatus($errno), true, $errno);
+
+        /*
+         * Retorna un Response para mostrar el mensaje de que algo salio mal
+         * este solo se muestra cuando esta en produccion.         *
+         */
+        if (!Settings::inDebug()) {
+            Settings::set('ForeverPHPTemplate', true);
+            $response->render('error', new Context(array('message' => 'Oops, al parecer algo salió mal.')))->make();
+        }
     }
 
     public function makeRedirect($path, $status, $headers) {

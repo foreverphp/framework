@@ -1,7 +1,7 @@
 <?php namespace ForeverPHP\Core\Facades;
 
 /**
- * @see \ForeverPHP\Routing\Redirect.
+ * @see \ForeverPHP\Routing\Redirect
  */
 class Redirect extends Facade {
     /**

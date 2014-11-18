@@ -1,7 +1,7 @@
 <?php namespace ForeverPHP\Core\Facades;
 
 /**
- * @see \ForeverPHP\Core\Filesystem.
+ * @see \ForeverPHP\Core\Filesystem
  */
 class File extends Facade {
     /**

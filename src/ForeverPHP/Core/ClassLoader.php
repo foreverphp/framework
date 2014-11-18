@@ -54,7 +54,7 @@ class ClassLoader {
      *
      * @return void
      */
-    public function register() {
+    public static function register() {
         if (!static::$registered) {
             static::$registered = spl_autoload_register(array('ForeverPHP\Core\ClassLoader', 'load'));
         }

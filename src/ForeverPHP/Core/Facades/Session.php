@@ -1,7 +1,7 @@
 <?php namespace ForeverPHP\Core\Facades;
 
 /**
- * @see \ForeverPHP\Session\SessionManager.
+ * @see \ForeverPHP\Session\SessionManager
  */
 class Session extends Facade {
     /**

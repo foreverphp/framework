@@ -5,6 +5,7 @@ use ForeverPHP\Core\Exceptions\AppException;
 use ForeverPHP\Core\Exceptions\CoreException;
 use ForeverPHP\Core\Exceptions\RouterException;
 use ForeverPHP\Core\Exceptions\ViewException;
+use ForeverPHP\Core\Facades\Redirect;
 use ForeverPHP\Core\Settings;
 use ForeverPHP\Core\Setup;
 use ForeverPHP\Http\Request;
@@ -260,16 +261,17 @@ class Router {
         if (Settings::getInstance()->inDebug()) {
             $ctx = new Context();
             $ctx->set('exception', 'Framework MVT');
-            $ctx->set('details', 'Hurra ForlightPHP esta corriendo, ahora genera una vista.');
+            $ctx->set('details', 'Hurra ForeverPHP esta corriendo, ahora genera una vista.');
 
             // Le indico a la vista que haga render usando los templates del framework
             Settings::getInstance()->set('ForeverPHPTemplate', true);
 
             $response = new Response();
-            $response->render('foreverphp_exception', $ctx)->make();
+            $response->render('exception', $ctx)->make();
         } else {
             // Si esta en produccion muestra un error 404
-            self::redirectToError(404);
+            //(new Redirect)->error(404);
+            Redirect::error(404);
         }
     }
 

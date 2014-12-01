@@ -52,7 +52,7 @@ class Chameleon implements TemplateInterface {
                 //echo $include_file;
                 //echo $this->data_render_base;
                 //echo $this->data_render;
-                $this->dataRender = preg_replace($regexReplace, $includeFile, $this->dataRender);
+                $this->dataRender = preg_replace($regexReplace, trim($includeFile), $this->dataRender);
                     //echo $this->data_render;
             }
         } else {
@@ -74,7 +74,7 @@ class Chameleon implements TemplateInterface {
                 $regexReplace = "#\{\% block " . $bloque[1] . " \%\}\{\% endblock \%\}#";
 
                 // Busco el bloque en el template base y lo reemplazo
-                $this->dataRenderBase = preg_replace($regexReplace, $bloque[2], $this->dataRenderBase);
+                $this->dataRenderBase = preg_replace($regexReplace, trim($bloque[2]), $this->dataRenderBase);
             }
         } else {
             // Cuando un template extiende otro debe de existir al menos un bloque
@@ -100,7 +100,7 @@ class Chameleon implements TemplateInterface {
                 //$static_file = $url_base . $this->static_dir . $static[1];
                 $staticFile = $this->staticDir . $static[1];
 
-                $this->dataRender = preg_replace($regexReplace, $staticFile, $this->dataRender);
+                $this->dataRender = preg_replace($regexReplace, trim($staticFile), $this->dataRender);
             }
         } else {
             return false;
@@ -125,7 +125,7 @@ class Chameleon implements TemplateInterface {
                 //$static_file = URL_BASE . $static[1];
                 $staticFile = $static[1];
 
-                $this->dataRender = preg_replace($regexReplace, $staticFile, $this->dataRender);
+                $this->dataRender = preg_replace($regexReplace, trim($staticFile), $this->dataRender);
             }
         } else {
             return false;
@@ -181,9 +181,9 @@ class Chameleon implements TemplateInterface {
         }
 
         if ($met) {
-            $this->dataRender = str_replace($data[0], $content1, $this->dataRender);
+            $this->dataRender = str_replace($data[0], trim($content1), $this->dataRender);
         } else {
-            $this->dataRender = str_replace($data[0], $content2, $this->dataRender);
+            $this->dataRender = str_replace($data[0], trim($content2), $this->dataRender);
         }
     }
 
@@ -224,19 +224,19 @@ class Chameleon implements TemplateInterface {
                     $contentToChange = $content;
 
                     foreach ($results as $vars => $var) {
-                        $contentToChange =   str_replace($var[0], $value[$var[1]], $contentToChange);
+                        $contentToChange =   str_replace($var[0], trim($value[$var[1]]), $contentToChange);
                     }
 
                     $contentFor .= $contentToChange;
                 }
 
-                $this->dataRender = str_replace($data[0], $contentFor, $this->dataRender);
+                $this->dataRender = str_replace($data[0], trim($contentFor), $this->dataRender);
             }
 
             unset($results);
         } else {
             // Si no se elimina la etiqueta for
-            $this->dataRender = str_replace($data[0], '', $this->dataRender);
+            $this->dataRender = str_replace($data[0], trim(''), $this->dataRender);
         }
     }
 
@@ -351,6 +351,18 @@ class Chameleon implements TemplateInterface {
         return true;
     }
 
+    /**
+     * Permite minificar el resultado del render.
+     *
+     * @param  string $dataRender
+     * @return string
+     */
+    private function minify($dataRender) {
+        //$tpl_ready = str_replace("\n", ' ', $tpl_ready);
+        //$tpl_ready = ereg_replace('[[:space:]]+', ' ', $tpl_ready);
+        return preg_replace(array('/<!--(.*)-->/Uis', "/[[:blank:]]+/"), array('', ' '), str_replace(array("\n", "\r", "\t"), '', $tplReady));
+    }
+
     private function release() {
         unset($this->dataRenderBase);
         unset($this->dataRender);
@@ -374,9 +386,7 @@ class Chameleon implements TemplateInterface {
 
         // Se verifica si hay que minificar el resultado
         if (Settings::getInstance()->get('minifyTemplate') && !Settings::getInstance()->inDebug()) {
-            //$tpl_ready = str_replace("\n", ' ', $tpl_ready);
-            //$tpl_ready = ereg_replace('[[:space:]]+', ' ', $tpl_ready);
-            $tplReady = preg_replace(array('/<!--(.*)-->/Uis', "/[[:blank:]]+/"), array('', ' '), str_replace(array("\n", "\r", "\t"), '', $tplReady));
+            $tplReady = $this->minify($tplReady);
         }
 
         $this->release();

@@ -32,6 +32,9 @@ class QueryRaw {
 
 	/*
 	 * Tipos de parametros.
+	 *
+	 * Nota: Estas constantes estan obsoletas, solo estan para
+	 * soporte a versiones anteriores.
 	 */
 	const QR_PARAM_INTEGER = 0x31;
 	const QR_PARAM_DOUBLE = 0x32;

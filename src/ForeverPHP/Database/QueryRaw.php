@@ -102,7 +102,7 @@ class QueryRaw {
 			$type = 'd';
 		} elseif ($type == self::QR_PARAM_STRING) {
 			$type = 's';
-		} else {
+		} elseif ($type == self::QR_PARAM_BLOB) {
 			$type = 'b';
 		}
 

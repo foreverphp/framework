@@ -112,6 +112,7 @@ class QueryRaw {
 	public static function execute($returnType = self::QR_RETURN_ARRAY) {
 		$db = null;
 		$return = false;
+		self::$error = '';
 
 		// Obtengo la configuracion de la base de datos a utilizar
 		$selectDb = Settings::getInstance()->get('dbs');
@@ -151,7 +152,6 @@ class QueryRaw {
 		}
 
 		// Se limpian las variables
-		self::$error = '';
 		self::$parameters = array();
 		self::$query = '';
 		self::$queryType = 'select';

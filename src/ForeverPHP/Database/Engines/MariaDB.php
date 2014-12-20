@@ -32,6 +32,8 @@ class MariaDB extends BaseEngine implements DbEngineInterface {
 		if ($this->queryType == 'other') {
 			if (mysqli_query($this->link, $this->query) === true) {
 				$return = true;
+
+				$this->error = mysqli_error($this->link);
 			}
 		} else {
 			if ($result = mysqli_query($this->link, $this->query)) {
@@ -51,6 +53,8 @@ class MariaDB extends BaseEngine implements DbEngineInterface {
 						$return = mysqli_fetch_all($result);
 					}
 				}
+
+				$this->error = mysqli_error($this->link);
 
 				mysqli_free_result($result);
 			} else {
@@ -98,6 +102,8 @@ class MariaDB extends BaseEngine implements DbEngineInterface {
 			if ($this->queryType == 'other') {
 				if ($this->stmt->execute() === true) {
 					$return = true;
+
+					$this->error = mysqli_error($this->link);
 				}
 			} else {
 				$fields = null;	// Almacena los nombres de campos afectados en la consulta
@@ -190,6 +196,8 @@ class MariaDB extends BaseEngine implements DbEngineInterface {
 						// Retorno todos los registros afectados
 						$return = $rows;
 					}
+
+					$this->error = mysqli_error($this->link);
 				} else {
 					$this->error = mysqli_error($this->link);
 				}

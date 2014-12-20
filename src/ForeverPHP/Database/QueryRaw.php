@@ -43,7 +43,7 @@ class QueryRaw {
 
 	private static $dbSetting = 'default';
 
-	private static $error = false;
+	private static $error = '';
 
 	private static $parameters = array();
 
@@ -143,6 +143,9 @@ class QueryRaw {
 				// Me desconecto
 				$db->disconnect();
 			}
+
+			// Recupera el ultimo error ocurrido en el motor de datos
+			self::$error = $db->getError();
 
 			unset($db);
 		}

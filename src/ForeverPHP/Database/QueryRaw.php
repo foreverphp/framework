@@ -65,7 +65,7 @@ class QueryRaw {
 		static::$autocommit = $value;
 	}
 
-	public static function query($query, $return = static::QR_FETCH_NUM) {
+	public static function query($query, $return = self::QR_FETCH_NUM) {
 		static::$query = $query;
 
 		// Debe detectar que tipo de consulta se va a ejecutar
@@ -111,7 +111,7 @@ class QueryRaw {
 		static::$parameters[$count] = array('type' => $type, 'value' => $value);
 	}
 
-	public static function execute($returnType = static::QR_RETURN_ARRAY) {
+	public static function execute($returnType = self::QR_RETURN_ARRAY) {
 		$db = null;
 		$return = false;
 		static::$hasError = false;

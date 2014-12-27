@@ -43,6 +43,8 @@ class QueryRaw {
 
 	private static $dbSetting = 'default';
 
+	private static $hasError = false;
+
 	private static $error = '';
 
 	private static $parameters = array();
@@ -56,87 +58,88 @@ class QueryRaw {
 	private static $autocommit = false;
 
 	public static function using($dbSetting) {
-		self::$dbSetting = $dbSetting;
+		static::$dbSetting = $dbSetting;
 	}
 
 	public static function autocommit($value = false) {
-		self::$autocommit = $value;
+		static::$autocommit = $value;
 	}
 
-	public static function query($query, $return = self::QR_FETCH_NUM) {
-		self::$query = $query;
+	public static function query($query, $return = static::QR_FETCH_NUM) {
+		static::$query = $query;
 
 		// Debe detectar que tipo de consulta se va a ejecutar
 		$queryInLCase = strtolower($query);
 
 		if (strpos($queryInLCase, 'insert') !== false) {
-			self::$queryType = 'insert';
+			static::$queryType = 'insert';
 		} elseif (strpos($queryInLCase, 'select') !== false) {
-			self::$queryType = 'select';
+			static::$queryType = 'select';
 		} elseif (strpos($queryInLCase, 'update') !== false) {
-			self::$queryType = 'update';
+			static::$queryType = 'update';
 		} elseif (strpos($queryInLCase, 'delete') !== false) {
-			self::$queryType = 'delete';
+			static::$queryType = 'delete';
 		} else {
-			self::$queryType = 'other';
+			static::$queryType = 'other';
 		}
 
 		unset($queryInLCase);
 
-		if ($return == self::QR_FETCH_ASSOC) {
-			self::$queryReturn = 'assoc';
-		} elseif ($return == self::QR_FETCH_BOTH) {
-			self::$queryReturn = 'both';
+		if ($return == static::QR_FETCH_ASSOC) {
+			static::$queryReturn = 'assoc';
+		} elseif ($return == static::QR_FETCH_BOTH) {
+			static::$queryReturn = 'both';
 		} else {
-			self::$queryReturn = 'num';
+			static::$queryReturn = 'num';
 		}
 	}
 
 	public static function addParameter($type, $value) {
-		$count = count(self::$parameters);
+		$count = count(static::$parameters);
 
 		// Cambia el parametro por el correcto
-		if ($type == self::QR_PARAM_INTEGER) {
+		if ($type == static::QR_PARAM_INTEGER) {
 			$type = 'i';
-		} elseif ($type == self::QR_PARAM_DOUBLE) {
+		} elseif ($type == static::QR_PARAM_DOUBLE) {
 			$type = 'd';
-		} elseif ($type == self::QR_PARAM_STRING) {
+		} elseif ($type == static::QR_PARAM_STRING) {
 			$type = 's';
-		} elseif ($type == self::QR_PARAM_BLOB) {
+		} elseif ($type == static::QR_PARAM_BLOB) {
 			$type = 'b';
 		}
 
-		self::$parameters[$count] = array('type' => $type, 'value' => $value);
+		static::$parameters[$count] = array('type' => $type, 'value' => $value);
 	}
 
-	public static function execute($returnType = self::QR_RETURN_ARRAY) {
+	public static function execute($returnType = static::QR_RETURN_ARRAY) {
 		$db = null;
 		$return = false;
-		self::$error = '';
+		static::$hasError = false;
+		static::$error = '';
 
 		// Obtengo la configuracion de la base de datos a utilizar
 		$selectDb = Settings::getInstance()->get('dbs');
-		$selectDb[self::$dbSetting];
-		$dbEngine = $selectDb[self::$dbSetting]['engine'];
+		$selectDb[static::$dbSetting];
+		$dbEngine = $selectDb[static::$dbSetting]['engine'];
 
 		if ($dbEngine == 'mariadb') {
-			$db = namespace\Engines\MariaDB::getInstance(self::$dbSetting);
+			$db = namespace\Engines\MariaDB::getInstance(static::$dbSetting);
 		} elseif ($dbEngine == 'postgresql') {
-			$db = namespace\Engines\PostgreSQL::getInstance(self::$dbSetting);
+			$db = namespace\Engines\PostgreSQL::getInstance(static::$dbSetting);
 		} else {
-			self::$error = 'Database engine not found.';
+			static::$error = 'Database engine not found.';
 		}
 
 		if ($db != null) {
 			// Me conecto al motor de datos
 			if ($db->connect()) {
-				$db->query(self::$query, self::$queryType, self::$queryReturn);
-				$db->setParameters(self::$parameters);
+				$db->query(static::$query, static::$queryType, static::$queryReturn);
+				$db->setParameters(static::$parameters);
 
 				if ($result = $db->execute()) {
-					if ($returnType == self::QR_RETURN_ARRAY) {
+					if ($returnType == static::QR_RETURN_ARRAY) {
 						$return = $result;
-					} elseif ($returnType == self::QR_RETURN_JSON) {
+					} elseif ($returnType == static::QR_RETURN_JSON) {
 						$return = json_encode($result, JSON_FORCE_OBJECT);
 					}
 				}
@@ -146,16 +149,20 @@ class QueryRaw {
 			}
 
 			// Recupera el ultimo error ocurrido en el motor de datos
-			self::$error = $db->getError();
+			static::$error = $db->getError();
+
+			if (!empty(static::$error)) {
+				static::$hasError = true;
+			}
 
 			unset($db);
 		}
 
 		// Se limpian las variables
-		self::$parameters = array();
-		self::$query = '';
-		self::$queryType = 'select';
-		self::$queryReturn = 'num';
+		static::$parameters = array();
+		static::$query = '';
+		static::$queryType = 'select';
+		static::$queryReturn = 'num';
 
 		return $return;
 	}
@@ -164,7 +171,11 @@ class QueryRaw {
 
 	}
 
+	public static function hasError() {
+		return static::$hasError;
+	}
+
 	public static function getError() {
-		return self::$error;
+		return static::$error;
 	}
 }

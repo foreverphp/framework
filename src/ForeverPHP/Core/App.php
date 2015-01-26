@@ -33,11 +33,11 @@ class App {
     private $appName;
 
     /**
-     * Almacena los decoradores agregados.
+     * Almacena los middlewares agregados.
      *
      * @var array
      */
-    private $decorators = array();
+    private $middlewares = array();
 
     /**
      * Almacena los contextos globales agregados.
@@ -91,7 +91,7 @@ class App {
 
         // Carga los archivos opcionales de las apps
         $this->loadOptional('contexts');
-        $this->loadOptional('decorators');
+        $this->loadOptional('middlewares');
 
         // Agrego los directorias al cargador de clases
         ClassLoader::addDirectories(array(
@@ -101,13 +101,13 @@ class App {
     }
 
     /**
-     * Valida si existe un decorador.
+     * Valida si existe un middleware.
      *
      * @param  string $name
      * @return boolean
      */
-    public function existsDecorator($name) {
-        if (array_key_exists($name, $this->decorators)) {
+    public function existsMiddleware($name) {
+        if (array_key_exists($name, $this->middlewares)) {
             return true;
         }
 
@@ -115,30 +115,30 @@ class App {
     }
 
     /**
-     * Agrega un decorador.
+     * Agrega un middleware.
      *
      * @param string $name
      * @param clousure
      * @return boolean
      */
-    public function setDecorator($name, $function) {
+    public function setMiddleware($name, $function) {
         if (!is_callable($function)) {
             return false;
         }
 
-        $this->decorators[$name] = $function;
+        $this->middlewares[$name] = $function;
     }
 
     /**
-     * Ejecuta un decorador.
+     * Ejecuta un middleware.
      *
      * @param  string $name
      * @param  array  $arguments
      * @return mixed
      */
-    public function getDecorator($name, $arguments = null) {
-        if ($this->existsDecorator($name)) {
-            return $this->decorators[$name]();
+    public function getMiddleware($name, $arguments = null) {
+        if ($this->existsMiddleware($name)) {
+            return $this->middlewares[$name]();
         }
 
         return false;

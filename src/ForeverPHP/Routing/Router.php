@@ -88,7 +88,7 @@ class Router {
         return $newRoute;
     }
 
-    public static function add($route, $view, $decorators = null) {
+    public static function add($route, $view, $middlewares = null) {
         $app = null;        // Aplicacion donde esta la vista
         $v = null;          // Vista a buscar
         $function = 'run';  // Funcion por defecto a ejecutar
@@ -134,7 +134,7 @@ class Router {
             static::$nameForRoute = $view['name'];
 
             // Vuelve a llamar a add para agregar la ruta
-            return static::add($route, $view[0], $decorators);
+            return static::add($route, $view[0], $middlewares);
         } else {
             $function = $view;
         }
@@ -150,7 +150,7 @@ class Router {
             'function' => $function,
             'paramsUrl' => $paramsUrl,
             'name' => static::$nameForRoute,
-            'decorators' => $decorators
+            'middlewares' => $middlewares
         );
 
         // Valida si es ruta normal o compleja
@@ -385,11 +385,11 @@ class Router {
                 $app->load($appName);
 
                 // Ejecuta los decoradores de la ruta si es que hay
-                $decorators = $routeContent['decorators'];
+                $middlewares = $routeContent['middlewares'];
 
-                if (!is_null($decorators)) {
-                    foreach ($decorators as $decorator) {
-                        $returnValue = $app->getDecorator($decorator);
+                if (!is_null($middlewares)) {
+                    foreach ($middlewares as $middleware) {
+                        $returnValue = $app->getMiddleware($middleware);
 
                         // Valida si el decorador retorna un Response
                         if ($returnValue instanceof \ForeverPHP\Http\ResponseInterface) {

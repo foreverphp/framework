@@ -360,7 +360,7 @@ class Chameleon implements TemplateInterface {
     private function minify($dataRender) {
         //$tpl_ready = str_replace("\n", ' ', $tpl_ready);
         //$tpl_ready = ereg_replace('[[:space:]]+', ' ', $tpl_ready);
-        return preg_replace(array('/<!--(.*)-->/Uis', "/[[:blank:]]+/"), array('', ' '), str_replace(array("\n", "\r", "\t"), '', $tplReady));
+        return preg_replace(array('/<!--(.*)-->/Uis', "/[[:blank:]]+/"), array('', ' '), str_replace(array("\n", "\r", "\t"), '', $dataRender));
     }
 
     private function release() {

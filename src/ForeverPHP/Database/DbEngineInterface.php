@@ -7,8 +7,9 @@
  * @since       Version 0.1.0
  */
 interface DbEngineInterface {
-	public function __construct($dbSetting, $database);
-	public function connect();
+	public function __construct($dbSetting);
+	public function selectDatabase($database);
+    public function connect();
 	public function query($query);
 	public function setParameters($parameters);
 	public function execute();

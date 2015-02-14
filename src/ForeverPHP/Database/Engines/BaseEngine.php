@@ -19,19 +19,22 @@ class BaseEngine  {
 
     protected static $instance;
 
-    public function __construct($dbSetting, $database) {
+    public function __construct($dbSetting) {
         $this->dbSetting = $dbSetting;
-        $this->database = $database;
         $this->numRows = 0;
         $this->parameters = array();
     }
 
-    public static function getInstance($dbSetting = 'default', $database = false) {
+    public static function getInstance($dbSetting = 'default') {
         if (is_null(static::$instance)) {
-            static::$instance = new static($dbSetting, $database);
+            static::$instance = new static($dbSetting);
         }
 
         return static::$instance;
+    }
+
+    public function selectDatabase($database) {
+        $this->database = $database;
     }
 
     public function query($query, $type = 'other', $return = 'num') {

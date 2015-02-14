@@ -64,10 +64,6 @@ class QueryRaw {
 		static::$database = false;
 	}
 
-	public static function selectDatabase($database) {
-		static::$database = $database;
-	}
-
 	public static function autocommit($value = false) {
 		static::$autocommit = $value;
 	}
@@ -130,18 +126,22 @@ class QueryRaw {
 		$dbEngine = $selectDb[static::$dbSetting]['engine'];
 
 		if ($dbEngine == 'mariadb') {
-			$db = namespace\Engines\MariaDB::getInstance(static::$dbSetting, static::$database);
+			$db = namespace\Engines\MariaDB::getInstance(static::$dbSetting);
 		} elseif ($dbEngine == 'mssql') {
-			$db = namespace\Engines\MSSQL::getInstance(static::$dbSetting, static::$database);
+			$db = namespace\Engines\MSSQL::getInstance(static::$dbSetting);
 		} elseif ($dbEngine == 'postgresql') {
-			$db = namespace\Engines\PostgreSQL::getInstance(static::$dbSetting, static::$database);
+			$db = namespace\Engines\PostgreSQL::getInstance(static::$dbSetting);
 		} elseif ($dbEngine == 'sqlsrv') {
-			$db = namespace\Engines\SQLSRV::getInstance(static::$dbSetting, static::$database);
+			$db = namespace\Engines\SQLSRV::getInstance(static::$dbSetting);
 		} else {
 			static::$error = 'Database engine not found.';
 		}
 
 		if ($db != null) {
+			if (static::$database != false) {
+				$db->selectDatabase(static::$database);
+			}
+
 			// Me conecto al motor de datos
 			if ($db->connect()) {
 				$db->query(static::$query, static::$queryType, static::$queryReturn);

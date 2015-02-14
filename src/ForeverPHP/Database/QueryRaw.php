@@ -128,6 +128,8 @@ class QueryRaw {
 			$db = namespace\Engines\MSSQL::getInstance(static::$dbSetting);
 		} elseif ($dbEngine == 'postgresql') {
 			$db = namespace\Engines\PostgreSQL::getInstance(static::$dbSetting);
+		} elseif ($dbEngine == 'sqlsrv') {
+			$db = namespace\Engines\SQLSRV::getInstance(static::$dbSetting);
 		} else {
 			static::$error = 'Database engine not found.';
 		}

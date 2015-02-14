@@ -19,7 +19,7 @@ class BaseEngine  {
 
     protected static $instance;
 
-    protected function __construct($dbSetting, $database) {
+    public function __construct($dbSetting, $database) {
         $this->dbSetting = $dbSetting;
         $this->database = $database;
         $this->numRows = 0;

@@ -124,6 +124,8 @@ class QueryRaw {
 
 		if ($dbEngine == 'mariadb') {
 			$db = namespace\Engines\MariaDB::getInstance(static::$dbSetting);
+		} elseif ($dbEngine == 'mssql') {
+			$db = namespace\Engines\MSSQL::getInstance(static::$dbSetting);
 		} elseif ($dbEngine == 'postgresql') {
 			$db = namespace\Engines\PostgreSQL::getInstance(static::$dbSetting);
 		} else {

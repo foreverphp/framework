@@ -36,7 +36,7 @@ class SQLSRV extends BaseEngine implements DbEngineInterface {
             if (sqlsrv_query($this->link, $this->query) === true) {
                 $return = true;
 
-                $this->error = sqlsrv_errors($this->link);
+                $this->error = sqlsrv_errors();
             }
         } else {
             if ($stmt = sqlsrv_query($this->link, $this->query)) {
@@ -57,11 +57,11 @@ class SQLSRV extends BaseEngine implements DbEngineInterface {
                     }
                 }
 
-                $this->error = sqlsrv_errors($this->link);
+                $this->error = sqlsrv_errors();
 
                 sqlsrv_free_stmt($stmt);
             } else {
-                $this->error = sqlsrv_errors($this->link);
+                $this->error = sqlsrv_errors();
             }
         }
 
@@ -224,7 +224,7 @@ class SQLSRV extends BaseEngine implements DbEngineInterface {
         if ($this->link != null) {
             // Cierro la conexion
             if (!sqlsrv_close($this->link)) {
-                $this->error = sqlsrv_errors($this->link);
+                $this->error = sqlsrv_errors();
                 return false;
             }
 

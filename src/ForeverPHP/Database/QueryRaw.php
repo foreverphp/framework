@@ -64,6 +64,10 @@ class QueryRaw {
 		static::$database = false;
 	}
 
+	public static function selectDatabase($database) {
+		static::$database = $database;
+	}
+
 	public static function autocommit($value = false) {
 		static::$autocommit = $value;
 	}

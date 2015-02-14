@@ -8,6 +8,7 @@
  */
 class BaseEngine  {
     protected $dbSetting;
+    protected $database;
     protected $link;
     protected $query;
     protected $queryType = 'other';

@@ -43,6 +43,8 @@ class QueryRaw {
 
 	private static $dbSetting = 'default';
 
+	private static $database = false;
+
 	private static $hasError = false;
 
 	private static $error = '';
@@ -59,6 +61,11 @@ class QueryRaw {
 
 	public static function using($dbSetting) {
 		static::$dbSetting = $dbSetting;
+		static::$database = false;
+	}
+
+	public static function selectDatabase($database) {
+		static::$database = $database;
 	}
 
 	public static function autocommit($value = false) {

@@ -15,6 +15,8 @@ class MSSQL extends BaseEngine implements DbEngineInterface {
         $db = Settings::getInstance()->get('dbs');
         $db = $db[$this->dbSetting];
 
+        $dbName = ($this->database != false) ? $this->database : $db['database'];
+
         $server = $db['server'] . ',' . $db['port'];
 
         // Me conecto a la base de datos
@@ -25,7 +27,7 @@ class MSSQL extends BaseEngine implements DbEngineInterface {
             return false;
         }
 
-        if (!mssql_select_db($db['database'])) {
+        if (!mssql_select_db($dbName)) {
             $this->error = mssql_get_last_message();
             return false;
         }
@@ -51,13 +53,18 @@ class MSSQL extends BaseEngine implements DbEngineInterface {
                     $this->numRows = mssql_rows_affected($this->link);
                 } else {
                     $this->numRows = mssql_num_rows($result);
+                    $fetchType = MSSQL_NUM;
 
                     if ($this->queryReturn == 'assoc') {
-                        $return = mssql_fetch_assoc($result);
+                        $fetchType = MSSQL_ASSOC;
                     } elseif ($this->queryReturn == 'both') {
-                        $return = mssql_fetch_array($result, MSSQL_BOTH);
-                    } elseif ($this->queryReturn == 'num') {
-                        $return = mssql_fetch_row($result);
+                        $fetchType = MSSQL_BOTH;
+                    }
+
+                    $return = array();
+
+                    while ($row = mssql_fetch_array($stmt, $fetchType)) {
+                        array_push($return, $row);
                     }
                 }
 

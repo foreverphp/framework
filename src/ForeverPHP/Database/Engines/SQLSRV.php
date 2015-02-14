@@ -15,8 +15,10 @@ class SQLSRV extends BaseEngine implements DbEngineInterface {
         $db = Settings::getInstance()->get('dbs');
         $db = $db[$this->dbSetting];
 
+        $dbName = ($this->database != false) ? $this->database : $db['database'];
+
         $server = $db['server'] . ',' . $db['port'];
-        $connectionInfo = array('UID' => $db['user'], 'PWD' => $db['password'], 'Database' => $db['database']);
+        $connectionInfo = array('UID' => $db['user'], 'PWD' => $db['password'], 'Database' => $dbName);
 
         // Me conecto a la base de datos
         $this->link = sqlsrv_connect($server, $connectionInfo);
@@ -33,7 +35,7 @@ class SQLSRV extends BaseEngine implements DbEngineInterface {
         $return = false;
 
         if ($this->queryType == 'other') {
-            if (sqlsrv_query($this->link, $this->query) === true) {
+            if (sqlsrv_query($this->link, $this->query) !== false) {
                 $return = true;
 
                 $this->error = sqlsrv_errors();

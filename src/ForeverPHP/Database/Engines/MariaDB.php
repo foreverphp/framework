@@ -15,8 +15,10 @@ class MariaDB extends BaseEngine implements DbEngineInterface {
 		$db = Settings::getInstance()->get('dbs');
         $db = $db[$this->dbSetting];
 
+        $dbName = ($this->database != false) ? $this->database : $db['database'];
+
         // Me conecto a la base de datos
-        $this->link = mysqli_connect($db['server'], $db['user'], $db['password'], $db['database'], $db['port']);
+        $this->link = mysqli_connect($db['server'], $db['user'], $db['password'], $dbName, $db['port']);
 
         if (mysqli_connect_errno()) {
         	$this->error = mysqli_connect_error();

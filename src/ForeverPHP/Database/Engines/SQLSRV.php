@@ -49,11 +49,11 @@ class SQLSRV extends BaseEngine implements DbEngineInterface {
                     $this->numRows = sqlsrv_num_rows($stmt);
 
                     if ($this->queryReturn == 'assoc') {
-                        $return = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
+                        $return = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
                     } elseif ($this->queryReturn == 'both') {
-                        $return = sqlsrv_fetch_array($result, SQLSRV_FETCH_BOTH);
+                        $return = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_BOTH);
                     } elseif ($this->queryReturn == 'num') {
-                        $return = sqlsrv_fetch_array($result, SQLSRV_FETCH_NUMERIC);
+                        $return = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_NUMERIC);
                     }
                 }
 

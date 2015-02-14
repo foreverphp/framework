@@ -130,13 +130,13 @@ class QueryRaw {
 		$dbEngine = $selectDb[static::$dbSetting]['engine'];
 
 		if ($dbEngine == 'mariadb') {
-			$db = namespace\Engines\MariaDB::getInstance(static::$dbSetting);
+			$db = namespace\Engines\MariaDB::getInstance(static::$dbSetting, static::$database);
 		} elseif ($dbEngine == 'mssql') {
-			$db = namespace\Engines\MSSQL::getInstance(static::$dbSetting);
+			$db = namespace\Engines\MSSQL::getInstance(static::$dbSetting, static::$database);
 		} elseif ($dbEngine == 'postgresql') {
-			$db = namespace\Engines\PostgreSQL::getInstance(static::$dbSetting);
+			$db = namespace\Engines\PostgreSQL::getInstance(static::$dbSetting, static::$database);
 		} elseif ($dbEngine == 'sqlsrv') {
-			$db = namespace\Engines\SQLSRV::getInstance(static::$dbSetting);
+			$db = namespace\Engines\SQLSRV::getInstance(static::$dbSetting, static::$database);
 		} else {
 			static::$error = 'Database engine not found.';
 		}

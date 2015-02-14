@@ -220,7 +220,11 @@ class MariaDB extends BaseEngine implements DbEngineInterface {
 	public function disconnect() {
 		if ($this->link != null) {
             // Cierro la conexion
-            mysqli_close($this->link);
+            if (!mysqli_close($this->link)) {
+            	$this->error = mysqli_error($this->link);
+            	return false;
+            }
+
             $this->link = null;
         }
 	}

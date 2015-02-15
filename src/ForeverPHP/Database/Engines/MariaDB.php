@@ -32,7 +32,7 @@ class MariaDB extends BaseEngine implements DbEngineInterface {
 		$return = false;
 
 		if ($this->queryType == 'other') {
-			if (mysqli_query($this->link, $this->query) === true) {
+			if (mysqli_query($this->link, $this->query) !== false) {
 				$return = true;
 
 				$this->error = mysqli_error($this->link);
@@ -44,6 +44,8 @@ class MariaDB extends BaseEngine implements DbEngineInterface {
 					$this->queryType == 'update' ||
 					$this->queryType == 'delete') {
 					$this->numRows = mysqli_affected_rows($this->link);
+
+					$return = true;
 				} else {
 					$this->numRows = mysqli_num_rows($result);
 
@@ -117,6 +119,8 @@ class MariaDB extends BaseEngine implements DbEngineInterface {
 						$this->queryType == 'update' ||
 						$this->queryType == 'delete') {
 						$this->numRows = $this->stmt->affected_rows;
+
+						$return = true;
 					} else {
 						// Se obtiene el numero de filas obtenidas de los metadatos de la consulta
 						$this->stmt->store_result();

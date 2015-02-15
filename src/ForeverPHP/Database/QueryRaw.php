@@ -168,6 +168,7 @@ class QueryRaw {
 
 			if (!empty(static::$error)) {
 				static::$hasError = true;
+				$return = false;
 			}
 
 			unset($db);

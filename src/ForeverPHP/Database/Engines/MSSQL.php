@@ -51,6 +51,8 @@ class MSSQL extends BaseEngine implements DbEngineInterface {
                     $this->queryType == 'update' ||
                     $this->queryType == 'delete') {
                     $this->numRows = mssql_rows_affected($this->link);
+
+                    $return = true;
                 } else {
                     $this->numRows = mssql_num_rows($result);
                     $fetchType = MSSQL_NUM;

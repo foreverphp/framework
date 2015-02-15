@@ -47,6 +47,8 @@ class SQLSRV extends BaseEngine implements DbEngineInterface {
                     $this->queryType == 'update' ||
                     $this->queryType == 'delete') {
                     $this->numRows = sqlsrv_rows_affected($stmt);
+
+                    $return = true;
                 } else {
                     $this->numRows = sqlsrv_num_rows($stmt);
                     $fetchType = SQLSRV_FETCH_NUMERIC;
@@ -91,7 +93,7 @@ class SQLSRV extends BaseEngine implements DbEngineInterface {
 
             // Se procede con la ejecucion de la consulta
             if ($this->queryType == 'other') {
-                if (sqlsrv_execute($stmt) === false) {
+                if (sqlsrv_execute($stmt) === true) {
                     $return = true;
 
                     $this->error = sqlsrv_errors();
@@ -103,6 +105,8 @@ class SQLSRV extends BaseEngine implements DbEngineInterface {
                         $this->queryType == 'update' ||
                         $this->queryType == 'delete') {
                         $this->numRows = sqlsrv_rows_affected($stmt);
+
+                        $return = true;
                     } else {
                         // Se obtiene el numero de filas obtenidas de los metadatos de la consulta
                         $this->numRows = sqlsrv_num_rows($stmt);

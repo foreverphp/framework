@@ -45,6 +45,8 @@ class QueryRaw {
 
 	private static $database = false;
 
+	private static $dbInstance = null;
+
 	private static $hasError = false;
 
 	private static $error = '';
@@ -119,10 +121,10 @@ class QueryRaw {
 	}
 
 	public static function execute($returnType = self::QR_RETURN_ARRAY) {
-		$db = null;
-		$return = false;
+		static::$dbInstance = null;
 		static::$hasError = false;
 		static::$error = '';
+		$return = false;
 
 		// Obtengo la configuracion de la base de datos a utilizar
 		$selectDb = Settings::getInstance()->get('dbs');
@@ -130,28 +132,28 @@ class QueryRaw {
 		$dbEngine = $selectDb[static::$dbSetting]['engine'];
 
 		if ($dbEngine == 'mariadb') {
-			$db = namespace\Engines\MariaDB::getInstance(static::$dbSetting);
+			static::$dbInstance = new namespace\Engines\MariaDB(static::$dbSetting);
 		} elseif ($dbEngine == 'mssql') {
-			$db = namespace\Engines\MSSQL::getInstance(static::$dbSetting);
+			static::$dbInstance = new namespace\Engines\MSSQL(static::$dbSetting);
 		} elseif ($dbEngine == 'postgresql') {
-			$db = namespace\Engines\PostgreSQL::getInstance(static::$dbSetting);
+			static::$dbInstance = new namespace\Engines\PostgreSQL(static::$dbSetting);
 		} elseif ($dbEngine == 'sqlsrv') {
-			$db = namespace\Engines\SQLSRV::getInstance(static::$dbSetting);
+			static::$dbInstance = new namespace\Engines\SQLSRV(static::$dbSetting);
 		} else {
 			static::$error = 'Database engine not found.';
 		}
 
-		if ($db != null) {
+		if (static::$dbInstance != null) {
 			if (static::$database != false) {
-				$db->selectDatabase(static::$database);
+				static::$dbInstance->selectDatabase(static::$database);
 			}
 
 			// Me conecto al motor de datos
-			if ($db->connect()) {
-				$db->query(static::$query, static::$queryType, static::$queryReturn);
-				$db->setParameters(static::$parameters);
+			if (static::$dbInstance->connect()) {
+				static::$dbInstance->query(static::$query, static::$queryType, static::$queryReturn);
+				static::$dbInstance->setParameters(static::$parameters);
 
-				if ($result = $db->execute()) {
+				if ($result = static::$dbInstance->execute()) {
 					if ($returnType == static::QR_RETURN_ARRAY) {
 						$return = $result;
 					} elseif ($returnType == static::QR_RETURN_JSON) {
@@ -160,21 +162,20 @@ class QueryRaw {
 				}
 
 				// Me desconecto
-				$db->disconnect();
+				static::$dbInstance->disconnect();
 			}
 
 			// Recupera el ultimo error ocurrido en el motor de datos
-			static::$error = $db->getError();
+			static::$error = static::$dbInstance->getError();
 
 			if (!empty(static::$error)) {
 				static::$hasError = true;
 				$return = false;
 			}
-
-			unset($db);
 		}
 
 		// Se limpian las variables
+		static::$dbInstance = null;
 		static::$parameters = array();
 		static::$query = '';
 		static::$queryType = 'select';

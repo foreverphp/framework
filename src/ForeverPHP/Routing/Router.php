@@ -3,7 +3,9 @@
 use ForeverPHP\Core\App;
 use ForeverPHP\Core\Exceptions\AppException;
 use ForeverPHP\Core\Exceptions\RouterException;
+use ForeverPHP\Core\ExceptionManager;
 use ForeverPHP\Core\Facades\Redirect;
+use ForeverPHP\Core\Facades\Request;
 use ForeverPHP\Core\Settings;
 use ForeverPHP\Core\Setup;
 use ForeverPHP\Http\Request;

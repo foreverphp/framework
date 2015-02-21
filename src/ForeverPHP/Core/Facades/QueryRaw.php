@@ -9,5 +9,5 @@ class QueryRaw extends Facade {
      *
      * @return mixed
      */
-    protected static function getComponent() { return \ForeverPHP\Database\QueryRaw; } //::getInstance(); }
+    protected static function getComponent() { return \ForeverPHP\Database\QueryRaw::getInstance(); }
 }

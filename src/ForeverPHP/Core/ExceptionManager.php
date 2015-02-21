@@ -53,6 +53,6 @@ class ExceptionManager {
     }
 
     public static function exceptionHandler($exception) {
-        self::triggerException($exception);
+        static::triggerException($exception);
     }
 }

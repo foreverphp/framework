@@ -3,7 +3,6 @@
 use ForeverPHP\Core\App;
 use ForeverPHP\Core\Exceptions\AppException;
 use ForeverPHP\Core\Exceptions\RouterException;
-use ForeverPHP\Core\ExceptionManager;
 use ForeverPHP\Core\Facades\Redirect;
 use ForeverPHP\Core\Facades\Request;
 use ForeverPHP\Core\Settings;
@@ -20,12 +19,34 @@ use ForeverPHP\View\View;
  * @since       Version 0.1.0
  */
 class Router {
-    private static $uriBase = '/';
-    private static $routes = array();
-    private static $complexRoutes = array();
-    private static $nameForRoute = null;
+    private $uriBase = '/';
+    private $routes = array();
+    private $complexRoutes = array();
+    private $nameForRoute = null;
 
-    private static function addSlash($route) {
+    /**
+     * Contiene la instancia singleton de Router.
+     *
+     * @var \ForeverPHP\Routing\Router
+     */
+    private static $instance;
+
+    public function __construct() {}
+
+    /**
+     * Obtiene o crea la instancia singleton de Router.
+     *
+     * @return \ForeverPHP\Routing\Router
+     */
+    public static function getInstance() {
+        if (is_null(static::$instance)) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
+    }
+
+    private function addSlash($route) {
         $url = $route;
 
         if (strlen($url) == 0) {
@@ -40,7 +61,7 @@ class Router {
         return $url;
     }
 
-    private static function removeSlash($route) {
+    private function removeSlash($route) {
         $url = $route;
 
         if ($url[strlen($url) - 1] == '/') {
@@ -50,11 +71,11 @@ class Router {
         return $url;
     }
 
-    private static function getUriBase() {
-        static::$uriBase = str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
+    private function getUriBase() {
+        $this->uriBase = str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
     }
 
-    private static function parseRoute($route, &$paramsUrl) {
+    private function parseRoute($route, &$paramsUrl) {
         $newRoute = $route;
         $matches = array();
 
@@ -81,13 +102,13 @@ class Router {
             // Le agrego esta pequeña expresion regular al final para no tener problemas con el slash
             $newRoute .= '[/]?';
         } else {
-            $newRoute = self::addSlash($newRoute);
+            $newRoute = $this->addSlash($newRoute);
         }
 
         return $newRoute;
     }
 
-    public static function add($route, $view, $middlewares = null) {
+    public function add($route, $view, $middlewares = null) {
         $app = null;        // Aplicacion donde esta la vista
         $v = null;          // Vista a buscar
         $function = 'run';  // Funcion por defecto a ejecutar
@@ -130,17 +151,17 @@ class Router {
              * Almacena temporalmente el nombre de la ruta para que al volver a
              * llamar a add se agregue el nombre a la ruta.
              */
-            static::$nameForRoute = $view['name'];
+            $this->nameForRoute = $view['name'];
 
             // Vuelve a llamar a add para agregar la ruta
-            return static::add($route, $view[0], $middlewares);
+            return $this->add($route, $view[0], $middlewares);
         } else {
             $function = $view;
         }
 
         // Se valida si la ruta trae parametros por ruta
         $paramsUrl = array();
-        $route = self::parseRoute($route, $paramsUrl);
+        $route = $this->parseRoute($route, $paramsUrl);
 
         // Matriz con el contenido de la ruta
         $routeContent = array(
@@ -148,15 +169,15 @@ class Router {
             'view' => $v,
             'function' => $function,
             'paramsUrl' => $paramsUrl,
-            'name' => static::$nameForRoute,
+            'name' => $this->nameForRoute,
             'middlewares' => $middlewares
         );
 
         // Valida si es ruta normal o compleja
         if (count($paramsUrl) == 0) {
-            self::$routes[$route] = $routeContent;
+            $this->routes[$route] = $routeContent;
         } else {
-            self::$complexRoutes[$route] = $routeContent;
+            $this->complexRoutes[$route] = $routeContent;
         }
     }
 
@@ -165,12 +186,12 @@ class Router {
      *
      * @return string        Retorna la ruta con el formato correcto
      */
-    private static function getRoute() {
+    private function getRoute() {
         $uri = $_SERVER['REQUEST_URI'];
 
         // Extraigo la URI base si esta es diferente a /
-        if (static::$uriBase != '/') {
-            $uri = str_replace(static::$uriBase, '/', $uri);
+        if ($this->uriBase != '/') {
+            $uri = str_replace($this->uriBase, '/', $uri);
         }
 
         // Busco el caracter ? por si se pasaron parametros por GET
@@ -181,7 +202,7 @@ class Router {
         }
 
         // Agrega un slash a uri para evitar error en la busqueda de ultimo slash
-        $uri = self::addSlash($uri);
+        $uri = $this->addSlash($uri);
 
         // Retorno la ruta correcta
         return $uri;
@@ -192,15 +213,15 @@ class Router {
      *
      * @return string
      */
-    public static function getRouteName() {
-        return static::$nameForRoute;
+    public function getRouteName() {
+        return $this->nameForRoute;
     }
 
-    private static function loadParamsRoute(&$route, &$routeContent) {
+    private function loadParamsRoute(&$route, &$routeContent) {
         $noMatch = true; // Indica si hay o no coincidencias de ruta
 
-        if (count(self::$complexRoutes) > 0) {
-            foreach (self::$complexRoutes as $complexRoute => $_routeContent) {
+        if (count($this->complexRoutes) > 0) {
+            foreach ($this->complexRoutes as $complexRoute => $_routeContent) {
                 $regex = '#^' . $complexRoute . '$#m';
 
                 // Busca los parametreos dentro de la ruta
@@ -256,7 +277,7 @@ class Router {
         }
     }
 
-    private static function notView() {
+    private function notView() {
         if (Settings::getInstance()->inDebug()) {
             $ctx = new Context();
             $ctx->set('exception', 'Framework MVT');
@@ -274,7 +295,7 @@ class Router {
         }
     }
 
-    private static function runFunction($function) {
+    private function runFunction($function) {
         if (!is_string($function)) {
             // Ejecuta la funcion anonima
             $returnValue = call_user_func($function);
@@ -287,11 +308,11 @@ class Router {
                 $returnValue->make();
             }
         } else {
-            self::notView();
+            $this->notView();
         }
     }
 
-    private static function setHeadersToResponse() {
+    private function setHeadersToResponse() {
         if (SessionManager::getInstance()->exists('headersInRedirect', 'redirect')) {
             $redirectPath = SessionManager::getInstance()->get('redirectPath', 'redirect');
             $requestURI = $_SERVER['REQUEST_URI'];
@@ -313,18 +334,18 @@ class Router {
     /**
      * Ejecuta la ruta solicitada
      */
-    public static function run() {
+    public function run() {
         // Obtiene la Url base
-        static::getUriBase();
+        $this->getUriBase();
 
         // Obtiene la ruta actual
-        $route = self::getRoute();
+        $route = $this->getRoute();
 
         /*
          * Establece como el manejador de excepciones no controladas a
          * ExceptionHandler
          */
-        set_exception_handler("ExceptionManager::exceptionHandler");
+        set_exception_handler("\ForeverPHP\Core\ExceptionManager::exceptionHandler");
 
         // Defino la ruta de los templates y estaticos del framework
         Setup::toDefine('FOREVERPHP_ROOT', dirname(dirname(__FILE__)));
@@ -335,8 +356,8 @@ class Router {
         $routeContent = null;
         $appName = null;
 
-        if (array_key_exists($route, self::$routes)) {
-            $route = self::$routes[$route];
+        if (array_key_exists($route, $this->routes)) {
+            $route = $this->routes[$route];
 
             if ($route['app'] != null) {
                 $appName = $route['app'];
@@ -350,22 +371,22 @@ class Router {
         } else {
             // Se remueve el ultimo slash ya que rutas complejas no lo requieren
             //$route = self::remove_slash($route);
-            if (!self::loadParamsRoute($route, $routeContent)) {
+            if (!$this->loadParamsRoute($route, $routeContent)) {
                 $routeContent = null;
             }
         }
 
         // Agrega las cabeceras a la respuesta de existir
-        static::setHeadersToResponse();
+        $this->setHeadersToResponse();
 
         /*
          * Almacena el nombre de la ruta actual si es que lo tiene, dependiendo
          * si es una ruta normal o compleja y si es funcion o vista.
          */
         if (is_array($route)) {
-            static::$nameForRoute = $route['name'];
+            $this->nameForRoute = $route['name'];
         } elseif (is_array($routeContent)) {
-            static::$nameForRoute = $routeContent['name'];
+            $this->nameForRoute = $routeContent['name'];
         }
 
         /*
@@ -402,9 +423,9 @@ class Router {
                 throw new AppException("La aplicación ($appName) a la que pertenece la vista no esta cargada en settings.php.");
             }
         } elseif (is_callable($routeContent)) {
-            self::runFunction($routeContent);
+            $this->runFunction($routeContent);
         } else {
-            self::notView();
+            $this->notView();
         }
     }
 }

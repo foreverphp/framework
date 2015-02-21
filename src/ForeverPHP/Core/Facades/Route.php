@@ -9,5 +9,5 @@ class Route extends Facade {
      *
      * @return mixed
      */
-    protected static function getComponent() { return \ForeverPHP\Routing\Router; } //App::getInstance(); }
+    protected static function getComponent() { return \ForeverPHP\Routing\Router::getInstance(); }
 }

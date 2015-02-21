@@ -41,158 +41,180 @@ class QueryRaw {
 	const QR_PARAM_STRING = 0x33;
 	const QR_PARAM_BLOB = 0x34;
 
-	private static $dbSetting = 'default';
+	private $dbSetting = 'default';
 
-	private static $database = false;
+	private $database = false;
 
-	private static $dbInstance = null;
+	private $dbInstance = null;
 
-	private static $hasError = false;
+	private $hasError = false;
 
-	private static $error = '';
+	private $error = '';
 
-	private static $parameters = array();
+	private $parameters = array();
 
-	private static $query = null;
+	private $query = null;
 
-	private static $queryType = 'select';
+	private $queryType = 'select';
 
-	private static $queryReturn = 'num';
+	private $queryReturn = 'num';
 
-	private static $autocommit = false;
+	private $autocommit = false;
 
-	public static function using($dbSetting) {
-		static::$dbSetting = $dbSetting;
-		static::$database = false;
+	/**
+	 * Contiene la instancia singleton de QueryRaw.
+	 *
+	 * @var \ForeverPHP\Database\QueryRaw
+	 */
+	private static $instance;
+
+	public function __construct() {}
+
+	/**
+	 * Obtiene o crea la instancia singleton de QueryRaw.
+	 *
+	 * @return \ForeverPHP\Database\QueryRaw
+	 */
+	public static function getInstance() {
+		if (is_null(static::$instance)) {
+			static::$instance = new static();
+		}
+
+		return static::$instance;
 	}
 
-	public static function selectDatabase($database) {
-		static::$database = $database;
+	public function using($dbSetting) {
+		$this->dbSetting = $dbSetting;
+		$this->database = false;
 	}
 
-	public static function autocommit($value = false) {
-		static::$autocommit = $value;
+	public function selectDatabase($database) {
+		$this->database = $database;
 	}
 
-	public static function query($query, $return = self::QR_FETCH_NUM) {
-		static::$query = $query;
+	public function autocommit($value = false) {
+		$this->autocommit = $value;
+	}
+
+	public function query($query, $return = QR_FETCH_NUM) {
+		$this->query = $query;
 
 		// Debe detectar que tipo de consulta se va a ejecutar
 		$queryInLCase = strtolower($query);
 
 		if (strpos($queryInLCase, 'insert') !== false) {
-			static::$queryType = 'insert';
+			$this->queryType = 'insert';
 		} elseif (strpos($queryInLCase, 'select') !== false) {
-			static::$queryType = 'select';
+			$this->queryType = 'select';
 		} elseif (strpos($queryInLCase, 'update') !== false) {
-			static::$queryType = 'update';
+			$this->queryType = 'update';
 		} elseif (strpos($queryInLCase, 'delete') !== false) {
-			static::$queryType = 'delete';
+			$this->queryType = 'delete';
 		} else {
-			static::$queryType = 'other';
+			$this->queryType = 'other';
 		}
 
 		unset($queryInLCase);
 
-		if ($return == static::QR_FETCH_ASSOC) {
-			static::$queryReturn = 'assoc';
-		} elseif ($return == static::QR_FETCH_BOTH) {
-			static::$queryReturn = 'both';
+		if ($return == QR_FETCH_ASSOC) {
+			$this->queryReturn = 'assoc';
+		} elseif ($return == QR_FETCH_BOTH) {
+			$this->queryReturn = 'both';
 		} else {
-			static::$queryReturn = 'num';
+			$this->queryReturn = 'num';
 		}
 	}
 
-	public static function addParameter($type, $value) {
-		$count = count(static::$parameters);
+	public function addParameter($type, $value) {
+		$count = count($this->parameters);
 
 		// Cambia el parametro por el correcto
-		if ($type == static::QR_PARAM_INTEGER) {
+		if ($type == QR_PARAM_INTEGER) {
 			$type = 'i';
-		} elseif ($type == static::QR_PARAM_DOUBLE) {
+		} elseif ($type == QR_PARAM_DOUBLE) {
 			$type = 'd';
-		} elseif ($type == static::QR_PARAM_STRING) {
+		} elseif ($type == QR_PARAM_STRING) {
 			$type = 's';
-		} elseif ($type == static::QR_PARAM_BLOB) {
+		} elseif ($type == QR_PARAM_BLOB) {
 			$type = 'b';
 		}
 
-		static::$parameters[$count] = array('type' => $type, 'value' => $value);
+		$this->parameters[$count] = array('type' => $type, 'value' => $value);
 	}
 
-	public static function execute($returnType = self::QR_RETURN_ARRAY) {
-		static::$dbInstance = null;
-		static::$hasError = false;
-		static::$error = '';
+	public function execute($returnType = QR_RETURN_ARRAY) {
+		$this->dbInstance = null;
+		$this->hasError = false;
+		$this->error = '';
 		$return = false;
 
 		// Obtengo la configuracion de la base de datos a utilizar
 		$selectDb = Settings::getInstance()->get('dbs');
-		$selectDb[static::$dbSetting];
-		$dbEngine = $selectDb[static::$dbSetting]['engine'];
+		$selectDb[$this->dbSetting];
+		$dbEngine = $selectDb[$this->dbSetting]['engine'];
 
 		if ($dbEngine == 'mariadb') {
-			static::$dbInstance = new namespace\Engines\MariaDB(static::$dbSetting);
+			$this->dbInstance = new namespace\Engines\MariaDB($this->dbSetting);
 		} elseif ($dbEngine == 'mssql') {
-			static::$dbInstance = new namespace\Engines\MSSQL(static::$dbSetting);
+			$this->dbInstance = new namespace\Engines\MSSQL($this->dbSetting);
 		} elseif ($dbEngine == 'postgresql') {
-			static::$dbInstance = new namespace\Engines\PostgreSQL(static::$dbSetting);
+			$this->dbInstance = new namespace\Engines\PostgreSQL($this->dbSetting);
 		} elseif ($dbEngine == 'sqlsrv') {
-			static::$dbInstance = new namespace\Engines\SQLSRV(static::$dbSetting);
+			$this->dbInstance = new namespace\Engines\SQLSRV($this->dbSetting);
 		} else {
-			static::$error = 'Database engine not found.';
+			$this->error = 'Database engine not found.';
 		}
 
-		if (static::$dbInstance != null) {
-			if (static::$database != false) {
-				static::$dbInstance->selectDatabase(static::$database);
+		if ($this->dbInstance != null) {
+			if ($this->database != false) {
+				$this->dbInstance->selectDatabase($this->database);
 			}
 
 			// Me conecto al motor de datos
-			if (static::$dbInstance->connect()) {
-				static::$dbInstance->query(static::$query, static::$queryType, static::$queryReturn);
-				static::$dbInstance->setParameters(static::$parameters);
+			if ($this->dbInstance->connect()) {
+				$this->dbInstance->query($this->query, $this->queryType, $this->queryReturn);
+				$this->dbInstance->setParameters($this->parameters);
 
-				if ($result = static::$dbInstance->execute()) {
-					if ($returnType == static::QR_RETURN_ARRAY) {
+				if ($result = $this->dbInstance->execute()) {
+					if ($returnType == QR_RETURN_ARRAY) {
 						$return = $result;
-					} elseif ($returnType == static::QR_RETURN_JSON) {
+					} elseif ($returnType == QR_RETURN_JSON) {
 						$return = json_encode($result, JSON_FORCE_OBJECT);
 					}
 				}
 
 				// Me desconecto
-				static::$dbInstance->disconnect();
+				$this->dbInstance->disconnect();
 			}
 
 			// Recupera el ultimo error ocurrido en el motor de datos
-			static::$error = static::$dbInstance->getError();
+			$this->error = $this->dbInstance->getError();
 
-			if (!empty(static::$error)) {
-				static::$hasError = true;
+			if (!empty($this->error)) {
+				$this->hasError = true;
 				$return = false;
 			}
 		}
 
 		// Se limpian las variables
-		static::$dbInstance = null;
-		static::$parameters = array();
-		static::$query = '';
-		static::$queryType = 'select';
-		static::$queryReturn = 'num';
+		$this->dbInstance = null;
+		$this->parameters = array();
+		$this->query = '';
+		$this->queryType = 'select';
+		$this->queryReturn = 'num';
 
 		return $return;
 	}
 
-	public static function commit() {
+	public function commit() {
 
 	}
 
-	public static function hasError() {
-		return static::$hasError;
+	public function hasError() {
+		return $this->hasError;
 	}
 
-	public static function getError() {
-		return static::$error;
+	public function getError() {
+		return $this->error;
 	}
 }

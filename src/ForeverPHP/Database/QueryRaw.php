@@ -1,12 +1,27 @@
 <?php namespace ForeverPHP\Database;
 
 use ForeverPHP\Core\Settings;
+use ForeverPHP\Core\Setup;
 
 /**
  * Permite la ejecucion de consultas en bruto a la base de datos.
  *
  * @since       Version 0.1.0
  */
+
+/*
+ * Tipos de resultado a devolver.
+ */
+//Setup::toDefine('QR_FETCH_ASSOC', 0x11);
+//Setup::toDefine('QR_FETCH_BOTH', 0x12);
+//Setup::toDefine('QR_FETCH_NUM', 0x13);
+
+/*
+ * Tipos de retorno de los resultados.
+ */
+//Setup::toDefine('QR_RETURN_ARRAY', 0x21);
+//Setup::toDefine('QR_RETURN_JSON', 0x22);
+
 class QueryRaw {
 	private $dbSetting = 'default';
 
@@ -63,11 +78,11 @@ class QueryRaw {
 		$this->autocommit = $value;
 	}
 
-	public function query($query, $return = 'num') {
+	public function query($query, $fetch = 'array') {
 		$this->query = $query;
 
 		// Debe detectar que tipo de consulta se va a ejecutar
-		$queryInLCase = strtolower($query);
+		$queryInLCase = lower($query);
 
 		if (strpos($queryInLCase, 'insert') !== false) {
 			$this->queryType = 'insert';
@@ -83,13 +98,15 @@ class QueryRaw {
 
 		unset($queryInLCase);
 
-		if ($return == 'assoc') {
+		if (lower($fetch) == 'assoc') {
 			$this->queryReturn = 'assoc';
-		} elseif ($return == 'both') {
+		} elseif (lower($fetch) == 'both') {
 			$this->queryReturn = 'both';
 		} else {
 			$this->queryReturn = 'num';
 		}
+
+		return $this;
 	}
 
 	public function addParameter($type, $value) {
@@ -132,7 +149,7 @@ class QueryRaw {
 				$this->dbInstance->setParameters($this->parameters);
 
 				if ($result = $this->dbInstance->execute()) {
-					if ($returnType == 'json') {
+					if (lower($returnType) == 'json') {
 						$return = json_encode($result, JSON_FORCE_OBJECT);
 					} else {
 						// array

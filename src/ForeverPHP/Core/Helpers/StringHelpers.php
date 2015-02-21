@@ -8,12 +8,32 @@
  */
 class StringHelpers {
     /**
-     * [lower description]
+     * Devuelve el largo de la cadena.
      *
-     * @param  [type] $string [description]
-     * @return [type]         [description]
+     * @param  string $string
+     * @return string
+     */
+    public static function length($string) {
+        return strlen($string);
+    }
+
+    /**
+     * Convierte una cadena a minusculas.
+     *
+     * @param  string $string
+     * @return string
      */
     public static function lower($string) {
         return mb_strtolower($string);
+    }
+
+    /**
+     * Convierte una cadena a mayusculas.
+     *
+     * @param  string $string
+     * @return string
+     */
+    public static function upper($string) {
+        return mb_strtoupper($string);
     }
 }

@@ -34,6 +34,12 @@ if (!function_exists('camel_case')) {
     }
 }
 
+if (!function_exists('length')) {
+    function length($string) {
+        return StringHelpers::length($string);
+    }
+}
+
 if (!function_exists('lower')) {
     function lower($string) {
         return StringHelpers::lower($string);
@@ -43,5 +49,11 @@ if (!function_exists('lower')) {
 if (!function_exists('snake_case')) {
     function snake_case() {
 
+    }
+}
+
+if (!function_exists('upper')) {
+    function upper($string) {
+        return StringHelpers::upper($string);
     }
 }

@@ -132,10 +132,11 @@ class QueryRaw {
 				$this->dbInstance->setParameters($this->parameters);
 
 				if ($result = $this->dbInstance->execute()) {
-					if ($returnType == 'array') {
-						$return = $result;
-					} elseif ($returnType == 'json') {
+					if ($returnType == 'json') {
 						$return = json_encode($result, JSON_FORCE_OBJECT);
+					} else {
+						// array
+						$return = $result;
 					}
 				}
 

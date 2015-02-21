@@ -8,7 +8,6 @@ use ForeverPHP\Core\Facades\Redirect;
 use ForeverPHP\Core\Facades\Request;
 use ForeverPHP\Core\Settings;
 use ForeverPHP\Core\Setup;
-use ForeverPHP\Http\Request;
 use ForeverPHP\Http\Response;
 use ForeverPHP\Session\SessionManager;
 use ForeverPHP\View\Context;

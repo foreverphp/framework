@@ -8,39 +8,6 @@ use ForeverPHP\Core\Settings;
  * @since       Version 0.1.0
  */
 class QueryRaw {
-	/*
-	 * Constantes de tipo de consulta.
-	 */
-	const QR_QUERY_INSERT = 0x01;
-	const QR_QUERY_SELECT = 0x02;
-	const QR_QUERY_UPDATE = 0x03;
-	const QR_QUERY_DELETE = 0x04;
-	const QR_QUERY_OTHER = 0x05;
-
-	/*
-	 * Tipos de resultado a devolver.
-	 */
-	const QR_FETCH_ASSOC = 0x11;
-	const QR_FETCH_BOTH = 0x12;
-	const QR_FETCH_NUM = 0x13;
-
-	/*
-	 * Tipos de retorno de los resultados.
-	 */
-	const QR_RETURN_ARRAY = 0x21;
-	const QR_RETURN_JSON = 0x22;
-
-	/*
-	 * Tipos de parametros.
-	 *
-	 * Nota: Estas constantes estan obsoletas, solo estan para
-	 * soporte a versiones anteriores.
-	 */
-	const QR_PARAM_INTEGER = 0x31;
-	const QR_PARAM_DOUBLE = 0x32;
-	const QR_PARAM_STRING = 0x33;
-	const QR_PARAM_BLOB = 0x34;
-
 	private $dbSetting = 'default';
 
 	private $database = false;
@@ -96,7 +63,7 @@ class QueryRaw {
 		$this->autocommit = $value;
 	}
 
-	public function query($query, $return = QR_FETCH_NUM) {
+	public function query($query, $return = 'num') {
 		$this->query = $query;
 
 		// Debe detectar que tipo de consulta se va a ejecutar
@@ -116,9 +83,9 @@ class QueryRaw {
 
 		unset($queryInLCase);
 
-		if ($return == QR_FETCH_ASSOC) {
+		if ($return == 'assoc') {
 			$this->queryReturn = 'assoc';
-		} elseif ($return == QR_FETCH_BOTH) {
+		} elseif ($return == 'both') {
 			$this->queryReturn = 'both';
 		} else {
 			$this->queryReturn = 'num';
@@ -128,21 +95,10 @@ class QueryRaw {
 	public function addParameter($type, $value) {
 		$count = count($this->parameters);
 
-		// Cambia el parametro por el correcto
-		if ($type == QR_PARAM_INTEGER) {
-			$type = 'i';
-		} elseif ($type == QR_PARAM_DOUBLE) {
-			$type = 'd';
-		} elseif ($type == QR_PARAM_STRING) {
-			$type = 's';
-		} elseif ($type == QR_PARAM_BLOB) {
-			$type = 'b';
-		}
-
 		$this->parameters[$count] = array('type' => $type, 'value' => $value);
 	}
 
-	public function execute($returnType = QR_RETURN_ARRAY) {
+	public function execute($returnType = 'array') {
 		$this->dbInstance = null;
 		$this->hasError = false;
 		$this->error = '';
@@ -176,9 +132,9 @@ class QueryRaw {
 				$this->dbInstance->setParameters($this->parameters);
 
 				if ($result = $this->dbInstance->execute()) {
-					if ($returnType == QR_RETURN_ARRAY) {
+					if ($returnType == 'array') {
 						$return = $result;
-					} elseif ($returnType == QR_RETURN_JSON) {
+					} elseif ($returnType == 'json') {
 						$return = json_encode($result, JSON_FORCE_OBJECT);
 					}
 				}

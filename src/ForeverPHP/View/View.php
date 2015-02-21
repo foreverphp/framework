@@ -1,5 +1,6 @@
 <?php namespace ForeverPHP\View;
 
+use ForeverPHP\Core\App;
 use ForeverPHP\Core\Setup;
 use ForeverPHP\Core\Exceptions\ViewException;
 
@@ -19,20 +20,47 @@ class View {
      * Importa ya sea modelos o vistas de la App en ejecución o
      * de otra.
      *
+     * Para llamar modelos de otra aplicación.
+     *
+     * $this->import('model', 'otra_app.modelo');
+     *
+     * Importar vistas de otras apps o de la misma.
+     *
+     * De la misma aplicación:
+     *
+     * $this->import('view', 'mi_vista');
+     *
+     * Desde otra aplicación:
+     *
+     * $this->import('view', 'otra_app.mi_vista');
+     *
      * @param  string $type
      * @param  string $toImport
      */
     public function import($type, $toImport) {
         $pathToImport = '';
+        $import = '';
 
         // Valida si se esta importando de la misma App o de otra
+        if (!strstr($toImport, '.')) {
+            $pathToImport = App::getInstance()->getAppName();
+        } else {
+            $importSegments = explode('.', $toImport);
 
+            // Valida que la aplicación este cargada.
+            if (App::getInstance()->exists($importSegments[0])) {
+                $pathToImport = $importSegments[0];
+                $import = $importSegments[1];
+            } else {
+                throw new ViewException("Error al importar el ($type) desde ($toImport).");
+            }
+        }
 
         // Valida el tipo de objeto a importar
         if ($type === 'model') {
-            $pathToImport = 'models/';
+            $pathToImport .= 'models/' . $import;
         } elseif ($type === 'view') {
-            $pathToImport = 'views/';
+            $pathToImport .= 'views/' . $import;
         } else {
             throw new ViewException("Imported object type ($type) is invalid.");
         }

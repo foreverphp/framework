@@ -5,18 +5,41 @@ use ForeverPHP\Core\Exceptions\SecurityException;
 /**
  * Permite generar diversos tipos de hash.
  *
+ * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.2.0
  */
 class Hash {
-    private static function generateMD5($value) {
+    /**
+     * Contiene la instancia singleton de Hash.
+     *
+     * @var \ForeverPHP\Security\Hash
+     */
+    private static $instance;
+
+    public function __construct() {}
+
+    /**
+     * Obtiene o crea la instancia singleton de App.
+     *
+     * @return \ForeverPHP\Security\Hash
+     */
+    public static function getInstance() {
+        if (is_null(static::$instance)) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
+    }
+
+    private function makeMD5($value) {
         return md5($value);
     }
 
-    private static function generateSHA1($value) {
+    private function makeSHA1($value) {
 
     }
 
-    public static function create($values, $type = 'md5') {
+    public function make($values, $type = 'md5') {
         $valueToHash = '';    // Alamacena el valor a hashear, puede ser una matriz
         $newHash = '';         // Alamacena el valor ya hasheado
 
@@ -29,9 +52,9 @@ class Hash {
         }
 
         if ($type === 'md5') {
-            $newHash = self::generateMD5($valueToHash);
+            $newHash = $this->makeMD5($valueToHash);
         } elseif ($type === 'sha1') {
-            $newHash = self::generateSHA1($valueToHash);
+            $newHash = $this->makeSHA1($valueToHash);
         } else {
             // Formato no compatible
             throw new SecurityException("El formato hash ($type) no es valido.");

@@ -1,7 +1,11 @@
 <?php namespace ForeverPHP\View;
 
+use ForeverPHP\Core\Setup;
+use ForeverPHP\Core\Exceptions\ViewException;
+
 /**
- * Todas las vistas deben heredar de este archivo, para ser tratadas como tal.
+ * Todas las vistas deben heredar de este archivo, para ser tratadas
+ * como tal.
  *
  * @since       Version 0.1.0
  */
@@ -10,6 +14,31 @@ class View {
     public $restful = false;
 
     public function __construct() {}
+
+    /**
+     * Importa ya sea modelos o vistas de la App en ejecución o
+     * de otra.
+     *
+     * @param  string $type
+     * @param  string $toImport
+     */
+    public function import($type, $toImport) {
+        $pathToImport = '';
+
+        // Valida si se esta importando de la misma App o de otra
+
+
+        // Valida el tipo de objeto a importar
+        if ($type === 'model') {
+            $pathToImport = 'models/';
+        } elseif ($type === 'view') {
+            $pathToImport = 'views/';
+        } else {
+            throw new ViewException("Imported object type ($type) is invalid.");
+        }
+
+        Setup::importFromApp($pathToImport);
+    }
 
     /*
      * Solo retorna el contexto global.

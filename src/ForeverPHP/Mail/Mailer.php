@@ -11,15 +11,35 @@ use PHPMailer;
  * @since       Version 0.1.0
  */
 class Mailer {
-    public function __construct($to, $subject, $message, $from) {
+    /**
+     * Contiene la instancia singleton de Mailer.
+     *
+     * @var \ForeverPHP\Mail\Mailer
+     */
+    private static $instance;
+
+    public function __construct() {}
+
+    /**
+     * Obtiene o crea la instancia singleton de App.
+     *
+     * @return \ForeverPHP\Core\App
+     */
+    public static function getInstance() {
+        if (is_null(static::$instance)) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
+    }
+
+    public function send($to, $subject, $message, $from) {
         $this->to = $to;
         $this->subject = $subject;
         $this->message = $message;
         $this->from = $from;
         $this->mail = new PHPMailer();
-    }
 
-    public function send() {
         $settings = Settings::getInstance()->get('mail');
 
         $this->mail->isSMTP();

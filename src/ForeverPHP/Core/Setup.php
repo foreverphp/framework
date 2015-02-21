@@ -3,7 +3,7 @@
 use ForeverPHP\Core\Exceptions\SetupException;
 
 /**
- * Importa objetos y configuraciones del framework.
+ * Importa objetos y configuraciones del framework y Apps.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
@@ -12,7 +12,7 @@ class Setup {
     /**
      * Carga una libreria al nucleo del framework.
      *
-     * @param string $name  Nombre de la libreria.
+     * @param string $name
      */
     public static function importLib($name) {
         $libPath = FOREVERPHP_ROOT . DS . 'libs' . DS . $name . '.php';
@@ -27,7 +27,7 @@ class Setup {
     /**
      * Carga un objeto de foreverPHP.
      *
-     * @param string $name  Nombre del objeto a importar.
+     * @param string $name
      */
     public static function import($name) {
         $importPath = FOREVERPHP_ROOT . DS . $name . '.php';
@@ -35,15 +35,31 @@ class Setup {
         if (file_exists($importPath)) {
             include_once $importPath;
         } else {
-            throw new SetupException("El objeto a importar ($name) no existe.");
+            throw new SetupException("The object to import ($name) not exists.");
         }
     }
 
     /**
-     * Permite definir valores, comprobando si ya existen previamente.
+     * Carga un objeto desde las Apps.
      *
-     * @param string $define    Nombre de la constante a definir.
-     * @param string $value     Valor de la constante.
+     * @param string $path
+     */
+    public static function importFromApp($path) {
+        $importPath = APPS_ROOT . DS . $path . '.php';
+
+        if (file_exists($importPath)) {
+            include_once $importPath;
+        } else {
+            throw new SetupException("The object to import ($path) not exists.");
+        }
+    }
+
+    /**
+     * Permite definir valores, comprobando si ya existen
+     * previamente.
+     *
+     * @param string $define
+     * @param string $value
      */
     public static function toDefine($define, $value) {
         if (!defined($define)) {

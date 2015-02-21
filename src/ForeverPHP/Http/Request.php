@@ -9,27 +9,49 @@ use ForeverPHP\Core\Settings;
  */
 class Request {
 
-    private static $registered = false;
+    private $registered = false;
 
-    private static $files = null;
+    private $files = null;
 
-    private static $method = 'get';
+    private $method = 'get';
 
-    private static $params = null;
+    private $params = null;
 
-    private static function loadRequest() {
+    /**
+     * Contiene la instancia singleton de Request.
+     *
+     * @var \ForeverPHP\Http\Request
+     */
+    private static $instance;
+
+    public function __construct() {}
+
+    /**
+     * Obtiene o crea la instancia singleton de Request.
+     *
+     * @return \ForeverPHP\Http\Request
+     */
+    public static function getInstance() {
+        if (is_null(static::$instance)) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
+    }
+
+    private function loadRequest() {
         $requestParams = null;
 
-        if (self::$params == null) {
+        if ($this->params == null) {
             $requestMethod = $_SERVER['REQUEST_METHOD'];
-            self::$files = array();
-            self::$params = array();
+            $this->files = array();
+            $this->params = array();
 
             if ($requestMethod == 'GET') {
-                self::$method = 'get';
+                $this->method = 'get';
                 $requestParams = $_GET;
             } elseif ($requestMethod == 'POST') {
-                self::$method = 'post';
+                $this->method = 'post';
                 $requestParams = $_POST;
             } elseif ($requestMethod == 'PUT' || $requestMethod == 'DELETE') {
                 /*
@@ -45,9 +67,9 @@ class Request {
                 parse_str($requestContent, $requestParams);
 
                 if ($requestMethod == 'PUT') {
-                    self::$method = 'put';
+                    $this->method = 'put';
                 } else {
-                    self::$method = 'delete';
+                    $this->method = 'delete';
                 }
             }
 
@@ -56,59 +78,59 @@ class Request {
                     // Almaceno el token CSRF para luego validarlo
                     Settings::getInstance()->set($name, $value);
                 } else {
-                    self::$params[$name] = $value;
+                    $this->params[$name] = $value;
                 }
             }
         }
     }
 
-    public static function register($params = null) {
-        if (!static::$registered) {
+    public function register($params = null) {
+        if (!$this->registered) {
             if ($params == null) {
-                self::loadRequest();
+                $this->loadRequest();
             } else {
                 // Parametros pasados por Url
                 // Ejemplo: posts/post/12 (posts/post/{id})
-                self::$params = $params;
+                $this->params = $params;
             }
 
-            static::$registered = true;
+            $this->registered = true;
         }
     }
 
-    public static function path() {
+    public function path() {
         // retorna la uri
     }
 
-    public static function url() {
+    public function url() {
         // retorna la url del request
     }
 
-    public static function segment($number) {
+    public function segment($number) {
         // devuelve el segmento de url indicado
     }
 
-    public static function is($path) {
+    public function is($path) {
         // valida si se esta en el path
     }
 
-    public static function header($name) {
+    public function header($name) {
         // devuelve el elemento del header ejemplo 'Content-Type'
     }
 
-    public static function server($var) {
+    public function server($var) {
         // retorna valores de $_SERVER
     }
 
-    public static function host() {
+    public function host() {
         return Host::getInstance();
     }
 
-    public static function method() {
+    public function method() {
         return self::$_method;
     }
 
-    public static function isMethod($method) {
+    public function isMethod($method) {
         if (strtolower($method) === self::$method) {
             return true;
         }
@@ -116,23 +138,23 @@ class Request {
         return false;
     }
 
-    public static function secure() {
+    public function secure() {
         // devuelve si esta en https o no
     }
 
-    public static function ajax() {
+    public function ajax() {
         // devuelve si esta en ajax o no
     }
 
-    public static function isJson() {
+    public function isJson() {
         // devuelve si el request content-type es de tipo json
     }
 
-    public static function wantsJson() {
+    public function wantsJson() {
         // devuelve si la solicitud esta pidiendo json o no
     }
 
-    public static function format($format) {
+    public function format($format) {
         /*
         Comprobación del formato de respuesta de la petición de
 
@@ -140,9 +162,9 @@ class Request {
          */
     }
 
-    public static function exists($name) {
-        if (!is_null(self::$params)) {
-            if (array_key_exists($name, self::$params)) {
+    public function exists($name) {
+        if (!is_null($this->params)) {
+            if (array_key_exists($name, $this->params)) {
                 return true;
             }
         }
@@ -150,23 +172,23 @@ class Request {
         return false;
     }
 
-    public static function get($name) {
-        if (self::exists($name)) {
-            return self::$params[$name];
+    public function get($name) {
+        if ($this->exists($name)) {
+            return $this->params[$name];
         }
 
         return false;
     }
 
-    public static function all() {
-        return self::$params;
+    public function all() {
+        return $this->params;
     }
 
-    public static function hasFile($name) {
+    public function hasFile($name) {
         // indica si el parametro pasado por nombre es de tipo file
     }
 
-    public static function file($name) {
+    public function file($name) {
         // retorna un parametro de tipo archivo
     }
 }

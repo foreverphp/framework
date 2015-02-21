@@ -7,7 +7,34 @@
  * @since       Version 0.1.0
  */
 class Cookie {
-    private static $cookiesExpires = array(); // Almacena los minutos de expiracion de las cookies.
+    /**
+     * Almacena los minutos de expiracion de las cookies.
+     *
+     * @var array
+     */
+    private $cookiesExpires = array();
+
+    /**
+     * Contiene la instancia singleton de Cookie.
+     *
+     * @var \ForeverPHP\Core\Cookie
+     */
+    private static $instance;
+
+    public function __construct() {}
+
+    /**
+     * Obtiene o crea la instancia singleton de Cookie.
+     *
+     * @return \ForeverPHP\Core\Cookie
+     */
+    public static function getInstance() {
+        if (is_null(static::$instance)) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
+    }
 
     /**
      * Verifica que exista la cookie.
@@ -15,7 +42,7 @@ class Cookie {
      * @param  string $name Nombre de la cookie.
      * @return boolean      Devuelve true si existe la cookie y false si no.
      */
-    public static function exists($name) {
+    public function exists($name) {
         if (isset($_COOKIE[$name])) {
             return true;
         }
@@ -34,7 +61,7 @@ class Cookie {
      * @param boolean $secure   Indica que la cookie sólo debiera transmitirse por una conexión segura HTTPS desde el cliente.
      * @param boolean $httponly Cuando es TRUE la cookie será accesible sólo a través del protocolo HTTP.
      */
-    public static function set($name, $value, $expire = 0, $path = null, $domain = null, $secure = false, $httpOnly = false) {
+    public function set($name, $value, $expire = 0, $path = null, $domain = null, $secure = false, $httpOnly = false) {
         /*
          * La cookie expira al cerrar el navegador por defecto, pero si
          * en $expire se pasa un -1 la cookie tendra una duracion de 1 año.
@@ -78,8 +105,8 @@ class Cookie {
      * @param boolean $secure   Indica que la cookie sólo debiera transmitirse por una conexión segura HTTPS desde el cliente.
      * @param boolean $httponly Cuando es TRUE la cookie será accesible sólo a través del protocolo HTTP.
      */
-    public static function forever($name, $value, $path = null, $domain = null, $secure = false, $httpOnly = false) {
-        self::set($name, $value, -1, $path, $domain, $secure, $httpOnly);
+    public function forever($name, $value, $path = null, $domain = null, $secure = false, $httpOnly = false) {
+        $this->set($name, $value, -1, $path, $domain, $secure, $httpOnly);
     }
 
     // Implementar en versiones futuras
@@ -98,8 +125,8 @@ class Cookie {
      * @param  string $name Nombre de la cookie.
      * @return boolean      De encontrarse la cookie se retorna si no, se retornara false.
      */
-    public static function get($name) {
-        if (self::exists($name)) {
+    public function get($name) {
+        if ($this->exists($name)) {
             // Retorna el valor de la cookie
             return base64_decode($_COOKIE[$name]);
         }
@@ -116,11 +143,11 @@ class Cookie {
      * @param boolean $secure   Indica que la cookie sólo debiera transmitirse por una conexión segura HTTPS desde el cliente.
      * @param boolean $httponly Cuando es TRUE la cookie será accesible sólo a través del protocolo HTTP.
      */
-    public static function remove($name, $path = null, $domain = null, $secure = false, $httpOnly = false) {
-        if (self::exists($name)) {
+    public function remove($name, $path = null, $domain = null, $secure = false, $httpOnly = false) {
+        if ($this->exists($name)) {
             $expire = time() - (3600 * 24 * 365);
 
-            self::set($name, '', $expire, $path, $domain, $secure, $httpOnly);
+            $this->set($name, '', $expire, $path, $domain, $secure, $httpOnly);
         }
     }
 }

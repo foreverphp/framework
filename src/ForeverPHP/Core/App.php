@@ -1,6 +1,8 @@
 <?php namespace ForeverPHP\Core;
 
 use ForeverPHP\Core\ClassLoader;
+use ForeverPHP\Core\Exceptions\AppException;
+use ForeverPHP\Core\Exceptions\ViewException;
 use ForeverPHP\Core\Setup;
 
 /**
@@ -22,8 +24,6 @@ use ForeverPHP\Core\Setup;
  * y la carga de modelos y vistas
  * ademas de los contextos globales
  */
-class AppException extends \Exception {}
-
 class App {
     /**
      * Nombre de la aplicación actual.

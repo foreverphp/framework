@@ -1,6 +1,7 @@
 <?php namespace ForeverPHP\Http;
 
 use ForeverPHP\Core\Settings;
+use ForeverPHP\Http\RequestFile;
 
 /**
  * Contiene parametros he informacion del request.

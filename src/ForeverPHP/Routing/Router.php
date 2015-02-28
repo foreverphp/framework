@@ -16,6 +16,7 @@ use ForeverPHP\View\View;
  * Almacena todas las rutas en una matriz para luego ejecutar la ruta
  * solicitada.
  *
+ * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
 class Router {

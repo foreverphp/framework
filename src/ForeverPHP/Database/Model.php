@@ -1,24 +1,15 @@
-<?php
+<?php namespace ForeverPHP\Database;
+
 /**
- * foreverPHP - Framework MVT (Model - View - Template)
- *
- * Model:
- *
  * ORM: para bases de datos relacionales.
  * ODM: para bases de datos no relacionales basadas en documentos.
  *
  * Model es el motor ORM estandar del framework, por el momento solo trabaja con
  * bases de datos relacionales.
  *
- * @package     foreverPHP
- * @subpackage  model
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @copyright   Copyright (c) 2014, Emarva.
- * @license     http://www.opensource.org/licenses/mit-license.php MIT License
- * @link        http://www.emarva.com/foreverphp
- * @since       Version 0.2.0
+ * @since       Version 0.4.0
  */
-
 class Model extends QuerySet {
     protected $data = array();       // Almacena el contenido que se va a trabajar en el modelo
 
@@ -63,7 +54,7 @@ class Model extends QuerySet {
 
 
 
-    public function order_by() {
+    public function orderBy() {
 
     }
 

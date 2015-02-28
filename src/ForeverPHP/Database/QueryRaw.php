@@ -78,7 +78,7 @@ class QueryRaw {
 		$this->autocommit = $value;
 	}
 
-	public function query($query, $fetch = 'array') {
+	public function query($query, $fetch = 'num') {
 		$this->query = $query;
 
 		// Debe detectar que tipo de consulta se va a ejecutar
@@ -102,6 +102,8 @@ class QueryRaw {
 			$this->queryReturn = 'assoc';
 		} elseif (lower($fetch) == 'both') {
 			$this->queryReturn = 'both';
+		} elseif (lower($fetch) == 'object') {
+			$this->queryReturn = 'object';
 		} else {
 			$this->queryReturn = 'num';
 		}
@@ -145,15 +147,21 @@ class QueryRaw {
 
 			// Me conecto al motor de datos
 			if ($this->dbInstance->connect()) {
-				$this->dbInstance->query($this->query, $this->queryType, $this->queryReturn);
+				$this->dbInstance->query($this->query, $this->queryType, ($this->queryReturn == 'object') ? 'assoc' : $this->queryReturn);
 				$this->dbInstance->setParameters($this->parameters);
 
 				if ($result = $this->dbInstance->execute()) {
 					if (lower($returnType) == 'json') {
 						$return = json_encode($result, JSON_FORCE_OBJECT);
 					} else {
-						// array
-						$return = $result;
+						if ($this->queryReturn == 'object') {
+							// object
+							//$return = (object)$result;
+							$return = json_decode(json_encode($result));
+						} else {
+							// array
+							$return = $result;
+						}
 					}
 				}
 
@@ -163,6 +171,8 @@ class QueryRaw {
 
 			// Recupera el ultimo error ocurrido en el motor de datos
 			$this->error = $this->dbInstance->getError();
+
+			echo $this->error;
 
 			if (!empty($this->error)) {
 				$this->hasError = true;

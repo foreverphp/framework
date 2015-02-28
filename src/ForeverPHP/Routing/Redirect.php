@@ -8,6 +8,7 @@ use ForeverPHP\View\Context;
 /**
  * Permite la redireccion con multiples opciones.
  *
+ * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since 0.2.0
  */
 class Redirect {

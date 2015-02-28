@@ -73,6 +73,13 @@ class Request {
                 }
             }
 
+            // Verifica si hay archivos enviados
+            if (count($_FILES) != 0) {
+                foreach ($_FILES as $name => $value) {
+                    $this->files[$name] = new RequestFile($value);
+                }
+            }
+
             foreach($requestParams as $name => $value) {
                 if ($name == 'csrfToken') {
                     // Almaceno el token CSRF para luego validarlo

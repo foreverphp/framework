@@ -197,6 +197,6 @@ class Request {
     }
 
     public function file($name) {
-        // retorna un parametro de tipo archivo
+        return $this->files[$name];
     }
 }

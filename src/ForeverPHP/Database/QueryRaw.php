@@ -8,20 +8,6 @@ use ForeverPHP\Core\Setup;
  *
  * @since       Version 0.1.0
  */
-
-/*
- * Tipos de resultado a devolver.
- */
-//Setup::toDefine('QR_FETCH_ASSOC', 0x11);
-//Setup::toDefine('QR_FETCH_BOTH', 0x12);
-//Setup::toDefine('QR_FETCH_NUM', 0x13);
-
-/*
- * Tipos de retorno de los resultados.
- */
-//Setup::toDefine('QR_RETURN_ARRAY', 0x21);
-//Setup::toDefine('QR_RETURN_JSON', 0x22);
-
 class QueryRaw {
 	private $dbSetting = 'default';
 
@@ -171,8 +157,6 @@ class QueryRaw {
 
 			// Recupera el ultimo error ocurrido en el motor de datos
 			$this->error = $this->dbInstance->getError();
-
-			echo $this->error;
 
 			if (!empty($this->error)) {
 				$this->hasError = true;

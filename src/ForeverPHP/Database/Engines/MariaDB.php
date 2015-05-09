@@ -17,8 +17,18 @@ class MariaDB extends BaseEngine implements DbEngineInterface {
 
         $dbName = ($this->database != false) ? $this->database : $db['database'];
 
+        $socket = false;
+
+        if ($db['usingSocket']) {
+        	$socket = $db['socket'];
+        }
+
         // Me conecto a la base de datos
-        $this->link = mysqli_connect($db['server'], $db['user'], $db['password'], $dbName, $db['port']);
+        if (!$socket) {
+        	$this->link = mysqli_connect($db['server'], $db['user'], $db['password'], $dbName, $db['port']);
+        } else {
+        	$this->link = mysqli_connect($db['server'], $db['user'], $db['password'], $dbName, $db['port'], $socket);
+        }
 
         if (mysqli_connect_errno()) {
         	$this->error = mysqli_connect_error();

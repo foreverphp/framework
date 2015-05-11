@@ -213,7 +213,28 @@ class App {
         $this->makeResponse($returnValue);
     }
 
+    /**
+     * Retorna el nombre de la aplicación actual.
+     *
+     * @return string
+     */
     public function getAppName() {
         return $this->appName;
+    }
+
+    /**
+     * Importa una vista propia o de otra aplicación
+     *
+     * @param  string $view
+     * @param  string $appName
+     */
+    public function importView($view, $appName = $this->appName) {
+        $importPath = APPS_ROOT . DS . $appName . DS . 'views' . DS . $view . '.php';
+
+        if (file_exists($importPath)) {
+            include_once $importPath;
+        } else {
+            throw new AppException("The object to import ($view) not exists.");
+        }
     }
 }

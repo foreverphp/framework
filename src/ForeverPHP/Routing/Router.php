@@ -109,6 +109,15 @@ class Router {
         return $newRoute;
     }
 
+    /**
+     * Carga las rutas propias de una aplicación.
+     *
+     * @param  string $appName
+     */
+    public function fromApp($appName) {
+        require_once APPS_ROOT . DS . $appName . DS . 'approutes.php';
+    }
+
     public function add($route, $view, $middlewares = null) {
         $app = null;        // Aplicacion donde esta la vista
         $v = null;          // Vista a buscar

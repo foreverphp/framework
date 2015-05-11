@@ -43,7 +43,7 @@ class Settings {
         $path = APPS_ROOT . DS . 'settings.php';
 
         if (!file_exists($path)) {
-            exit("El archivo de configuración settings.php no existe.");
+            exit('El archivo de configuración settings.php no existe.');
         }
 
         $this->settings = require $path;
@@ -90,7 +90,27 @@ class Settings {
      */
     public function get($name) {
         if ($this->exists($name)) {
-            return $this->settings[$name];
+            $value = $this->settings[$name];
+
+            /*
+             * NO VA: Si el valor a devolver es una matriz se debe retornar una
+             * instancia de SubSettings para recorrer dicha matriz y asi
+             * sucesivamente hasta recorrer toda la configuracion.
+             */
+
+            /*
+             * Idea si se quiere llamar a una configuracion que esta en una matriz
+             * dentro del settings.php
+             *
+             * podria haber dos opciones:
+             *     1.- con secciones:
+             *         Settings::get($name, $section);
+             *
+             *     2.- con separaciones por punto:
+             *         Settings::get('db.default.port');
+             */
+
+            return $value;
         }
 
         return false;

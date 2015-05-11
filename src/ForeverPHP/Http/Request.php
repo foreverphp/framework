@@ -139,7 +139,7 @@ class Request {
     }
 
     public function isMethod($method) {
-        if (strtolower($method) === self::$method) {
+        if (strtolower($method) === $this->method) {
             return true;
         }
 

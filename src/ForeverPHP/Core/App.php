@@ -228,7 +228,8 @@ class App {
      * @param  string $view
      * @param  string $appName
      */
-    public function importView($view, $appName = $this->appName) {
+    public function importView($view, $appName = null) {
+        $appName = ($appName === null) ? $this->appName : $appName;
         $importPath = APPS_ROOT . DS . $appName . DS . 'views' . DS . $view . '.php';
 
         if (file_exists($importPath)) {

@@ -204,6 +204,10 @@ class App {
         }
 
         // Creo la vista y la ejecuto y le asigno el request a la vista para manipulacion interna
+        if (Settings::getInstance()->get('usingNamespaces')) {
+            $view = '\\Apps\\' . $this->appName . '\\Views\\' . $view;
+        }
+
         $v = new $view();
 
         // Ejecuta la funcion y almacena su valor de retorno

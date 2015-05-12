@@ -238,4 +238,17 @@ class App {
             throw new AppException("The object to import ($view) not exists.");
         }
     }
+
+    public function instanceView($view, $appName = null) {
+        $appName = ($appName === null) ? $this->appName : $appName;
+        $importPath = APPS_ROOT . DS . $appName . DS . 'views' . DS . $view . '.php';
+
+        if (file_exists($importPath)) {
+            include_once $importPath;
+        } else {
+            throw new AppException("The object to import ($view) not exists.");
+        }
+
+        return new $view;
+    }
 }

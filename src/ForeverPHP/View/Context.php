@@ -57,7 +57,8 @@ class Context {
      * @return boolean
      */
     public function merge($context) {
-
+        $content = $context->all();
+        array_combine($content, $this->items);
     }
 
     /**

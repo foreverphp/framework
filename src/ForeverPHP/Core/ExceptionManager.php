@@ -13,12 +13,42 @@ use ForeverPHP\View\Context;
  */
 class ExceptionManager {
     /**
-     * Permite lanzar una excepcion propia se le puede pasar como
-     * parametro una Exception.
+     * Permite mostrar un excepción propia.
      *
-     * @param Exception $exception
+     * @param  string $type
+     * @param  string $message
+     * @return void
      */
-    private static function triggerException($exception = null) {
+    private static function viewException($type, $message) {
+        $title = 'Excepción';
+
+        // 1 es Error Fatal
+        if ($type === 1) {
+            $title = 'Error Fatal';
+        }
+
+        if (Settings::getInstance()->inDebug()) {
+            $ctx = new Context();
+            $ctx->set('exception', $title);
+            $ctx->set('details', $message);
+
+            // Le indico a la vista que haga render usando los templates del framework
+            Settings::getInstance()->set('ForeverPHPTemplate', true);
+
+            $response = new Response();
+            $response->render('exception', $ctx)->make();
+        } else {
+            Redirect::error(500);
+        }
+    }
+
+    /**
+     * Manipulador de excepciones.
+     *
+     * @param  Exception $exception
+     * @return void
+     */
+    public static function exceptionHandler($exception) {
         $message = 'Tipo de excepción no valida.';
 
         /*
@@ -37,22 +67,59 @@ class ExceptionManager {
             }
         }
 
-        if (Settings::getInstance()->inDebug()) {
-            $ctx = new Context();
-            $ctx->set('exception', 'Excepción');
-            $ctx->set('details', $message);
-
-            // Le indico a la vista que haga render usando los templates del framework
-            Settings::getInstance()->set('ForeverPHPTemplate', true);
-
-            $response = new Response();
-            $response->render('exception', $ctx)->make();
-        } else {
-            Redirect::error(500);
-        }
+        static::viewException(0, $message);
     }
 
-    public static function exceptionHandler($exception) {
-        static::triggerException($exception);
+    /**
+     * Manipulador de funciones de cierre, por ejemplo para controlar
+     * errores fatales (E_ERROR).
+     *
+     * @return void
+     */
+    public static function shutdownFunctionHandler() {
+        $type = 'UNKNOWN';
+        $error = error_get_last();
+
+        if ($error !== null) {
+            switch ($error['type']){
+                case E_ERROR: // 1
+                    $type = 'E_ERROR'; break;
+                case E_WARNING: // 2
+                    $type = 'E_WARNING'; break;
+                case E_PARSE: // 4
+                    $type = 'E_PARSE'; break;
+                case E_NOTICE: // 8
+                    $type = 'E_NOTICE'; break;
+                case E_CORE_ERROR: // 16
+                    $type = 'E_CORE_ERROR'; break;
+                case E_CORE_WARNING: // 32
+                    $type = 'E_CORE_WARNING'; break;
+                case E_COMPILE_ERROR: // 64
+                    $type = 'E_COMPILE_ERROR'; break;
+                case E_CORE_WARNING: // 128
+                    $type = 'E_COMPILE_WARNING'; break;
+                case E_USER_ERROR: // 256
+                    $type = 'E_USER_ERROR'; break;
+                case E_USER_WARNING: // 512
+                    $type = 'E_USER_WARNING'; break;
+                case E_USER_NOTICE: // 1024
+                    $type = 'E_USER_NOTICE'; break;
+                case E_STRICT: // 2048
+                    $type = 'E_STRICT'; break;
+                case E_RECOVERABLE_ERROR: // 4096
+                    $type = 'E_RECOVERABLE_ERROR'; break;
+                case E_DEPRECATED: // 8192
+                    $type = 'E_DEPRECATED'; break;
+                case E_USER_DEPRECATED: // 16384
+                    $type = 'E_USER_DEPRECATED'; break;
+            }
+
+            $message = 'Tipo: ' . $type . '<br />';
+            $message .= 'Mensaje: ' . $error['message'] . '<br />';
+            $message .= 'Archivo: ' . $error['file'] . '<br />';
+            $message .= 'Line: ' . $error['line'];
+
+            static::viewException(1, $message);
+        }
     }
 }

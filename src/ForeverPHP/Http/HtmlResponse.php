@@ -38,7 +38,7 @@ class HtmlResponse implements ResponseInterface {
      */
     private $usingCache;
 
-    public function __construct($template, $context, $usingCache = true) {
+    public function __construct($template, $context, $usingCache = false) {
         $this->template = $template;
         $this->context = $context;
         $this->usingCache = $usingCache;

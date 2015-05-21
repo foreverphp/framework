@@ -7,8 +7,8 @@
  * @since   Version 0.4.0
  */
 interface CacheInterface {
-    public function exists($name);
-    public function set($name, $value);
-    public function get($name);
-    public function remove($name);
+    public function exists($key);
+    public function set($key, $value);
+    public function get($key);
+    public function remove($key);
 }

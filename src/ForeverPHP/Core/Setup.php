@@ -10,6 +10,37 @@ use ForeverPHP\Core\Exceptions\SetupException;
  */
 class Setup {
     /**
+     * Inicializador, se encarga de cargar los requerimientos para la
+     * ejecución.
+     *
+     * @return void
+     */
+    public static function initialize() {
+        /*
+         * Defino la ruta de los templates y estaticos del framework.
+         */
+        static::toDefine('FOREVERPHP_ROOT', dirname(dirname(__FILE__)));
+        static::toDefine('FOREVERPHP_TEMPLATES_PATH', FOREVERPHP_ROOT . DS . 'static' . DS . 'templates' . DS);
+        static::toDefine('FOREVERPHP_STATIC_PATH', basename(FOREVERPHP_ROOT) . DS . 'static' . DS);
+
+        /*
+         * Establece como el manejador de errores ExceptionManager.
+         */
+        set_error_handler('\ForeverPHP\Core\ExceptionManager::errorHandler');
+
+        /*
+         * Establece como el manejador de excepciones no controladas a
+         * ExceptionManager.
+         */
+        set_exception_handler('\ForeverPHP\Core\ExceptionManager::exceptionHandler');
+
+        /*
+         * Le deja el control de la función de cierre a ExceptionManager.
+         */
+        register_shutdown_function('\ForeverPHP\Core\ExceptionManager::shutdown');
+    }
+
+    /**
      * Carga una libreria al nucleo del framework.
      *
      * @param string $name

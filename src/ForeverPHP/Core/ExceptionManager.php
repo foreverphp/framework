@@ -30,9 +30,9 @@ class ExceptionManager {
         $template = 'exception';
         $title = 'Excepción';
 
-        // 1 es Error Fatal
+        // 1 es Error
         if ($type === 1) {
-            $title = 'Error Fatal';
+            $title = 'Error';
         }
 
         if (Settings::getInstance()->inDebug()) {
@@ -140,11 +140,11 @@ class ExceptionManager {
     }
 
     /**
-     * Ultima función en ejecutarse, una vez terminada la ejecución del script.
+     * Muestra los errores.
      *
      * @return void
      */
-    public static function shutdown() {
+    private static function showErrors() {
         if (count(static::$errors) > 0) {
             $errorsList = '';
 
@@ -157,6 +157,26 @@ class ExceptionManager {
 
             static::viewException(1, $errorsList);
         }
+    }
+
+    /**
+     * Ultima función en ejecutarse, una vez terminada la ejecución del script.
+     *
+     * @return void
+     */
+    public static function shutdown() {
+        if (count(static::$errors) == 0) {
+            $error = error_get_last();
+
+            if ($error != null) {
+                ob_start();
+
+                static::errorHandler($error['type'], $error['message'], $error['file'], $error['line']);
+            }
+        }
+
+        // Muestra los errores
+        static::showErrors();
 
         /*
          * Como ultima funcion en ejecutarse, es aca donde se termina el flujo

@@ -31,8 +31,8 @@ class FileCache implements CacheInterface {
      * @param  string $key
      * @return boolean
      */
-    public function exists($name) {
-        $filenameCache = $this->location . DS . $name;
+    public function exists($key) {
+        $filenameCache = $this->location . DS . $key;
 
         if (file_exists($filenameCache)) {
             return true;
@@ -44,12 +44,12 @@ class FileCache implements CacheInterface {
     /**
      * Almacena un nuevo archivo en cache.
      *
-     * @param string $name
+     * @param string $key
      * @param string $value
      */
-    public function set($name, $value) {
+    public function set($key, $value) {
         try {
-            $filenameCache = $this->location . DS . $name;
+            $filenameCache = $this->location . DS . $key;
 
             // Escribe el archivo en cache
             file_put_contents($filenameCache, $value);
@@ -60,12 +60,12 @@ class FileCache implements CacheInterface {
         return true;
     }
 
-    public function get($name) {
+    public function get($key) {
 
 
     }
 
-    public function remove($name) {
+    public function remove($key) {
 
     }
 }

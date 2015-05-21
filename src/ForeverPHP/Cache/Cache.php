@@ -146,28 +146,34 @@ class Cache {
     /**
      * Valida si la entrada existe en el cache.
      *
-     * @param  string $name
+     * @param  string $key
      * @return boolean
      */
-    public function exists($name) {
-        return $this->cacheEngine->exists($name);
+    public function exists($key) {
+        if ($this->cacheEnabled) {
+            return $this->cacheEngine->exists($key);
+        }
+
+        return false;
     }
 
     /**
      * Almacena una entrada en el cache.
      *
-     * @param string $name
+     * @param string $key
      * @param string $value
      */
-    public function set($name, $value) {
-        $this->cacheEngine->set($name, $value);
+    public function set($key, $value) {
+        if ($this->cacheEnabled) {
+            $this->cacheEngine->set($key, $value);
+        }
     }
 
-    public function get($name) {
+    public function get($key) {
         // NO DISPONIBLE POR AHORA, YA QUE SE ESTAN HACIENDO PRUEBAS CON EL CACHE
     }
 
-    public function remove($name) {
+    public function remove($key) {
         // NO DISPONIBLE POR AHORA, YA QUE SE ESTAN HACIENDO PRUEBAS CON EL CACHE
     }
 }

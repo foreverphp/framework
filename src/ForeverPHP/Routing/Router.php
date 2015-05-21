@@ -351,27 +351,6 @@ class Router {
         // Obtiene la ruta actual
         $route = $this->getRoute();
 
-        /*
-         * Establece como el manejador de errores ExceptionManager.
-         */
-        set_error_handler('\ForeverPHP\Core\ExceptionManager::errorHandler');
-
-        /*
-         * Establece como el manejador de excepciones no controladas a
-         * ExceptionManager.
-         */
-        set_exception_handler('\ForeverPHP\Core\ExceptionManager::exceptionHandler');
-
-        /*
-         * Le deja el control de la función de cierre a ExceptionManager.
-         */
-        register_shutdown_function('\ForeverPHP\Core\ExceptionManager::shutdown');
-
-        // Defino la ruta de los templates y estaticos del framework
-        Setup::toDefine('FOREVERPHP_ROOT', dirname(dirname(__FILE__)));
-        Setup::toDefine('FOREVERPHP_TEMPLATES_PATH', FOREVERPHP_ROOT . DS . 'static' . DS . 'templates' . DS);
-        Setup::toDefine('FOREVERPHP_STATIC_PATH', basename(FOREVERPHP_ROOT) . DS . 'static' . DS);
-
         // Valida que tipo de ruta se solicito
         $routeContent = null;
         $appName = null;

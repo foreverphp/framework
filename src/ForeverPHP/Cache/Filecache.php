@@ -1,24 +1,71 @@
-<?php
+<?php namespace ForeverPHP\Cache;
+
+use ForeverPHP\Cache\CacheInterface;
+
 /**
- * foreverPHP - Framework MVT (Model - View - Template)
- *
- * FileCache:
- *
  * Realiza cache con archivos en disco, es la forma basica del cache.
  *
- * @package     foreverPHP
- * @subpackage  cache
- * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @copyright   Copyright (c) 2014, Emarva.
- * @license     http://www.opensource.org/licenses/mit-license.php MIT License
- * @link        http://www.emarva.com/foreverphp
- * @since       Version 0.1.0
+ * @author  Daniel Nuñez S. <dnunez@emarva.com>
+ * @since   Version 0.4.0
  */
+class FileCache implements CacheInterface {
+    /**
+     * Ruta del directorio a usar para el cache.
+     *
+     * @var string
+     */
+    private $location;
 
-class FileCache {
-    public function __construct() {}
+    public function __construct($location) {
+        $this->location = $location;
 
-    public function exists() {
+        // Verifica si existe el directorio del cache, si no se crea
+        if (!file_exists($this->location)) {
+            mkdir($this->location, 0777);
+        }
+    }
+
+    /**
+     * Valida si existe el archivo en el directorio cache.
+     *
+     * @param  string $key
+     * @return boolean
+     */
+    public function exists($name) {
+        $filenameCache = $this->location . DS . $name;
+
+        if (file_exists($filenameCache)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Almacena un nuevo archivo en cache.
+     *
+     * @param string $name
+     * @param string $value
+     */
+    public function set($name, $value) {
+        try {
+            $filenameCache = $this->location . DS . $name;
+
+            // Escribe el archivo en cache
+            file_put_contents($filenameCache, $value);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function get($name) {
+
+
+    }
+
+    public function remove($name) {
 
     }
 }

@@ -2,6 +2,7 @@
 
 use ForeverPHP\Core\App;
 use ForeverPHP\Core\Exceptions\SecurityException;
+use ForeverPHP\Core\Facades\Cache;
 use ForeverPHP\Core\Redirect;
 use ForeverPHP\Core\Settings;
 use ForeverPHP\Http\ResponseInterface;
@@ -30,9 +31,17 @@ class HtmlResponse implements ResponseInterface {
      */
     private $context;
 
-    public function __construct($template, $context) {
+    /**
+     * Indica si se debe usar cache en el renderizado.
+     *
+     * @var boolean
+     */
+    private $usingCache;
+
+    public function __construct($template, $context, $usingCache = true) {
         $this->template = $template;
         $this->context = $context;
+        $this->usingCache = $usingCache;
     }
 
     public function make() {
@@ -73,8 +82,25 @@ class HtmlResponse implements ResponseInterface {
                 $tpl = new Chameleon();
             }
 
+            // Comienza la captura del buffer de salida
+            ob_start();
+
             // Rendereo el template
             echo $tpl->render($this->template, $data);
+
+            /*
+             * Aca se controla el cache de templates.
+             */
+            if (ob_get_length() > 0) {
+                if ($this->usingCache) {
+                    // Obtiene el contenido del template renderizado
+                    $cacheValue = ob_get_contents();
+
+                    // POR AHORA SOLO GUARDA EL CACHE PARA PRUEBAS NO VALIDA DURACION, NI SI EXISTE
+                    // Guarda el template en el cache
+                    Cache::set($this->template . '.template.cache', $cacheValue);
+                }
+            }
         //}
 
         // Rendereo el template

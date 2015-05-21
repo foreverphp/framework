@@ -13,6 +13,13 @@ use ForeverPHP\View\Context;
  */
 class ExceptionManager {
     /**
+     * Almacena la pila de errores.
+     *
+     * @var string
+     */
+    private static $errors = array();
+
+    /**
      * Permite mostrar un excepción propia.
      *
      * @param  string $type
@@ -20,6 +27,7 @@ class ExceptionManager {
      * @return void
      */
     private static function viewException($type, $message) {
+        $template = 'exception';
         $title = 'Excepción';
 
         // 1 es Error Fatal
@@ -28,6 +36,11 @@ class ExceptionManager {
         }
 
         if (Settings::getInstance()->inDebug()) {
+            // Si hay buffer de salida previo cambio el template
+            if (ob_get_length() != 0) {
+                $template = 'exception-block';
+            }
+
             $ctx = new Context();
             $ctx->set('exception', $title);
             $ctx->set('details', $message);
@@ -36,9 +49,13 @@ class ExceptionManager {
             Settings::getInstance()->set('ForeverPHPTemplate', true);
 
             $response = new Response();
-            $response->render('exception', $ctx)->make();
+            $response->render($template, $ctx)->make();
         } else {
-            Redirect::error(500);
+            // Termino el buffer de salida y lo limpio
+            ob_end_clean();
+
+            // Redirijo a un error 500
+            return Redirect::error(500);
         }
     }
 
@@ -71,55 +88,80 @@ class ExceptionManager {
     }
 
     /**
-     * Manipulador de funciones de cierre, por ejemplo para controlar
+     * Manipulador de errores, por ejemplo para controlar
      * errores fatales (E_ERROR).
+     *
+     * @param  int    $errno
+     * @param  string $errstr
+     * @param  string $errfile
+     * @param  int    $errline
+     * @return void
+     */
+    public static function errorHandler($errno, $errstr, $errfile, $errline) {
+        switch ($errno){
+            case E_ERROR: // 1
+                $type = 'E_ERROR'; break;
+            case E_WARNING: // 2
+                $type = 'E_WARNING'; break;
+            case E_PARSE: // 4
+                $type = 'E_PARSE'; break;
+            case E_NOTICE: // 8
+                $type = 'E_NOTICE'; break;
+            case E_CORE_ERROR: // 16
+                $type = 'E_CORE_ERROR'; break;
+            case E_CORE_WARNING: // 32
+                $type = 'E_CORE_WARNING'; break;
+            case E_COMPILE_ERROR: // 64
+                $type = 'E_COMPILE_ERROR'; break;
+            case E_CORE_WARNING: // 128
+                $type = 'E_COMPILE_WARNING'; break;
+            case E_USER_ERROR: // 256
+                $type = 'E_USER_ERROR'; break;
+            case E_USER_WARNING: // 512
+                $type = 'E_USER_WARNING'; break;
+            case E_USER_NOTICE: // 1024
+                $type = 'E_USER_NOTICE'; break;
+            case E_STRICT: // 2048
+                $type = 'E_STRICT'; break;
+            case E_RECOVERABLE_ERROR: // 4096
+                $type = 'E_RECOVERABLE_ERROR'; break;
+            case E_DEPRECATED: // 8192
+                $type = 'E_DEPRECATED'; break;
+            case E_USER_DEPRECATED: // 16384
+                $type = 'E_USER_DEPRECATED'; break;
+        }
+
+        array_push(static::$errors, array(
+            'type' => $type,
+            'message' => $errstr,
+            'file' => $errfile,
+            'line' => $errline
+        ));
+    }
+
+    /**
+     * Ultima función en ejecutarse, una vez terminada la ejecución del script.
      *
      * @return void
      */
-    public static function shutdownFunctionHandler() {
-        $type = 'UNKNOWN';
-        $error = error_get_last();
+    public static function shutdown() {
+        if (count(static::$errors) > 0) {
+            $errorsList = '';
 
-        if ($error !== null) {
-            switch ($error['type']){
-                case E_ERROR: // 1
-                    $type = 'E_ERROR'; break;
-                case E_WARNING: // 2
-                    $type = 'E_WARNING'; break;
-                case E_PARSE: // 4
-                    $type = 'E_PARSE'; break;
-                case E_NOTICE: // 8
-                    $type = 'E_NOTICE'; break;
-                case E_CORE_ERROR: // 16
-                    $type = 'E_CORE_ERROR'; break;
-                case E_CORE_WARNING: // 32
-                    $type = 'E_CORE_WARNING'; break;
-                case E_COMPILE_ERROR: // 64
-                    $type = 'E_COMPILE_ERROR'; break;
-                case E_CORE_WARNING: // 128
-                    $type = 'E_COMPILE_WARNING'; break;
-                case E_USER_ERROR: // 256
-                    $type = 'E_USER_ERROR'; break;
-                case E_USER_WARNING: // 512
-                    $type = 'E_USER_WARNING'; break;
-                case E_USER_NOTICE: // 1024
-                    $type = 'E_USER_NOTICE'; break;
-                case E_STRICT: // 2048
-                    $type = 'E_STRICT'; break;
-                case E_RECOVERABLE_ERROR: // 4096
-                    $type = 'E_RECOVERABLE_ERROR'; break;
-                case E_DEPRECATED: // 8192
-                    $type = 'E_DEPRECATED'; break;
-                case E_USER_DEPRECATED: // 16384
-                    $type = 'E_USER_DEPRECATED'; break;
+            foreach (static::$errors as $error) {
+                $errorsList .= 'Tipo: ' . $error['type'] . '<br>';
+                $errorsList .= 'Mensaje: ' . $error['message'] . '<br>';
+                $errorsList .= 'Archivo: ' . $error['file'] . '<br>';
+                $errorsList .= 'Line: ' . $error['line'] . '<br><br>';
             }
 
-            $message = 'Tipo: ' . $type . '<br />';
-            $message .= 'Mensaje: ' . $error['message'] . '<br />';
-            $message .= 'Archivo: ' . $error['file'] . '<br />';
-            $message .= 'Line: ' . $error['line'];
-
-            static::viewException(1, $message);
+            static::viewException(1, $errorsList);
         }
+
+        /*
+         * Como ultima funcion en ejecutarse, es aca donde se termina el flujo
+         * del buffer de salida y lo muestra.
+         */
+        ob_end_flush();
     }
 }

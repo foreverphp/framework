@@ -352,15 +352,20 @@ class Router {
         $route = $this->getRoute();
 
         /*
+         * Establece como el manejador de errores ExceptionManager.
+         */
+        set_error_handler('\ForeverPHP\Core\ExceptionManager::errorHandler');
+
+        /*
          * Establece como el manejador de excepciones no controladas a
-         * ExceptionHandler
+         * ExceptionManager.
          */
         set_exception_handler('\ForeverPHP\Core\ExceptionManager::exceptionHandler');
 
         /*
-         * Establece como el manejador de Fatal Errors a ExceptionHandler.
+         * Le deja el control de la función de cierre a ExceptionManager.
          */
-        register_shutdown_function('\ForeverPHP\Core\ExceptionManager::shutdownFunctionHandler');
+        register_shutdown_function('\ForeverPHP\Core\ExceptionManager::shutdown');
 
         // Defino la ruta de los templates y estaticos del framework
         Setup::toDefine('FOREVERPHP_ROOT', dirname(dirname(__FILE__)));

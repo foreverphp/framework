@@ -1,11 +1,14 @@
 <?php namespace ForeverPHP\Cache;
 
 /**
- * Realiza cache con archivos en disco, es la forma basica del cache.
+ * Interface base para los motores de Cache.
  *
- * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @since       Version 0.1.0
+ * @author  Daniel Nuñez S. <dnunez@emarva.com>
+ * @since   Version 0.4.0
  */
 interface CacheInterface {
-
+    public function exists($name);
+    public function set($name, $value);
+    public function get($name);
+    public function remove($name);
 }

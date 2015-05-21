@@ -1,19 +1,12 @@
-<?php
+<?php namespace ForeverPHP\Cache;
+
+use ForeverPHP\Core\Facades\Settings;
+
 /**
- * foreverPHP - Framework MVT (Model - View - Template)
+ * Permite el trabajo con Cache con diferentes motores.
  *
- * Template:
- *
- * Esta clase trabaja en conjunto con la vista para renderear la vista con
- * el template.
- *
- * @package     foreverPHP
- * @subpackage  cache
- * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @copyright   Copyright (c) 2014, Emarva.
- * @license     http://www.opensource.org/licenses/mit-license.php MIT License
- * @link        http://www.emarva.com/foreverphp
- * @since       Version 0.1.0
+ * @author  Daniel Nuñez S. <dnunez@emarva.com>
+ * @since   Version 0.4.0
  */
 
 /*
@@ -54,28 +47,127 @@ Cache::set: antes de guardar el objeto en el cache debe verificar que no se
 */
 
 class Cache {
-    private static $_cache_object = null;
+    /**
+     * Indica si el cache esta activo.
+     *
+     * @var boolean
+     */
+    private $cacheEnabled;
 
-    private static function _load_cache() {
-        if (self::$_cache_object == null) {
-           self::$_config_cache = Config::get('cache');
+    /**
+     * El tipo de motor a utilizar.
+     *
+     * @var string
+     */
+    private $engine;
 
+    /**
+     * Ubicación del cache, solo algunos motores usan esta opción.
+     *
+     * @var string
+     */
+    private $location;
 
+    /**
+     * Tiempo de refresco del cache, esta representado en segundos.
+     *
+     * @var int
+     */
+    private $timeout;
+
+    /**
+     * Numero máximo de entradas en cache.
+     *
+     * @var int
+     */
+    private $maxEntries;
+
+    /**
+     * Contiene la instancia del motor de cache.
+     *
+     * @var mixed
+     */
+    private $cacheEngine;
+
+    /**
+     * Contiene la instancia singleton de Cache.
+     *
+     * @var \ForeverPHP\Cache\Cache
+     */
+    private static $instance;
+
+    private function __construct() {
+        $this->cacheEnabled = false;
+    }
+
+    /**
+     * Obtiene o crea la instancia singleton de Cache.
+     *
+     * @return \ForeverPHP\Cache\Cache
+     */
+    public static function getInstance() {
+        if (is_null(static::$instance)) {
+            static::$instance = new static();
+            static::$instance->load();
+        }
+
+        return static::$instance;
+    }
+
+    /**
+     * Carga una vez el motor de cache y la
+     * configuración del cache.
+     *
+     * @return void
+     */
+    private function load() {
+        // Verifico si el cache esta activo
+        if (Settings::get('cacheEnabled')) {
+            $this->cacheEnabled = true;
+        }
+
+        // Sigue cargando el motor de cache, solo su esta activo
+        if ($this->cacheEnabled) {
+            $cacheSettings = Settings::get('cache');
+
+            // Se almacenan los ítems de configuración del cache
+            $this->engine = $cacheSettings['engine'];
+            $this->location = $cacheSettings['location'];
+            $this->timeout = $cacheSettings['timeout'];
+            $this->maxEntries = $cacheSettings['maxEntries'];
+
+            // Se crea la instancia del motor según la configuración
+            if ($this->engine === 'filecache') {
+                $this->cacheEngine = new \ForeverPHP\Cache\FileCache($this->location);
+            }
         }
     }
 
-    public static function exists() {
-        self::_load_cache();
+    /**
+     * Valida si la entrada existe en el cache.
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function exists($name) {
+        return $this->cacheEngine->exists($name);
     }
 
-    public static function get() {
-        self::_load_cache();
-    }
-    public static function set() {
-        self::_load_cache();
+    /**
+     * Almacena una entrada en el cache.
+     *
+     * @param string $name
+     * @param string $value
+     */
+    public function set($name, $value) {
+        $this->cacheEngine->set($name, $value);
     }
 
-    public static function delete() {
-        self::_load_cache();
+    public function get($name) {
+        // NO DISPONIBLE POR AHORA, YA QUE SE ESTAN HACIENDO PRUEBAS CON EL CACHE
+    }
+
+    public function remove($name) {
+        // NO DISPONIBLE POR AHORA, YA QUE SE ESTAN HACIENDO PRUEBAS CON EL CACHE
     }
 }

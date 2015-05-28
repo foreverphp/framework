@@ -247,7 +247,7 @@ class Router {
 
                     // Se genera la matriz con los parametros para el request
                     foreach ($_routeContent['paramsUrl'] as $paramKey => $paramValue) {
-                        if ($matches[$i] != null) {
+                        if ($matches[$i] != null && $matches[$i] != 'undefined') {
                             $paramsUrl[$paramKey] = $matches[$i];
                         }
 

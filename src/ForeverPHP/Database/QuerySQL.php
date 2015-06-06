@@ -8,7 +8,7 @@ use ForeverPHP\Core\Setup;
  *
  * @since       Version 0.1.0
  */
-class QueryRaw {
+class QuerySQL {
 	private $dbSetting = 'default';
 
 	private $database = false;
@@ -30,18 +30,18 @@ class QueryRaw {
 	private $autocommit = false;
 
 	/**
-	 * Contiene la instancia singleton de QueryRaw.
+	 * Contiene la instancia singleton de QuerySQL.
 	 *
-	 * @var \ForeverPHP\Database\QueryRaw
+	 * @var \ForeverPHP\Database\QuerySQL
 	 */
 	private static $instance;
 
 	public function __construct() {}
 
 	/**
-	 * Obtiene o crea la instancia singleton de QueryRaw.
+	 * Obtiene o crea la instancia singleton de QuerySQL.
 	 *
-	 * @return \ForeverPHP\Database\QueryRaw
+	 * @return \ForeverPHP\Database\QuerySQL
 	 */
 	public static function getInstance() {
 		if (is_null(static::$instance)) {

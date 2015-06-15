@@ -20,8 +20,8 @@ class Setup {
          * Defino la ruta de los templates y estaticos del framework.
          */
         static::toDefine('FOREVERPHP_ROOT', dirname(dirname(__FILE__)));
-        static::toDefine('FOREVERPHP_TEMPLATES_PATH', FOREVERPHP_ROOT . DS . 'static' . DS . 'templates' . DS);
-        static::toDefine('FOREVERPHP_STATIC_PATH', basename(FOREVERPHP_ROOT) . DS . 'static' . DS);
+        static::toDefine('FOREVERPHP_TEMPLATES_PATH', FOREVERPHP_ROOT . DS . 'Static' . DS . 'templates' . DS);
+        static::toDefine('FOREVERPHP_STATIC_PATH', basename(FOREVERPHP_ROOT) . DS . 'Static' . DS);
 
         /*
          * Establece como el manejador de errores ExceptionManager.

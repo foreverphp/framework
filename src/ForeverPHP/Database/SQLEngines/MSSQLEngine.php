@@ -1,8 +1,6 @@
-<?php namespace ForeverPHP\Database\Engines;
+<?php namespace ForeverPHP\Database\SQLEngines;
 
 use ForeverPHP\Core\Settings;
-use ForeverPHP\Database\DbEngineBase;
-use ForeverPHP\Database\DbEngineInterface;
 
 /**
  * Motor MSSQL(Microsoft SQL Server) permite trabajar con este motor de base
@@ -11,7 +9,7 @@ use ForeverPHP\Database\DbEngineInterface;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.4.0
  */
-class MSSQL extends DbEngineBase implements DbEngineInterface {
+class MSSQLEngine extends SQLEngine implements SQLEngineInterface {
     public function connect() {
         $db = Settings::getInstance()->get('dbs');
         $db = $db[$this->dbSetting];

@@ -1,12 +1,13 @@
-<?php namespace ForeverPHP\Database;
+<?php namespace ForeverPHP\Database\SQLEngines;
 
 /**
- * Interface que deben implementar si o si todos los motores de datos.
+ * Interface que deben implementar si o si todos los motores de datos, que
+ * interpreten SQL.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
-interface DbEngineInterface {
+interface SQLEngineInterface {
 	public function __construct($dbSetting);
 	public function selectDatabase($database);
     public function connect();

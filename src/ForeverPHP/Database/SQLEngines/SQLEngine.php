@@ -1,12 +1,13 @@
-<?php namespace ForeverPHP\Database;
+<?php namespace ForeverPHP\Database\SQLEngines;
 
 /**
- * Clase base para los motores de base de datos.
+ * Clase base para los motores de base de datos, que
+ * interpreten SQL.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.3.0
  */
-class DbEngineBase  {
+class SQLEngine {
     protected $dbSetting;
     protected $database;
     protected $link;

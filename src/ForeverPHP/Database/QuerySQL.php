@@ -115,13 +115,13 @@ class QuerySQL {
 		$dbEngine = $selectDb[$this->dbSetting]['engine'];
 
 		if ($dbEngine == 'mariadb') {
-			$this->dbInstance = new namespace\Engines\MariaDB($this->dbSetting);
+			$this->dbInstance = new namespace\SQLEngines\MariaDBEngine($this->dbSetting);
 		} elseif ($dbEngine == 'mssql') {
-			$this->dbInstance = new namespace\Engines\MSSQL($this->dbSetting);
+			$this->dbInstance = new namespace\SQLEngines\MSSQLEngine($this->dbSetting);
 		} elseif ($dbEngine == 'postgresql') {
-			$this->dbInstance = new namespace\Engines\PostgreSQL($this->dbSetting);
+			$this->dbInstance = new namespace\SQLEngines\PostgreSQLEngine($this->dbSetting);
 		} elseif ($dbEngine == 'sqlsrv') {
-			$this->dbInstance = new namespace\Engines\SQLSRV($this->dbSetting);
+			$this->dbInstance = new namespace\SQLEngines\SQLSRVEngine($this->dbSetting);
 		} else {
 			$this->error = 'Database engine not found.';
 		}

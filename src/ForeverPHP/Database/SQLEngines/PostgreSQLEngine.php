@@ -1,8 +1,6 @@
-<?php namespace ForeverPHP\Database\Engines;
+<?php namespace ForeverPHP\Database\SQLEngines;
 
 use ForeverPHP\Core\Settings;
-use ForeverPHP\Database\DbEngineBase;
-use ForeverPHP\Database\DbEngineInterface;
 
 /**
  * Motor PostgreSQL permite trabajar con este motor de base de datos.
@@ -10,6 +8,6 @@ use ForeverPHP\Database\DbEngineInterface;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.4.0
  */
-class PostgreSQL extends DbEngineBase implements DbEngineInterface {
+class PostgreSQLEngine extends SQLEngine implements SQLEngineInterface {
 
 }

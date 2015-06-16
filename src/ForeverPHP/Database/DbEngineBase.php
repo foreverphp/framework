@@ -1,4 +1,4 @@
-<?php namespace ForeverPHP\Database\Engines;
+<?php namespace ForeverPHP\Database;
 
 /**
  * Clase base para los motores de base de datos.
@@ -6,7 +6,7 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.3.0
  */
-class BaseEngine  {
+class DbEngineBase  {
     protected $dbSetting;
     protected $database;
     protected $link;

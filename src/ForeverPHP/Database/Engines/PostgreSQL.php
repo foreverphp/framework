@@ -1,6 +1,7 @@
 <?php namespace ForeverPHP\Database\Engines;
 
 use ForeverPHP\Core\Settings;
+use ForeverPHP\Database\DbEngineBase;
 use ForeverPHP\Database\DbEngineInterface;
 
 /**
@@ -9,6 +10,6 @@ use ForeverPHP\Database\DbEngineInterface;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.4.0
  */
-class PostgreSQL extends BaseEngine implements DbEngineInterface {
+class PostgreSQL extends DbEngineBase implements DbEngineInterface {
 
 }

@@ -17,7 +17,7 @@ class MSSQL extends BaseEngine implements DbEngineInterface {
 
         $dbName = ($this->database != false) ? $this->database : $db['database'];
 
-        $server = $db['server'] . ',' . $db['port'];
+        $server = $db['server'] . ':' . $db['port'];
 
         // Me conecto a la base de datos
         $this->link = mssql_pconnect($server, $db['user'], $db['password']);
@@ -27,7 +27,7 @@ class MSSQL extends BaseEngine implements DbEngineInterface {
             return false;
         }
 
-        if (!mssql_select_db($dbName)) {
+        if (!mssql_select_db($dbName, $this->link)) {
             $this->error = mssql_get_last_message();
             return false;
         }
@@ -65,7 +65,7 @@ class MSSQL extends BaseEngine implements DbEngineInterface {
 
                     $return = array();
 
-                    while ($row = mssql_fetch_array($stmt, $fetchType)) {
+                    while ($row = mssql_fetch_array($result, $fetchType)) {
                         array_push($return, $row);
                     }
                 }

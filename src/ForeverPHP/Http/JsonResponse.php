@@ -26,6 +26,7 @@ class JsonResponse implements ResponseInterface {
 
     public function __construct($content, $charset = 'utf-8', $statusCode = 200) {
         $this->content = $content;
+        $this->charset = $charset;
         $this->statusCode = $statusCode;
     }
 
@@ -42,8 +43,8 @@ class JsonResponse implements ResponseInterface {
         }
 
         header('HTTP/1.0 ' . $this->statusCode . ' ' . Response::getResponseStatus($this->statusCode), true, $this->statusCode);
-        header('Content-type: application/json; charset: ' . $charset);
-        header('Accept-Charset: ' . $charset);
+        header('Content-type: application/json; charset: ' . $this->charset);
+        header('Accept-Charset: ' . $this->charset);
 
         // Comienza la captura del buffer de salida
         ob_start();

@@ -36,20 +36,32 @@ class ExceptionManager {
         }
 
         if (Settings::getInstance()->inDebug()) {
-            // Si hay buffer de salida previo cambio el template
-            if (ob_get_length() != 0) {
-                $template = 'exception-block';
-            }
+            $contentBuffer = json_decode(ob_get_contents());
+
+            // Limpio el buffer de salida previo
+            ob_clean();
 
             $ctx = new Context();
             $ctx->set('exception', $title);
             $ctx->set('details', $message);
 
-            // Le indico a la vista que haga render usando los templates del framework
-            Settings::getInstance()->set('ForeverPHPTemplate', true);
-
             $response = new Response();
-            $response->render($template, $ctx)->make();
+
+            if (is_array($contentBuffer)) {
+                $contentBuffer['ForeverPHPException'] = $ctx->all();
+
+                $response->json($contentBuffer)->make();
+            } else {
+                // Si hay buffer de salida previo cambio el template
+                if (ob_get_length() != 0) {
+                    $template = 'exception-block';
+                }
+
+                // Le indico a la vista que haga render usando los templates del framework
+                Settings::getInstance()->set('ForeverPHPTemplate', true);
+
+                $response->render($template, $ctx)->make();
+            }
         } else {
             // Termino el buffer de salida y lo limpio
             ob_end_clean();

@@ -51,7 +51,7 @@ class HtmlResponse implements ResponseInterface {
         //if (Settings::getInstance()->inDebug()) {
         if (Settings::getInstance()->exists('csrfToken')) {
             if (!CSRF::validateToken()) {
-                throw new SecurityException('Acceso denegado, token inválido. Es imposible procesar tu solicitud vuelve al inicio o cierra esta página.');
+                throw new SecurityException('Access denied, invalid token. It becomes impossible to process your request to start or close this page.');
             }
         }
         /*} else {

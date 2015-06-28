@@ -1,20 +1,13 @@
-<?php
+<?php namespace ForeverPHP\Database;
+
 /**
- * foreverPHP - Framework MVT (Model - View - Template)
- *
  * FieldTypes:
  *
  * Este archivo contiene todos los tipos de campos para el ORM.
  *
- * @package     foreverPHP
- * @subpackage  database
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @copyright   Copyright (c) 2014, Emarva.
- * @license     http://www.opensource.org/licenses/mit-license.php MIT License
- * @link        http://www.emarva.com/foreverphp
  * @since       Version 0.1.0
  */
-
 class FieldType {
     protected function _load_attributes($attributes) {
         // se deben mesclar los atributos y atributos por defecto

@@ -24,7 +24,7 @@ class JsonResponse implements ResponseInterface {
      */
     private $statusCode;
 
-    public function __construct($content, $statusCode = 200) {
+    public function __construct($content, $charset = 'utf-8', $statusCode = 200) {
         $this->content = $content;
         $this->statusCode = $statusCode;
     }
@@ -42,8 +42,11 @@ class JsonResponse implements ResponseInterface {
         }
 
         header('HTTP/1.0 ' . $this->statusCode . ' ' . Response::getResponseStatus($this->statusCode), true, $this->statusCode);
-        header('Content-type: application/json; charset: utf-8');
-        header('Accept-Charset: utf-8');
+        header('Content-type: application/json; charset: ' . $charset);
+        header('Accept-Charset: ' . $charset);
+
+        // Comienza la captura del buffer de salida
+        ob_start();
 
         // Retorna los datos en formato JSON
         echo json_encode($data);

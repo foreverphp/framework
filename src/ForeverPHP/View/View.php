@@ -8,6 +8,7 @@ use ForeverPHP\Core\Exceptions\ViewException;
  * Todas las vistas deben heredar de este archivo, para ser tratadas
  * como tal.
  *
+ * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
 class View {
@@ -52,7 +53,7 @@ class View {
                 $pathToImport = $importSegments[0];
                 $import = $importSegments[1];
             } else {
-                throw new ViewException("Error al importar el ($type) desde ($toImport).");
+                throw new ViewException("Error importing ($type) from ($toImport).");
             }
         }
 
@@ -190,17 +191,5 @@ class View {
         //}
 
         echo $response;
-    }*/
-
-    /*public function render_to_csv() {
-
-    }
-
-    public function render_to_excel() {
-        Setup::import('vendor/phpexcel/phpexcel');
-    }
-
-    public function render_to_pdf() {
-
     }*/
 }

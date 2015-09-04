@@ -1,4 +1,4 @@
-<?php namespace ForeverPHP\Core;
+<?php namespace ForeverPHP\Filesystem;
 
 /**
  * Permite administrar el sistema de archivos.
@@ -7,6 +7,11 @@
  * @since       Version 0.3.0
  */
 class FilesystemException extends \Exception {}
+
+/*
+ * Se debe poder trabajar con diferentes sistemas de archivos.
+ * Como: local, google drive, amazon s3, dropbox
+ */
 
 class Filesystem {
     /**
@@ -45,5 +50,21 @@ class Filesystem {
 
     public function pruebaMas2($p1, $p2, $p3, $p4, $p5, $p6, $p7) {
         echo "prueba fachada.".$p1.$p2.$p3.$p4.$p5.$p6.$p7.'<br>';
+    }
+
+    /**
+     * Crea un nuevo directorio.
+     *
+     * @param  string  $path
+     * @param  string  $permissions
+     * @param  boolean $recursive
+     * @return boolean
+     */
+    public function makeDirectory($path, $mode = 0755, $recursive = false) {
+        if (!file_exists($path)) {
+            return mkdir($path, $mode, $recursive);
+        }
+
+        return true;
     }
 }

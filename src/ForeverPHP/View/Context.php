@@ -140,4 +140,8 @@ class Context {
             unset($this->contexts[$name]);
         }
     }
+
+    public function removeAll() {
+        $this->contexts = array();
+    }
 }

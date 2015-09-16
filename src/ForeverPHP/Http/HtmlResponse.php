@@ -50,8 +50,11 @@ class HtmlResponse implements ResponseInterface {
             Redirect::toError(500);
         }*/
 
-        // Obtiene los datos del contexto
+        // Obtienen los contextos
         $data = Context::all();
+
+        // Se limpian los contextos
+        Context::removeAll();
 
         // Valida si el render solo esta disponible en DEBUG
         //if ($only_debug) {

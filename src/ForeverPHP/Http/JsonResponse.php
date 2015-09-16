@@ -1,7 +1,7 @@
 <?php namespace ForeverPHP\Http;
 
+use ForeverPHP\Core\Facades\Context;
 use ForeverPHP\Http\ResponseInterface;
-use ForeverPHP\View\Context;
 
 /**
  * Genera respuestas en formato JSON al cliente.
@@ -37,9 +37,7 @@ class JsonResponse implements ResponseInterface {
             $data = $this->content;
         } else {
             // Obtiene los datos del contexto
-            if ($context instanceof Context) {
-                $data = $context->all();
-            }
+            $data = Context::all();
         }
 
         header('HTTP/1.0 ' . $this->statusCode . ' ' . Response::getResponseStatus($this->statusCode), true, $this->statusCode);

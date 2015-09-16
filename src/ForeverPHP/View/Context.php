@@ -8,67 +8,136 @@
  */
 class Context {
     /**
-     * Almacena todos los items del contexto.
+     * Almacena los contextos.
      *
      * @var array
      */
-    private $items = array();
+    private $contexts;
 
-    public function __construct($items = array()) {
-        $this->items = $items;
+    /**
+     * Almacena los contextos globales.
+     *
+     * @var array
+     */
+    private $globalContexts;
+
+    /**
+     * Indica si usaran o no contextos globales, al retornar
+     * todos los contextos.
+     *
+     * @var bool
+     */
+    private $useGlobalContexts;
+
+    /**
+     * Contiene la instancia singleton de Context.
+     *
+     * @var \ForeverPHP\View\Context
+     */
+    private static $instance;
+
+    private function __construct() {
+        $this->contexts = array();
+        $this->globalContexts = array();
+        $this->useGlobalContexts = true;
+    }
+
+    /**
+     * Obtiene o crea la instancia singleton de Context.
+     *
+     * @return \ForeverPHP\View\Context
+     */
+    public static function getInstance() {
+        if (is_null(static::$instance)) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
     }
 
     public function exists($name) {
-        if (array_key_exists($name, $this->items)) {
+        if (array_key_exists($name, $this->contexts)) {
             return true;
+        } else {
+            if (array_key_exists($name, $this->globalContexts)) {
+                return true;
+            }
         }
 
         return false;
     }
 
-    public function set($name, $value) {
-        $this->items[$name] = $value;
+    private function set($name, $value, $global = false) {
+        if ($global) {
+            $this->globalContexts[$name] = $value;
+        } else {
+            $this->contexts[$name] = $value;
+        }
     }
 
-    public function get($name) {
+    private function setArray($values, $global) {
+        foreach ($values as $key => $value) {
+            $this->set($key, $value, $global);
+        }
+    }
+
+    /**
+     * Controlador de llamadas dinamicas, hacia el objeto.
+     *
+     * @param  string $method
+     * @param  array $args
+     * @return void
+     */
+    public function __call($method, $args) {
+        switch (count($args)) {
+            case 1:
+                if ($method === 'set' && is_array($args[0])) {
+                    return $this->setArray($args[0], false);
+                }
+
+                return $this->$method($args[0]);
+            case 2:
+                if ($method == 'set' && is_array($args[0])) {
+                    return $this->setArray($args[0], $args[1]);
+                }
+
+                return $this->$method($args[0], $args[1]);
+            case 3:
+                return $this->$method($args[0], $args[1], $args[2]);
+        }
+    }
+
+    public function get($name, $global = false) {
         $value = null;
 
         if ($this->exists($name)) {
-            $value = $this->items[$name];
+            if ($global) {
+                $value = $this->globalContexts[$name];
+            } else {
+                $value = $this->contexts[$name];
+            }
         }
 
         return $value;
     }
 
+    public function useGlobal($value) {
+        $this->useGlobalContexts = $value;
+    }
+
     public function all() {
-        return $this->items;
-    }
+        $contentContext = $this->contexts;
 
-    public function remove($name) {
-        if ($this->exists($name)) {
-            unset($this->items[$name]);
+        if ($this->useGlobalContexts) {
+            $contentContext = array_merge($contentContext, $this->globalContexts);
         }
+
+        return $contentContext;
     }
 
-    /**
-     * Permite conbinar otro contexto a este.
-     *
-     * @param  Context $context
-     * @return boolean
-     */
-    public function merge($context) {
-        $contentContext = $context->all();
-        $this->items = array_merge($this->items, $contentContext);
-    }
-
-    /**
-     * Permite conbinar al contexto actual con un contexto de una
-     * aplicacion diferente a la actual.
-     *
-     * @param  string $path_context
-     * @return boolean
-     */
-    public function mergeFromApp($pathContext) {
-
+    public function remove($name, $global = false) {
+        if ($this->exists($name)) {
+            unset($this->contexts[$name]);
+        }
     }
 }

@@ -40,8 +40,8 @@ class Response {
      * @param  array  $context
      * @return \ForeverPHP\Http\HtmlResponse
      */
-    public function render($template, $context = null) {
-        return new HtmlResponse($template, $context);
+    public function render($template) {
+        return new HtmlResponse($template);
     }
 
     /**

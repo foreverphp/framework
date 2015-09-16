@@ -18,10 +18,53 @@ class Filesystem {
      * Determina si un archivo existe.
      *
      * @param  string $path
-     * @return boolean
+     * @return bool
      */
     public function exists($path) {
         return file_exists($path);
+    }
+
+    public function get() {
+
+    }
+
+    public function put() {
+
+    }
+
+    /**
+     * Elimina un archivo de la ruta determinada.
+     *
+     * @param  string|array $paths
+     * @return bool
+     */
+    public function delete($paths) {
+        $paths = is_array($paths) ? $paths : func_get_args();
+
+        $return = true;
+
+        foreach ($paths as $path) {
+            try {
+                if (!@unlink($path)) {
+                    $return = false;
+                }
+            } catch (ErrorException $e) {
+                $return = false;
+            }
+        }
+
+        return $return;
+    }
+
+    /**
+     * Mueve un archivo a una nueva ubicación.
+     *
+     * @param  string $path
+     * @param  string $target
+     * @return bool
+     */
+    public function move($path, $target) {
+        return rename($path, $target);
     }
 
     public function prueba() {

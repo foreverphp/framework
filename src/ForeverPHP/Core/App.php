@@ -40,13 +40,6 @@ class App {
     private $middlewares = array();
 
     /**
-     * Almacena los contextos globales agregados.
-     *
-     * @var array
-     */
-    private $globalContexts = array();
-
-    /**
      * Contiene la instancia singleton de App.
      *
      * @var \ForeverPHP\Core\App
@@ -104,7 +97,7 @@ class App {
      * Valida si existe un middleware.
      *
      * @param  string $name
-     * @return boolean
+     * @return bool
      */
     public function existsMiddleware($name) {
         if (array_key_exists($name, $this->middlewares)) {
@@ -142,33 +135,6 @@ class App {
         }
 
         return false;
-    }
-
-    /**
-     * Agrega uno o mas contextos globales los cuales seran usados
-     * luego por al aplicacion en ejecucion.
-     *
-     * @param mixed $context
-     */
-    public function setGlobalContext($context) {
-        if (is_array($context)) {
-            foreach ($context as $c) {
-                $ctx = new $c;
-                $this->globalContexts = array_merge($this->globalContexts, $ctx->all());
-            }
-        } else {
-            $ctx = new $context;
-            $this->globalContexts = array_merge($this->globalContexts, $ctx->all());
-        }
-    }
-
-    /**
-     * Obtiene todos los nombres de los contextos globales.
-     *
-     * @return array
-     */
-    public function getGlobalContexts() {
-        return $this->globalContexts;
     }
 
     private function makeResponse($response) {

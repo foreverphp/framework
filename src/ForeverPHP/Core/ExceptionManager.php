@@ -1,8 +1,8 @@
 <?php namespace ForeverPHP\Core;
 
+use ForeverPHP\Core\Facades\Context;
 use ForeverPHP\Core\Facades\Redirect;
 use ForeverPHP\Http\Response;
-use ForeverPHP\View\Context;
 
 /**
  * Controla todos los errores producidos, en modo Debug lanza mensajes
@@ -41,14 +41,14 @@ class ExceptionManager {
             // Limpio el buffer de salida previo
             ob_clean();
 
-            $ctx = new Context();
-            $ctx->set('exception', $title);
-            $ctx->set('details', $message);
+            Context::useGlobal(false);
+            Context::set('exception', $title);
+            Context::set('details', $message);
 
             $response = new Response();
 
             if (is_array($contentBuffer)) {
-                $contentBuffer['ForeverPHPException'] = $ctx->all();
+                $contentBuffer['ForeverPHPException'] = Context::all();
 
                 $response->json($contentBuffer)->make();
             } else {
@@ -60,7 +60,7 @@ class ExceptionManager {
                 // Le indico a la vista que haga render usando los templates del framework
                 Settings::getInstance()->set('ForeverPHPTemplate', true);
 
-                $response->render($template, $ctx)->make();
+                $response->render($template)->make();
             }
         } else {
             // Termino el buffer de salida y lo limpio

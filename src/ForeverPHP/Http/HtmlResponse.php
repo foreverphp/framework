@@ -3,12 +3,12 @@
 use ForeverPHP\Core\App;
 use ForeverPHP\Core\Exceptions\SecurityException;
 use ForeverPHP\Core\Facades\Cache;
+use ForeverPHP\Core\Facades\Context;
 use ForeverPHP\Core\Redirect;
 use ForeverPHP\Core\Settings;
 use ForeverPHP\Http\ResponseInterface;
 use ForeverPHP\Http\TemplateEngines\Chameleon;
 use ForeverPHP\Security\CSRF;
-use ForeverPHP\View\Context;
 
 /**
  * Genera respuestas en formato HTML al cliente.
@@ -25,22 +25,14 @@ class HtmlResponse implements ResponseInterface {
     private $template;
 
     /**
-     * Objeto de tipo Context.
-     *
-     * @var \ForeverPHP\View\Context
-     */
-    private $context;
-
-    /**
      * Indica si se debe usar cache en el renderizado.
      *
-     * @var boolean
+     * @var bool
      */
     private $usingCache;
 
-    public function __construct($template, $context, $usingCache = false) {
+    public function __construct($template, $usingCache = false) {
         $this->template = $template;
-        $this->context = $context;
         $this->usingCache = $usingCache;
     }
 
@@ -59,18 +51,7 @@ class HtmlResponse implements ResponseInterface {
         }*/
 
         // Obtiene los datos del contexto
-        if ($this->context != null) {
-            if ($this->context instanceof Context) {
-                $data = $this->context->all();
-            }
-        }
-
-        // Valida si hay contextos globales y de ser asi se conbinan con el contexto
-        $globalContexts = App::getInstance()->getGlobalContexts();
-
-        if (count($globalContexts) > 0) {
-            $data = array_merge($globalContexts, $data);
-        }
+        $data = Context::all();
 
         // Valida si el render solo esta disponible en DEBUG
         //if ($only_debug) {

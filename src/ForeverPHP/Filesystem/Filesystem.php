@@ -6,7 +6,7 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.3.0
  */
-class FilesystemException extends \Exception {}
+class FileNotFoundException extends \Exception {}
 
 /*
  * Se debe poder trabajar con diferentes sistemas de archivos.
@@ -24,8 +24,20 @@ class Filesystem {
         return file_exists($path);
     }
 
-    public function get() {
+    /**
+     * Obtiene el contenido del archivo.
+     *
+     * @param  string  $path
+     * @return string
+     *
+     * @throws \ForeverPHP\Filesystem\FileNotFoundException
+     */
+    public function get($path) {
+        if ($this->isFile($path)) {
+            return file_get_contents($path);
+        }
 
+        throw new FileNotFoundException("File does not exist at path {$path}");
     }
 
     public function put() {
@@ -74,8 +86,7 @@ class Filesystem {
      * @param  string  $target
      * @return bool
      */
-    public function copy($path, $target)
-    {
+    public function copy($path, $target) {
         return copy($path, $target);
     }
 
@@ -85,12 +96,40 @@ class Filesystem {
      * @param  string  $path
      * @return int
      */
-    public function size($path)
-    {
+    public function size($path) {
         return filesize($path);
     }
 
-    public function prueba() {
+    /**
+     * Determina si la ruta dada es un directorio.
+     *
+     * @param  string  $directory
+     * @return bool
+     */
+    public function isDirectory($directory) {
+        return is_dir($directory);
+    }
+    /**
+     * Determina si la ruta dada se puede escribir.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function isWritable($path) {
+        return is_writable($path);
+    }
+
+    /**
+     * Determina si la ruta dada es un archivo.
+     *
+     * @param  string  $file
+     * @return bool
+     */
+    public function isFile($file) {
+        return is_file($file);
+    }
+
+    /*public function prueba() {
         echo "prueba fachada.".'<br>';
     }
 
@@ -116,7 +155,7 @@ class Filesystem {
 
     public function pruebaMas2($p1, $p2, $p3, $p4, $p5, $p6, $p7) {
         echo "prueba fachada.".$p1.$p2.$p3.$p4.$p5.$p6.$p7.'<br>';
-    }
+    }*/
 
     /**
      * Crea un nuevo directorio.

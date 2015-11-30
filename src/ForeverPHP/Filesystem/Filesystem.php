@@ -67,6 +67,18 @@ class Filesystem {
         return rename($path, $target);
     }
 
+    /**
+     * Copia un archivo a una nueva ubicación.
+     *
+     * @param  string  $path
+     * @param  string  $target
+     * @return bool
+     */
+    public function copy($path, $target)
+    {
+        return copy($path, $target);
+    }
+
     public function prueba() {
         echo "prueba fachada.".'<br>';
     }

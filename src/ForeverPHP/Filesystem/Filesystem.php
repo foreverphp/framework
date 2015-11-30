@@ -40,8 +40,16 @@ class Filesystem {
         throw new FileNotFoundException("File does not exist at path {$path}");
     }
 
-    public function put() {
-
+    /**
+     * Escribir el contenido a un archivo.
+     *
+     * @param  string  $path
+     * @param  string  $contents
+     * @param  bool    $lock
+     * @return int
+     */
+    public function put($path, $contents, $lock = false) {
+        return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
     }
 
     /**
@@ -88,6 +96,46 @@ class Filesystem {
      */
     public function copy($path, $target) {
         return copy($path, $target);
+    }
+
+    /**
+     * Extrae el nombre del archivo de una ruta de archivo.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function name($path) {
+        return pathinfo($path, PATHINFO_FILENAME);
+    }
+
+    /**
+     * Extrae la extensión del archivo de una ruta de archivo.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function extension($path) {
+        return pathinfo($path, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * Obtiene el tipo de archivo de un archivo determinado.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function type($path) {
+        return filetype($path);
+    }
+
+    /**
+     * Obtiene el tipo MIME de un archivo determinado.
+     *
+     * @param  string  $path
+     * @return string|false
+     */
+    public function mimeType($path) {
+        return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
     }
 
     /**

@@ -79,6 +79,17 @@ class Filesystem {
         return copy($path, $target);
     }
 
+    /**
+     * Obtiene el tamaño del archivo dado.
+     *
+     * @param  string  $path
+     * @return int
+     */
+    public function size($path)
+    {
+        return filesize($path);
+    }
+
     public function prueba() {
         echo "prueba fachada.".'<br>';
     }

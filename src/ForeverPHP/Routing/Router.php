@@ -296,7 +296,7 @@ class Router {
             Settings::getInstance()->set('ForeverPHPTemplate', true);
 
             $response = new Response();
-            $response->render('exception', $ctx)->make();
+            $response->render('exception')->make();
         } else {
             // Si esta en produccion muestra un error 404
             //(new Redirect)->error(404);

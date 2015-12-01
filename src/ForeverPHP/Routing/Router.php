@@ -289,8 +289,8 @@ class Router {
 
     private function notView() {
         if (Settings::getInstance()->inDebug()) {
-            Context::set('exception', 'Framework MVT');
-            Context::set('details', 'Hurra ForeverPHP esta corriendo, ahora genera una vista.');
+            Context::getInstance()->set('exception', 'Framework MVT');
+            Context::getInstance()->set('details', 'Hurra ForeverPHP esta corriendo, ahora genera una vista.');
 
             // Le indico a la vista que haga render usando los templates del framework
             Settings::getInstance()->set('ForeverPHPTemplate', true);

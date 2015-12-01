@@ -352,15 +352,16 @@ class Chameleon implements TemplateInterface {
     }
 
     /**
-     * Permite minificar el resultado del render.
+     * Permite minificar el resultado del render, incluye
+     * la limpieza de comentarios HTML.
      *
      * @param  string $dataRender
      * @return string
      */
     private function minify($dataRender) {
-        //$tpl_ready = str_replace("\n", ' ', $tpl_ready);
-        //$tpl_ready = ereg_replace('[[:space:]]+', ' ', $tpl_ready);
-        return preg_replace(array('/<!--(.*)-->/Uis', "/[[:blank:]]+/"), array('', ' '), str_replace(array("\n", "\r", "\t"), '', $dataRender));
+        return preg_replace(array('/<!--(.*)-->/Uis', "/[[:blank:]]+/"),
+                            array('', ' '),
+                            str_replace(array("\n", "\r", "\t"), '', $dataRender));
     }
 
     private function release() {

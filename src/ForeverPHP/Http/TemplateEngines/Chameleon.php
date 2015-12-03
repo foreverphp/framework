@@ -9,6 +9,8 @@ use ForeverPHP\Security\CSRF;
  *
  * @since   Version 0.1.0
  */
+class TemplateVarNotFound extends \Exception {}
+
 class Chameleon implements TemplateInterface {
     private $templatesDir = '';
     private $staticDir = '';
@@ -135,14 +137,52 @@ class Chameleon implements TemplateInterface {
         return true;
     }
 
-    private function inIf($data) {
+    private function isVarLoop($var) {
+        if (is_string($var)) {
+            if (!preg_match('#\'([0-9A-Za-z\-_]+)\'#', $var)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function setTypeVarLoop(&$var) {
+        if (lower($var) === 'true') {
+            $var = true;
+        } else if (lower($var) === 'false') {
+            $var = false;
+        } else if (filter_var($var, FILTER_VALIDATE_INT)) {
+            settype($var, 'int');
+        } else if (filter_var($var, FILTER_VALIDATE_FLOAT)) {
+            settype($var, 'float');
+        } else if (lower($var) === 'null') {
+            settype($var, 'null');
+        } else {
+            settype($var, 'string');
+        }
+    }
+
+    private function inIf($data, $operands = 2) {
+        $varNotFound = false;
+        $withElse = false;
+        $operador = '';
+
         // Operandos y operador
-        $var1 = $this->removeQuotes($data[1]);
-        $var2 = $this->removeQuotes($data[3]);
-        $operator = $data[2];
+        if ($operands == 1 && count($data) == 4) {
+            $var1 = $data[2];
+            $operador = trim($data[1]);
+        } else {
+            $var1 = $data[1];
+        }
+
+        if ($operands == 2) {
+            $var2 = $data[3];
+            $operator = $data[2];
+        }
 
         // Contenidos del if else endif
-        $content1 = $data[4];
+        $content1 = ($operands == 1) ? ((count($data) == 4) ? $data[3] : $data[2]) : $data[4];
         $content2 = '';
 
         // Verifica si hay un {% else %}
@@ -154,50 +194,104 @@ class Chameleon implements TemplateInterface {
         if (count($results) > 0) {
             $content1 = $results[1];
             $content2 = $results[2];
+            $withElse = true;
         }
+
+        // Establece el tipo de las variables, por defecto son "string"
+        $this->setTypeVarLoop($var1);
 
         // Verifica si $var_1 esta definida en las variables del template
-        if (array_key_exists($var1, $this->data)) {
-            $var1 = $this->data[$var1];
+        if ($this->isVarLoop($var1)) {
+            if (array_key_exists($var1, $this->data)) {
+                $var1 = $this->data[$var1];
+            } else {
+                $varNotFound = $var1;
+            }
         }
 
-        // Verifica si $var_2 esta definida en las variables del template
-        if (array_key_exists($var2, $this->data)) {
-            $var2 = $this->data[$var2];
+        if ($operands == 2) {
+            $this->setTypeVarLoop($var2);
+
+            // Verifica si $var_2 esta definida en las variables del template
+            if ($this->isVarLoop($var2)) {
+                if (array_key_exists($var2, $this->data)) {
+                    $var2 = $this->data[$var2];
+                    $varNotFound = false;
+                } else {
+                    $varNotFound = $var2;
+                }
+            }
         }
 
         // Valido el operador para ver la accion a realizar
         $met = false;
 
-        switch ($operator) {
-            case '==': if ($var1 == $var2) { $met = true; } break;
-            case '===': if ($var1 === $var2) { $met = true; } break;
-            case '!=': if ($var1 != $var2) { $met = true; } break;
-            case '!==': if ($var1 !== $var2) { $met = true; } break;
-            case '>': if ($var1 > $var2) { $met = true; } break;
-            case '<': if ($var1 < $var2) { $met = true; } break;
-            case '>=': if ($var1 >= $var2) { $met = true; } break;
-            case '<=': if ($var1 <= $var2) { $met = true; } break;
-        }
+        // Solo procesa el "if", si no hay errores en las variables
+        if (!$varNotFound) {
+            $var1 = $this->removeQuotes($var1);
 
-        if ($met) {
-            $this->dataRender = str_replace($data[0], trim($content1), $this->dataRender);
+            if ($operands == 1) {
+                switch ($operador) {
+                    case 'not': if (!$var1) { $met = true; } break;
+                    default: if ($var1) { $met = true; } break;
+                }
+            } else if ($operands == 2) {
+                $var2 = $this->removeQuotes($var2);
+
+                switch ($operator) {
+                    case '==': if ($var1 == $var2) { $met = true; } break;
+                    case '===': if ($var1 === $var2) { $met = true; } break;
+                    case '!=': if ($var1 != $var2) { $met = true; } break;
+                    case '!==': if ($var1 !== $var2) { $met = true; } break;
+                    case '>': if ($var1 > $var2) { $met = true; } break;
+                    case '<': if ($var1 < $var2) { $met = true; } break;
+                    case '>=': if ($var1 >= $var2) { $met = true; } break;
+                    case '<=': if ($var1 <= $var2) { $met = true; } break;
+                }
+            }
+
+            if ($met) {
+                $this->dataRender = str_replace($data[0], trim($content1), $this->dataRender);
+            } else {
+                if ($withElse) {
+                    $this->dataRender = str_replace($data[0], trim($content2), $this->dataRender);
+                } else {
+                    $this->dataRender = str_replace($data[0], '', $this->dataRender);
+                }
+            }
         } else {
-            $this->dataRender = str_replace($data[0], trim($content2), $this->dataRender);
+            if (Settings::getInstance()->inDebug()) {
+                throw new TemplateVarNotFound('The variable \'' . $varNotFound .
+                                            '\' is not defined for template \'' .
+                                            $this->template . '\'.');
+            } else {
+                $this->dataRender = str_replace($data[0], '', $this->dataRender);
+            }
         }
     }
 
     private function ifsTemplate() {
-        $regexSimple = "#\{\% if ([0-9A-Za-z\-_]*) (.*) ([0-9A-Za-z\-_'\"]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
+        $regexSimple = "#\{\% if(| not) ([0-9A-Za-z\-_\.]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
+        $regexDouble = "#\{\% if ([0-9A-Za-z\-_\.]*) (.*) ([0-9A-Za-z\-_\.'\"]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
+        //$regexQuad = "#\{\% if ([0-9A-Za-z\-_\.]*) (.*) ([0-9A-Za-z\-_\.'\"]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
         //$regex_complex = "#\{\% if ([0-9a-zA-Z\-_]*) (.*) ([0-9a-zA-Z\-_]*) \%\}([\w|\t\|\r\|\W]*?)\{\% else \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
         $results = array();
 
-        // Se buscan las apariciones de if simples
+        // Se buscan las apariciones de if de operando simple
         preg_match_all($regexSimple, $this->dataRender, $results, PREG_SET_ORDER);
 
         if (count($results) > 0) {
             foreach ($results as $if) {
-                $this->inIf($if);
+                $this->inIf($if, 1);
+            }
+        }
+
+        // Se buscan las apariciones de if de doble operando
+        preg_match_all($regexDouble, $this->dataRender, $results, PREG_SET_ORDER);
+
+        if (count($results) > 0) {
+            foreach ($results as $if) {
+                $this->inIf($if, 2);
             }
         }
 

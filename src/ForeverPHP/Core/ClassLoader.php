@@ -25,8 +25,10 @@ class ClassLoader {
         $class = static::normalizeClass($class);
 
         foreach (static::$directories as $directory) {
-            if (file_exists($path = $directory . DS . $class)) {
-                require_once static::normalizePath($path);
+            $path = static::normalizePath($directory . DS . $class);
+
+            if (file_exists($path)) {
+                require_once $path ;
 
                 return true;
             }

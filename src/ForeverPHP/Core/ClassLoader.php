@@ -26,7 +26,7 @@ class ClassLoader {
 
         foreach (static::$directories as $directory) {
             if (file_exists($path = $directory . DS . $class)) {
-                require_once $path;
+                require_once static::normalizePath($path);
 
                 return true;
             }
@@ -47,6 +47,22 @@ class ClassLoader {
         }
 
         return str_replace(array('\\', '_'), DS, $class) . '.php';
+    }
+
+    /**
+     * Obtiene la ruta de la clase normalizada para sensibilidad
+     * de mayúsculas y minúsculas.
+     *
+     * @param  string $path
+     * @return string
+     */
+    private static function normalizePath($path) {
+        $directories = array(
+            'upper' => array('Apps', 'Models', 'Views'),
+            'lower' => array('apps', 'models', 'views')
+        );
+
+        return str_replace($directories['upper'], $directories['lower'], $path);
     }
 
     /**

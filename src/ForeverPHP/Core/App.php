@@ -161,7 +161,7 @@ class App {
         $view = $route['view'];
         $function = $route['function'];
 
-        Setup::toDefine('TEMPLATES_PATH', APPS_ROOT . DS . $this->appName . DS . 'templates' . DS);
+        Setup::toDefine('TEMPLATES_PATH', APPS_ROOT . DS . $this->appName . DS . 'Templates' . DS);
         Setup::toDefine('STATIC_PATH', APPS_ROOT . DS . 'static' . DS);
 
         // Verifico que la vista hereda de View

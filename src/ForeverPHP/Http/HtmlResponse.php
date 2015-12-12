@@ -25,14 +25,27 @@ class HtmlResponse implements ResponseInterface {
     private $template;
 
     /**
+     * Indica si el template se obtendra de una aplicación diferente.
+     *
+     * @var string
+     */
+    private $from;
+
+    /**
      * Indica si se debe usar cache en el renderizado.
+     *
+     * NOTA: La variable $usingCache no deberia ir en el contructor
+     *       ya que al especificar en la configuracion que esta
+     *       activo el cache la plantilla deberia usar cache, ver
+     *       la mejor forma de usar el cache.
      *
      * @var bool
      */
     private $usingCache;
 
-    public function __construct($template, $usingCache = false) {
+    public function __construct($template, $from, $usingCache = false) {
         $this->template = $template;
+        $this->from = $from;
         $this->usingCache = $usingCache;
     }
 

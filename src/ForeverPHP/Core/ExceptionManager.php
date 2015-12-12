@@ -39,7 +39,9 @@ class ExceptionManager {
             $contentBuffer = json_decode(ob_get_contents());
 
             // Limpio el buffer de salida previo
-            ob_clean();
+            if (ob_get_length()) {
+                ob_clean();
+            }
 
             Context::useGlobal(false);
             Context::set('exception', $title);

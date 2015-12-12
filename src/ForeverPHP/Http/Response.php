@@ -37,11 +37,11 @@ class Response {
      * Devuelve una respuesta del rendereo de un template.
      *
      * @param  string $template
-     * @param  array  $context
+     * @param  string $from
      * @return \ForeverPHP\Http\HtmlResponse
      */
-    public function render($template) {
-        return new HtmlResponse($template);
+    public function render($template, $from = null) {
+        return new HtmlResponse($template, $from);
     }
 
     /**

@@ -5,6 +5,7 @@ use ForeverPHP\Core\Exceptions\AppException;
 use ForeverPHP\Core\Exceptions\RouterException;
 use ForeverPHP\Core\Facades\Redirect;
 use ForeverPHP\Core\Facades\Request;
+use ForeverPHP\Core\Facades\Storage;
 use ForeverPHP\Core\Settings;
 use ForeverPHP\Core\Setup;
 use ForeverPHP\Http\Response;
@@ -401,6 +402,13 @@ class Router {
             $app = App::getInstance();
             if ($app->exists($appName)) {
                 $app->load($appName);
+
+                // Cargo el autoload.php, archivo opcional
+                $autoloadPath = APPS_ROOT . DS . 'autoload.php';
+
+                if (Storage::exists($autoloadPath)) {
+                    include_once $autoloadPath;
+                }
 
                 // Ejecuta los decoradores de la ruta si es que hay
                 $middlewares = $routeContent['middlewares'];

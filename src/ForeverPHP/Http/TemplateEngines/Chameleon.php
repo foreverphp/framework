@@ -1,5 +1,7 @@
 <?php namespace ForeverPHP\Http\TemplateEngines;
 
+use ForeverPHP\Core\Facades\App;
+use ForeverPHP\Core\Facades\Storage;
 use ForeverPHP\Core\Settings;
 use ForeverPHP\Http\TemplateEngines\TemplateInterface;
 use ForeverPHP\Security\CSRF;
@@ -26,36 +28,67 @@ class Chameleon implements TemplateInterface {
     }
 
     private function extendsTemplate() {
-        $regex = "#\{\% extends ([0-9A-Za-z\-_]*) \%\}#";
+        $regex = "#\{\% extends ('|\")([0-9A-Za-z\-_]*)('|\")(| from ('|\")([0-9A-Za-z\-_]*)('|\")) \%\}#";
         $results = array();
 
-        preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);
+        preg_match_all($regex, $this->dataRender, $result, PREG_SET_ORDER);
 
-        if (count($results) > 0) {
-            $this->dataRenderBase = file_get_contents($this->templatesDir . $results[0][1] . '.html');
+        $extendsFile = '';
+        $extendsLength = count($result[0]);
+
+
+        if ($extendsLength == 5) {
+            $extendsFile = $this->templatesDir . $result[0][2] . '.html';
+        } else if ($extendsLength == 8) {
+            // Verifica si la App esta cargada, en settings.php
+            if (App::exists($result[0][6])) {
+                $extendsFile = APPS_ROOT . DS . $result[0][6] . DS .
+                            'Templates' . DS . $result[0][2] . '.html';
+            }
+
         } else {
             return false;
         }
 
         unset($results);
+
+        if (Storage::exists($extendsFile)) {
+            $this->dataRenderBase = Storage::get($extendsFile);
+        } else {
+            return false;
+        }
+
         return true;
     }
 
     private function includesTemplate() {
-        $regex = "#\{\% include ([0-9A-Za-z\-_]*) \%\}#";
+        $regex = "#\{\% include ('|\")([0-9A-Za-z\-_]*)('|\")(| from ('|\")([0-9A-Za-z\-_]*)('|\")) \%\}#";
         $results = array();
 
         preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);
 
         if (count($results) > 0) {
             foreach ($results as $include) {
-                $regexReplace = "#\{\% include " . $include[1] . " \%\}#";
-                $includeFile = file_get_contents($this->templatesDir . $include[1] . '.html');
-                //echo $include_file;
-                //echo $this->data_render_base;
-                //echo $this->data_render;
-                $this->dataRender = preg_replace($regexReplace, trim($includeFile), $this->dataRender);
-                    //echo $this->data_render;
+                $includeFile = '';
+                $templateFile = DS .'Templates' . DS;
+
+                // Verifica si la App esta cargada, en settings.php
+                $includeLength = count($include);
+
+                if ($includeLength > 5) {
+                    if (App::exists($include[6])) {
+                        $templateFile = APPS_ROOT . DS . $include[6] . DS .
+                                        'Templates' . DS . $include[2] . '.html';
+                    }
+                } else {
+                    $templateFile = $this->templatesDir . $include[2] .'.html';
+                }
+
+                if (Storage::exists($templateFile)) {
+                    $includeFile = Storage::get($templateFile);
+                }
+
+                $this->dataRender = str_replace($include[0], trim($includeFile), $this->dataRender);
             }
         } else {
             return false;
@@ -66,17 +99,19 @@ class Chameleon implements TemplateInterface {
     }
 
     private function blocksTemplate() {
-        $regex = "#\{\% block ([0-9A-Za-z\-_]*) \%\}([\w|\t|\r|\W]*?)\{\% endblock \%\}#";
+        $regex = "#\{\% block ('|\")([0-9A-Za-z\-_]*)('|\") \%\}([\w|\t|\r|\W]*?)\{\% endblock \%\}#";
         $results = array();
 
         preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);
 
         if (count($results) > 0) {
-            foreach ($results as $bloque) {
-                $regexReplace = "#\{\% block " . $bloque[1] . " \%\}\{\% endblock \%\}#";
+            foreach ($results as $block) {
+                $regexReplace = "#\{\% block " . $block[1] . $block[2] .
+                                $block[3] . " \%\}\{\% endblock \%\}#";
 
                 // Busco el bloque en el template base y lo reemplazo
-                $this->dataRenderBase = preg_replace($regexReplace, trim($bloque[2]), $this->dataRenderBase);
+                $this->dataRenderBase = preg_replace($regexReplace,
+                                        trim($block[4]), $this->dataRenderBase);
             }
         } else {
             // Cuando un template extiende otro debe de existir al menos un bloque
@@ -89,7 +124,7 @@ class Chameleon implements TemplateInterface {
     }
 
     private function staticsTemplate() {
-        $regex = "#\{\% static '(.*?)' \%\}#";
+        $regex = "#\{\% static ('|\")(.*?)('|\") \%\}#";
         $results = array();
 
         preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);
@@ -113,7 +148,7 @@ class Chameleon implements TemplateInterface {
     }
 
     private function urlsTemplate() {
-        $regex = "#\{\% url '(.*?)' \%\}#";
+        $regex = "#\{\% url ('|\")(.*?)('|\") \%\}#";
         $results = array();
 
         preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);
@@ -368,13 +403,13 @@ class Chameleon implements TemplateInterface {
     // FUNCION OBSOLETA
     private function routeTagsTemplate() {
         // Tag url_base
-        $regex = "#\{\% url_base \%\}#";
+        $regex = "#\{\% urlbase \%\}#";
         //$url_base = (URL_BASE === '/') ? '' : URL_BASE;
 
         $this->dataRender = preg_replace($regex, '/', $this->dataRender);
 
         // Tag url_static
-        $regex = "#\{\% url_static \%\}#";
+        $regex = "#\{\% urlstatic \%\}#";
 
         $this->dataRender = preg_replace($regex, '/' . 'static/', $this->dataRender);
     }
@@ -383,13 +418,13 @@ class Chameleon implements TemplateInterface {
         $results = array();
 
         // Tag csrf_token
-        $regex = "#\{\% csrf_token \%\}#";
+        $regex = "#\{\% csrftoken \%\}#";
 
         preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);
 
         if (count($results) > 0) {
             $token = CSRF::generateToken();
-            $inputTag = '<input type="hidden" name="csrf_token" value="' . $token . '" />';
+            $inputTag = '<input type="hidden" name="csrfToken" value="' . $token . '" />';
 
             $this->dataRender = preg_replace($regex, $inputTag, $this->dataRender);
         }

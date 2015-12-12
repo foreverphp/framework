@@ -33,27 +33,32 @@ class Chameleon implements TemplateInterface {
 
         preg_match_all($regex, $this->dataRender, $result, PREG_SET_ORDER);
 
-        $extendsFile = '';
-        $extendsLength = count($result[0]);
+        $resultLength = count($result);
 
+        if ($resultLength == 1) {
+            $extendsFile = '';
+            $extendsLength = count($result[0]);
 
-        if ($extendsLength == 5) {
-            $extendsFile = $this->templatesDir . $result[0][2] . '.html';
-        } else if ($extendsLength == 8) {
-            // Verifica si la App esta cargada, en settings.php
-            if (App::exists($result[0][6])) {
-                $extendsFile = APPS_ROOT . DS . $result[0][6] . DS .
-                            'Templates' . DS . $result[0][2] . '.html';
+            if ($extendsLength == 5) {
+                $extendsFile = $this->templatesDir . $result[0][2] . '.html';
+            } else if ($extendsLength == 8) {
+                // Verifica si la App esta cargada, en settings.php
+                if (App::exists($result[0][6])) {
+                    $extendsFile = APPS_ROOT . DS . $result[0][6] . DS .
+                                'Templates' . DS . $result[0][2] . '.html';
+                }
+
+            } else {
+                return false;
             }
 
-        } else {
-            return false;
-        }
+            unset($results);
 
-        unset($results);
-
-        if (Storage::exists($extendsFile)) {
-            $this->dataRenderBase = Storage::get($extendsFile);
+            if (Storage::exists($extendsFile)) {
+                $this->dataRenderBase = Storage::get($extendsFile);
+            } else {
+                return false;
+            }
         } else {
             return false;
         }

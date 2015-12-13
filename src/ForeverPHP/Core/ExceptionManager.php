@@ -2,6 +2,7 @@
 
 use ForeverPHP\Core\Facades\Context;
 use ForeverPHP\Core\Facades\Redirect;
+use ForeverPHP\Core\Facades\Settings;
 use ForeverPHP\Http\Response;
 
 /**
@@ -112,6 +113,16 @@ class ExceptionManager {
      * @return void
      */
     public static function errorHandler($errno, $errstr, $errfile, $errline) {
+        /*
+         * Si la configuración "debugHideNotices" existe, indica si se
+         * muestran o no los errores de tipo E_NOTICE.
+         */
+        if (Settings::exists('debugHideNotices')) {
+            if ($errno == E_NOTICE && Settings::get('debugHideNotices')) {
+                return;
+            }
+        }
+
         switch ($errno){
             case E_ERROR: // 1
                 $type = 'E_ERROR'; break;

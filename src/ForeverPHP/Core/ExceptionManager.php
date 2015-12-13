@@ -2,7 +2,6 @@
 
 use ForeverPHP\Core\Facades\Context;
 use ForeverPHP\Core\Facades\Redirect;
-use ForeverPHP\Core\Facades\Settings;
 use ForeverPHP\Http\Response;
 
 /**
@@ -117,8 +116,8 @@ class ExceptionManager {
          * Si la configuración "debugHideNotices" existe, indica si se
          * muestran o no los errores de tipo E_NOTICE.
          */
-        if (Settings::exists('debugHideNotices')) {
-            if ($errno == E_NOTICE && Settings::get('debugHideNotices')) {
+        if (Settings::getInstance()->exists('debugHideNotices')) {
+            if ($errno == E_NOTICE && Settings::getInstance()->get('debugHideNotices')) {
                 return;
             }
         }

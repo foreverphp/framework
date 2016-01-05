@@ -17,6 +17,8 @@ class QuerySQL {
 
 	private $hasError = false;
 
+	private $errno = 0;
+
 	private $error = '';
 
 	private $parameters = array();
@@ -106,6 +108,7 @@ class QuerySQL {
 	public function execute($returnType = 'array') {
 		$this->dbInstance = null;
 		$this->hasError = false;
+		$this->errno = 0;
 		$this->error = '';
 		$return = false;
 
@@ -156,6 +159,7 @@ class QuerySQL {
 			}
 
 			// Recupera el ultimo error ocurrido en el motor de datos
+			$this->errno = $this->dbInstance->getErrorNumber();
 			$this->error = $this->dbInstance->getError();
 
 			if (!empty($this->error)) {
@@ -180,6 +184,10 @@ class QuerySQL {
 
 	public function hasError() {
 		return $this->hasError;
+	}
+
+	public function getErrorNumber() {
+		return $this->errno;
 	}
 
 	public function getError() {

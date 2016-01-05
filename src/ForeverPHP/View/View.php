@@ -69,13 +69,6 @@ class View {
         Setup::importFromApp($pathToImport);
     }
 
-    /*
-     * Solo retorna el contexto global.
-     */
-    /*protected static function _get_global_context() {
-        return self::$_global_contexts;
-    }*/
-
     /**
      * Renderea un templete y lo retorna como respuesta al cliente.
      *

@@ -30,6 +30,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
         }
 
         if (mysqli_connect_errno()) {
+        	$this->errno = mysqli_errno($this->link);
         	$this->error = mysqli_connect_error();
     		return false;
 		}
@@ -135,6 +136,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 			if ($this->stmt->execute() === true) {
 				$return = true;
 
+				$this->errno = mysqli_errno($this->link);
 				$this->error = mysqli_error($this->link);
 			}
 		} else {
@@ -155,8 +157,10 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 					$return = $this->returnDataGenerator();
 				}
 
+				$this->errno = mysqli_errno($this->link);
 				$this->error = mysqli_error($this->link);
 			} else {
+				$this->errno = mysqli_errno($this->link);
 				$this->error = mysqli_error($this->link);
 			}
 		}
@@ -173,6 +177,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 			if (mysqli_query($this->link, $this->query) !== false) {
 				$return = true;
 
+				$this->errno = mysqli_errno($this->link);
 				$this->error = mysqli_error($this->link);
 			}
 		} else {
@@ -196,10 +201,12 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 					}
 				}
 
+				$this->errno = mysqli_errno($this->link);
 				$this->error = mysqli_error($this->link);
 
 				mysqli_free_result($result);
 			} else {
+				$this->errno = mysqli_errno($this->link);
 				$this->error = mysqli_error($this->link);
 			}
 		}
@@ -245,6 +252,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 				if ($this->stmt->execute() === true) {
 					$return = true;
 
+					$this->errno = mysqli_errno($this->link);
 					$this->error = mysqli_error($this->link);
 				}
 			} else {
@@ -341,8 +349,10 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 						$return = $rows;
 					}
 
+					$this->errno = mysqli_errno($this->link);
 					$this->error = mysqli_error($this->link);
 				} else {
+					$this->errno = mysqli_errno($this->link);
 					$this->error = mysqli_error($this->link);
 				}
 			}
@@ -391,6 +401,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 				if ($this->stmt->execute() === true) {
 					$return = true;
 
+					$this->errno = mysqli_errno($this->link);
 					$this->error = mysqli_error($this->link);
 				}
 			} else {
@@ -411,8 +422,10 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 						$return = $this->returnDataGenerator();
 					}
 
+					$this->errno = mysqli_errno($this->link);
 					$this->error = mysqli_error($this->link);
 				} else {
+					$this->errno = mysqli_errno($this->link);
 					$this->error = mysqli_error($this->link);
 				}
 			}
@@ -435,6 +448,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 		if ($this->link != null) {
             // Cierro la conexion
             if (!mysqli_close($this->link)) {
+            	$this->errno = mysqli_errno($this->link);
             	$this->error = mysqli_error($this->link);
             	return false;
             }

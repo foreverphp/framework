@@ -15,6 +15,7 @@ class SQLEngine {
     protected $queryType = 'other';
     protected $queryReturn = 'num';
     protected $parameters;
+    protected $errno;
     protected $error;
     protected $numRows;
 
@@ -46,6 +47,10 @@ class SQLEngine {
 
     public function setParameters($parameters) {
         $this->parameters = $parameters;
+    }
+
+    public function getErrorNumber() {
+        return $this->errno;
     }
 
     public function getError() {

@@ -122,22 +122,22 @@ class Router {
     public function add($route, $view, $middlewares = null) {
         $app = null;        // Aplicacion donde esta la vista
         $v = null;          // Vista a buscar
-        $function = 'run';  // Funcion por defecto a ejecutar
+        $method = 'run';  // Metodo por defecto a ejecutar
 
         // Se valida si es una vista a ejecutar o una funcion anonima
         if (is_string($view)) {
-            if (!strpos($view, '.')) {
+            if (!strpos($view, '@')) {
                 throw new RouterException("Revise la ruta ($route) al parecer la ruta a la vista no esta correctamente escrita.");
             }
 
             // Dividir la vista en app, vista y funcion si es que esta definida
-            $view = explode('.', $view);
+            $view = explode('@', $view);
             $app = $view[0];
             $v = $view[1];
 
             // Valida si la vista trae un metodo a ejecutar
             if (count($view) == 3) {
-                $function = $view[2];
+                $method = $view[2];
             }
         } elseif (is_array($view)) {
             /*
@@ -167,7 +167,7 @@ class Router {
             // Vuelve a llamar a add para agregar la ruta
             return $this->add($route, $view[0], $middlewares);
         } else {
-            $function = $view;
+            $method = $view;
         }
 
         // Se valida si la ruta trae parametros por ruta
@@ -178,7 +178,7 @@ class Router {
         $routeContent = array(
             'app' => $app,
             'view' => $v,
-            'function' => $function,
+            'method' => $method,
             'paramsUrl' => $paramsUrl,
             'name' => $this->nameForRoute,
             'middlewares' => $middlewares

@@ -158,11 +158,29 @@ class App {
             $this->makeResponse($route);
         }
 
-        $view = $route['view'];
-        $function = $route['function'];
+        // Se separa la vista por ".", si es que la vista esta en subcarpetas
+        // NOTA: En ForeverPHP los niveles de directorios se separan por "."
+        $viewSegments = explode('.', $route['view']);
+
+        // Nombre del metodo a ejecutar
+        $method = $route['method'];
 
         Setup::toDefine('TEMPLATES_PATH', APPS_ROOT . DS . $this->appName . DS . 'Templates' . DS);
         Setup::toDefine('STATIC_PATH', APPS_ROOT . DS . 'static' . DS);
+
+        $viewPath = '';
+        $view = $viewSegments[0];
+
+        if (count($viewSegments) > 1) {
+            $view = $viewSegments[count($viewSegments) - 1];
+
+            // Se elimina el ultimo segmento de la vista, que es el nombre del archivo vista
+            array_pop($viewSegments);
+
+            // Se unen los segmentos de la vista con el separador de nombres de espacio
+            $viewPath = implode('\\', $viewSegments);
+            $viewPath .= '\\';
+        }
 
         // Verifico que la vista hereda de View
         if ($view instanceof \ForeverPHP\View\View) {
@@ -171,13 +189,13 @@ class App {
 
         // Creo la vista y la ejecuto y le asigno el request a la vista para manipulacion interna
         if (Settings::getInstance()->get('usingNamespaces')) {
-            $view = '\\Apps\\' . $this->appName . '\\Views\\' . $view;
+            $view = '\\Apps\\' . $this->appName . '\\Views\\' . $viewPath . $view;
         }
 
         $v = new $view();
 
         // Ejecuta la funcion y almacena su valor de retorno
-        $returnValue = $v->$function();
+        $returnValue = $v->$method();
 
         // Se construye la respuesta
         $this->makeResponse($returnValue);

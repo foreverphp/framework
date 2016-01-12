@@ -25,13 +25,6 @@ class HtmlResponse implements ResponseInterface {
     private $template;
 
     /**
-     * Indica si el template se obtendra de una aplicación diferente.
-     *
-     * @var string
-     */
-    private $from;
-
-    /**
      * Indica si se debe usar cache en el renderizado.
      *
      * NOTA: La variable $usingCache no deberia ir en el contructor
@@ -43,9 +36,8 @@ class HtmlResponse implements ResponseInterface {
      */
     private $usingCache;
 
-    public function __construct($template, $from, $usingCache = false) {
+    public function __construct($template, $usingCache = false) {
         $this->template = $template;
-        $this->from = $from;
         $this->usingCache = $usingCache;
     }
 
@@ -82,8 +74,57 @@ class HtmlResponse implements ResponseInterface {
             // Comienza la captura del buffer de salida
             ob_start();
 
-            // Rendereo el template
-            echo $tpl->render($this->template, $data);
+            // Se construye la ruta del template
+            $templatesDir = '';
+            $staticDir = '';
+            $templatePath = '';
+            $appAndTemplate = null;
+
+            // Se definen las rutas de los templates y de los archivos estaticos
+            if (Settings::getInstance()->get('ForeverPHPTemplate')) {
+                // Se usaran templates de foreverPHP
+                $templatesDir = FOREVERPHP_TEMPLATES_PATH;
+                $staticDir = str_replace(DS, '/', FOREVERPHP_STATIC_PATH);
+            } else {
+                $templatesDir = TEMPLATES_PATH;
+                $staticDir = str_replace(DS, '/', STATIC_PATH);
+            }
+
+            $tpl->setTemplatesDir($templatesDir);
+
+            // Verifica si el template maneja aplicacion diferente y subdirectorios
+            if (strpos($this->template, '@')) {
+                $appAndTemplate = explode('@', $this->template);
+            }
+
+            if ($appAndTemplate != null) {
+                $templatesDir = APPS_ROOT . DS . $appAndTemplate[0] . DS . 'Templates' . DS;
+                $this->template = $appAndTemplate[1];
+            }
+
+            $subdirectories = explode('.', $this->template);
+            $totalSubdirectories = count($subdirectories);
+
+            if ($totalSubdirectories > 1) {
+                $this->template = $subdirectories[$totalSubdirectories - 1];
+
+                array_pop($subdirectories);
+
+                foreach ($subdirectories as $subdirectory) {
+                    $templatesDir .= $subdirectory . DS;
+                }
+            } else {
+                $this->template = $subdirectories[0];
+            }
+
+            // Se define la ruta del template
+            $templatePath = $templatesDir . $this->template;
+
+            // Le indico al motor de templates la ruta de los archivos estaticos
+            $tpl->setStaticDir($staticDir);
+
+            // Renderea el template
+            echo $tpl->render($templatePath, $data);
 
             /*
              * Aca se controla el cache de templates.

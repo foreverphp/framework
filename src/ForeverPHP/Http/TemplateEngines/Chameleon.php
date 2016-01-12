@@ -24,6 +24,7 @@ class Chameleon implements TemplateInterface {
     private function removeQuotes($data) {
         $dataTemp = str_replace("'", '', $data);
         $dataTemp = str_replace('"', '', $dataTemp);
+
         return $dataTemp;
     }
 
@@ -100,6 +101,7 @@ class Chameleon implements TemplateInterface {
         }
 
         unset($results);
+
         return true;
     }
 
@@ -125,6 +127,7 @@ class Chameleon implements TemplateInterface {
         }
 
         unset($results);
+
         return true;
     }
 
@@ -149,6 +152,7 @@ class Chameleon implements TemplateInterface {
         }
 
         unset($results);
+
         return true;
     }
 
@@ -174,6 +178,7 @@ class Chameleon implements TemplateInterface {
         }
 
         unset($results);
+
         return true;
     }
 
@@ -438,7 +443,7 @@ class Chameleon implements TemplateInterface {
     }
 
     private function loadTemplate() {
-        if (Settings::getInstance()->get('ForeverPHPTemplate')) {
+        /*if (Settings::getInstance()->get('ForeverPHPTemplate')) {
             // Se usaran templates de foreverPHP
             $this->templatesDir = FOREVERPHP_TEMPLATES_PATH;
             $this->staticDir = str_replace(DS, '/', FOREVERPHP_STATIC_PATH);
@@ -448,7 +453,8 @@ class Chameleon implements TemplateInterface {
         }
 
         // Cargo el contenido del template
-        $this->dataRender = file_get_contents($this->templatesDir . $this->template . '.html');
+        $this->dataRender = file_get_contents($this->templatesDir . $this->template . '.html');*/
+        $this->dataRender = file_get_contents($this->template . '.html');
 
         // Verifica si el template extiende otro
         if ($this->extendsTemplate()) {
@@ -501,6 +507,14 @@ class Chameleon implements TemplateInterface {
     private function release() {
         unset($this->dataRenderBase);
         unset($this->dataRender);
+    }
+
+    public function setTemplatesDir($templatesDir) {
+        $this->templatesDir = $templatesDir;
+    }
+
+    public function setStaticDir($staticDir) {
+        $this->staticDir = $staticDir;
     }
 
     /**

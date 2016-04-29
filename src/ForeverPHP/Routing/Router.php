@@ -192,12 +192,14 @@ class Router {
         }
     }
 
+
+
     /**
-     * Obtiene la ruta correcta
+     * Obtiene la ruta actual
      *
-     * @return string        Retorna la ruta con el formato correcto
+     * @return string
      */
-    private function getRoute() {
+    public function getRoute() {
         $uri = $_SERVER['REQUEST_URI'];
 
         // Extraigo la URI base si esta es diferente a /
@@ -213,7 +215,7 @@ class Router {
         }
 
         // Agrega un slash a uri para evitar error en la busqueda de ultimo slash
-        $uri = $this->addSlash($uri);
+        //$uri = $this->addSlash($uri);
 
         // Retorno la ruta correcta
         return $uri;
@@ -349,7 +351,7 @@ class Router {
         $this->getUriBase();
 
         // Obtiene la ruta actual
-        $route = $this->getRoute();
+        $route = $this->addSlash($this->getRoute());
 
         // Valida que tipo de ruta se solicito
         $routeContent = null;

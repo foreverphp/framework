@@ -197,6 +197,13 @@ class Request {
     }
 
     public function file($name) {
-        return $this->files[$name];
+        $return = false;
+
+        if (isset($this->files[$name])) {
+            $return = $this->files[$name];
+        }
+
+        return $return;//$this->files[$name];
+        //return $this->files[$name];
     }
 }

@@ -15,5 +15,8 @@ interface SQLEngineInterface {
 	public function setParameters($parameters);
 	public function execute();
     public function disconnect();
+    public function startTransaction();
+    public function commit();
+    public function rollback();
 	public function __destruct();
 }

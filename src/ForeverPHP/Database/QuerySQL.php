@@ -62,9 +62,9 @@ class QuerySQL {
 		$this->database = $database;
 	}
 
-	public function autocommit($value = false) {
+	/*public function autocommit($value = false) {
 		$this->autocommit = $value;
-	}
+	}*/
 
 	public function query($query, $fetch = 'num') {
 		$this->query = $query;
@@ -178,8 +178,16 @@ class QuerySQL {
 		return $return;
 	}
 
-	public function commit() {
+	public function startTransaction() {
+		$this->dbInstance->startTransaction();
+	}
 
+	public function commit() {
+		$this->dbInstance->commit();
+	}
+
+	public function rollback() {
+		$this->dbInstance->rollback();
 	}
 
 	public function hasError() {

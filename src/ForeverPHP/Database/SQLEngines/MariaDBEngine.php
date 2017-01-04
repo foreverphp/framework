@@ -14,6 +14,9 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 		$db = Settings::getInstance()->get('dbs');
         $db = $db[$this->dbSetting];
 
+        // Las transacciones no estan activas
+        $this->useTransaction = false;
+
         $dbName = ($this->database != false) ? $this->database : $db['database'];
 
         $socket = false;
@@ -455,6 +458,29 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 
             $this->link = null;
         }
+	}
+
+	public function startTransaction() {
+		if ($this->link != null) {
+			mysqli_autocommit($this->link, false);
+			$this->useTransaction = true;
+		}
+	}
+
+	public function commit() {
+		if ($this->link != null) {
+			if ($this->useTransaction) {
+				mysqli_commit($this->link);
+			}
+		}
+	}
+
+	public function rollback() {
+		if ($this->link != null) {
+			if ($this->useTransaction) {
+				mysqli_rollback($this->link);
+			}
+		}
 	}
 
 	public function __destruct() {

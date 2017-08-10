@@ -84,7 +84,7 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface {
             $params = array();
 
             foreach ($this->parameters as $param => $paramContent) {
-                $params[] = $paramContent['value'];
+                $params[] = &$paramContent['value'];
             }
 
             // Preparo la consulta

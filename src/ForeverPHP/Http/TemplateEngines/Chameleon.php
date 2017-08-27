@@ -96,6 +96,9 @@ class Chameleon implements TemplateInterface {
 
                 $this->dataRender = str_replace($include[0], trim($includeFile), $this->dataRender);
             }
+
+            // Vuelvo a llamar la función en busca de mas tags include
+            $this->includesTemplate();
         } else {
             return false;
         }

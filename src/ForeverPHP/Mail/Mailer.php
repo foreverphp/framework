@@ -69,6 +69,9 @@ class Mailer {
         //$mail->addAttachment('/tmp/image.jpg', 'new.jpg');
         $this->mail->isHTML(true);
 
+        // Activo condificacción utf-8
+        $this->mail->CharSet = 'UTF-8';
+
         $this->mail->Subject = $this->subject;
         $this->mail->Body    = $this->message;
         $this->mail->AltBody = $this->message;

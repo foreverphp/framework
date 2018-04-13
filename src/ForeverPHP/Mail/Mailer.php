@@ -33,7 +33,7 @@ class Mailer {
         return static::$instance;
     }
 
-    public function send($to, $subject, $message, $from, $attachment = null) {
+    public function send($to, $subject, $message, $from, $attachmentPath = null, $attachmentName = null) {
         $this->to = $to;
         $this->subject = $subject;
         $this->message = $message;

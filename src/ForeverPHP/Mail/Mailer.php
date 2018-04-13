@@ -33,7 +33,7 @@ class Mailer {
         return static::$instance;
     }
 
-    public function send($to, $subject, $message, $from) {
+    public function send($to, $subject, $message, $from, $attachment = null) {
         $this->to = $to;
         $this->subject = $subject;
         $this->message = $message;
@@ -65,8 +65,16 @@ class Mailer {
         //$mail->addBCC('bcc@example.com');
 
         $this->mail->WordWrap = 50;
-        //$mail->addAttachment('/var/tmp/file.tar.gz');
-        //$mail->addAttachment('/tmp/image.jpg', 'new.jpg');
+
+        // Verifico si lleva adjunto
+        if ($attachmentPath != null) {
+            if ($attachmentName == null) {
+                $this->mail->addAttachment($attachmentPath);
+            } else {
+                $this->mail->addAttachment($attachmentPath, $attachmentName);
+            }
+        }
+
         $this->mail->isHTML(true);
 
         // Activo condificacción utf-8
@@ -76,7 +84,7 @@ class Mailer {
         $this->mail->Body    = $this->message;
         $this->mail->AltBody = $this->message;
 
-        if(!$this->mail->send()) {
+        if (!$this->mail->send()) {
             $this->error = $this->mail->ErrorInfo;
             return false;
         }

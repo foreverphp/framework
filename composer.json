@@ -3,6 +3,12 @@
     "description": "ForeverPHP Framework.",
     "keywords": ["framework", "foreverphp"],
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniel Nuñez",
+            "email": "dnunez@pointers.cl"
+        }
+    ],
     "require": {
         "php": ">=5.4.0",
         "phpmailer/phpmailer": "5.2.*"

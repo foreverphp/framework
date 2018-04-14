@@ -6,12 +6,11 @@
     "authors": [
         {
             "name": "Daniel Nuñez S.",
-            "email": "dnunezse@gmail.com"
+            "email": "dnunez@pointers.cl"
         }
     ],
     "require": {
         "php": ">=5.4.0",
-		"phpoffice/phpexcel": "1.8.*",
 		"phpmailer/phpmailer": "5.2.*"
     },
     "autoload": {

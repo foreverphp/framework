@@ -11,6 +11,5 @@
         "psr-0": {
             "ForeverPHP": "src/"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }

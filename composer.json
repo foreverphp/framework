@@ -1,23 +1,21 @@
 {
-    "name": "foreverphp/framework",
-    "description": "ForeverPHP Framework.",
-    "keywords": ["framework", "foreverphp"],
-    "license": "MIT",
+	"name": "foreverphp/framework",
+	"description": "ForeverPHP Framework.",
+	"keywords": ["framework", "foreverphp"],
+	"license": "MIT",
     "authors": [
         {
-            "name": "Daniel Nuñez",
+            "name": "Daniel Nuñez S.",
             "email": "dnunez@pointers.cl"
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "phpmailer/phpmailer": "5.2.*"
+        "php": ">=7.0.0"
     },
     "autoload": {
         "psr-0": {
             "ForeverPHP": "src/"
         }
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "minimum-stability": "dev"
 }

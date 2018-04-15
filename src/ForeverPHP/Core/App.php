@@ -1,9 +1,6 @@
 <?php namespace ForeverPHP\Core;
 
-use ForeverPHP\Core\ClassLoader;
-use ForeverPHP\Core\Exceptions\AppException;
-use ForeverPHP\Core\Exceptions\ViewException;
-use ForeverPHP\Core\Setup;
+use ForeverPHP\Core\{ClassLoader, AppException, ViewException, Setup};
 
 /**
  * Funciones comunes para las aplicaciones

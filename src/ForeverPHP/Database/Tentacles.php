@@ -13,7 +13,7 @@
  * @copyright   Copyright (c) 2014, Emarva.
  * @license     http://www.opensource.org/licenses/mit-license.php MIT License
  * @link        http://www.emarva.com/foreverphp
- * @since       Version 0.5.0
+ * @since       Version 1.0.0
  */
 
 /*

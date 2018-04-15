@@ -5,14 +5,10 @@
  * snake_case
  * camel_case
  *
- * sacar algunas ideas de laravel
- *
  * Nota este archivo se debe cargar al iniciar el framework
  */
 
-use ForeverPHP\Core\Helpers\ArrayHelpers;
-use ForeverPHP\Core\Helpers\RouteHelpers;
-use ForeverPHP\Core\Helpers\StringHelpers;
+use ForeverPHP\Core\Helpers\{ArrayHelpers, RouteHelpers, StringHelpers};
 
 if (!function_exists('array_add')) {
     /**

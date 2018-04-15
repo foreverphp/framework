@@ -10,7 +10,8 @@ use PHPMailer;
  *
  * @since       Version 0.1.0
  */
-class Mailer {
+class Mailer
+{
     /**
      * Contiene la instancia singleton de Mailer.
      *
@@ -18,14 +19,18 @@ class Mailer {
      */
     private static $instance;
 
-    public function __construct() {}
+    public function __construct()
+    {
+        //
+    }
 
     /**
      * Obtiene o crea la instancia singleton de App.
      *
      * @return \ForeverPHP\Core\App
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static();
         }
@@ -33,7 +38,8 @@ class Mailer {
         return static::$instance;
     }
 
-    public function send($to, $subject, $message, $from, $attachmentPath = null, $attachmentName = null) {
+    public function send($to, $subject, $message, $from, $attachmentPath = null, $attachmentName = null)
+    {
         $this->to = $to;
         $this->subject = $subject;
         $this->message = $message;
@@ -77,9 +83,6 @@ class Mailer {
 
         $this->mail->isHTML(true);
 
-        // Activo condificacción utf-8
-        $this->mail->CharSet = 'UTF-8';
-
         $this->mail->Subject = $this->subject;
         $this->mail->Body    = $this->message;
         $this->mail->AltBody = $this->message;
@@ -92,7 +95,8 @@ class Mailer {
         return true;
     }
 
-    public function error() {
+    public function error()
+    {
         return $this->error;
     }
 }

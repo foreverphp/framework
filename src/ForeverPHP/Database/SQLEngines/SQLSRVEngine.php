@@ -84,7 +84,7 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface {
             $params = array();
 
             foreach ($this->parameters as $param => $paramContent) {
-                $params[] = &$paramContent['value'];
+                $params[] = $paramContent['value'];
             }
 
             // Preparo la consulta
@@ -154,18 +154,6 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface {
 
             $this->link = null;
         }
-    }
-
-    public function startTransaction() {
-        return false;
-    }
-
-    public function commit() {
-        return false;
-    }
-
-    public function rollback() {
-        return false;
     }
 
     public function __destruct() {

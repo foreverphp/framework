@@ -41,7 +41,7 @@ class HtmlResponse implements ResponseInterface {
         $this->usingCache = $usingCache;
     }
 
-    public function make($returnRender = false) {
+    public function make() {
         $data = array();
 
         // Valido el token CSRF, el cual solo esta disponible en GET o POST
@@ -124,11 +124,7 @@ class HtmlResponse implements ResponseInterface {
             $tpl->setStaticDir($staticDir);
 
             // Renderea el template
-            $render = $tpl->render($templatePath, $data);
-
-            if (!$returnRender) {
-                echo $render;
-            }
+            echo $tpl->render($templatePath, $data);
 
             /*
              * Aca se controla el cache de templates.
@@ -155,10 +151,5 @@ class HtmlResponse implements ResponseInterface {
          */
         // NOTA: al paracer esto ya no es necesario, validar despues
         Settings::getInstance()->set('viewState', 'render_ok');
-
-        // Devuelve el template rendereado si el parametro $returnRender esta en true
-        if ($returnRender) {
-            return $render;
-        }
     }
 }

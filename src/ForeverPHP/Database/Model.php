@@ -8,7 +8,7 @@
  * bases de datos relacionales.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @since       Version 0.4.0
+ * @since       Version 1.0.0
  */
 class Model extends QuerySet {
     protected $data = array();       // Almacena el contenido que se va a trabajar en el modelo

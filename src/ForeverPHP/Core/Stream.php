@@ -6,7 +6,7 @@
  * cliente con una salida mas limpia.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @since       Version 0.4.0
+ * @since       Version 1.0.0
  */
 class Stream {
     /**
@@ -44,7 +44,7 @@ class Stream {
      */
     private static $instance;
 
-    private function __construct() {
+    private function Stream() {
         $this->data = array();
         $this->headerData = array();
         $this->buffer = '';

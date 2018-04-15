@@ -134,18 +134,6 @@ class MSSQLEngine extends SQLEngine implements SQLEngineInterface {
         }
     }
 
-    public function startTransaction() {
-        return false;
-    }
-
-    public function commit() {
-        return false;
-    }
-
-    public function rollback() {
-        return false;
-    }
-
     public function __destruct() {
         $this->disconnect();
     }

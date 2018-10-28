@@ -26,6 +26,11 @@ class RequestFile {
     public function __construct($fileInfo) {
         $this->filename = $fileInfo['name'];
 
+        // Valida si el nombre del archivo viene en array
+        if (is_array($this->filename)) {
+            $this->filename = $this->filename[0];
+        }
+
         // Obtengo el nombre y la extención del archivo
         $nameAndExtension = explode('.', $this->filename);
         $this->name = $nameAndExtension[0];

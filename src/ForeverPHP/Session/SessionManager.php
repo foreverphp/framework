@@ -44,9 +44,8 @@ class SessionManager {
     }
 
     private function sessionStart() {
-        session_name(Settings::getInstance()->get('sessionName'));
-
         if (!$this->isSessionStarted()) {
+            session_name(Settings::getInstance()->get('sessionName'));
             session_start();
         }
     }

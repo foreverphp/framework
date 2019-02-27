@@ -10,6 +10,7 @@
  * Nota este archivo se debe cargar al iniciar el framework
  */
 
+use ForeverPHP\Core\Helpers\GlobalHelpers;
 use ForeverPHP\Core\Helpers\ArrayHelpers;
 use ForeverPHP\Core\Helpers\RouteHelpers;
 use ForeverPHP\Core\Helpers\StringHelpers;
@@ -31,6 +32,13 @@ if (!function_exists('array_add')) {
 if (!function_exists('camel_case')) {
     function camel_case() {
 
+    }
+}
+
+if (!function_exists('env')) {
+    function env($nombre, $valor = null)
+    {
+        return GlobalHelpers::env($nombre, $valor);
     }
 }
 

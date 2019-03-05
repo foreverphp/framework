@@ -5,29 +5,34 @@
  *
  * @since       Version 1.0.0
  */
-class Config {
+class Config
+{
     /**
      * Almacena todos los elementos de configuracion.
      *
      * @var array
      */
-    private $settings;
+    private $configs;
 
     /**
-     * Contiene la instancia singleton de Settings.
+     * Contiene la instancia singleton de config.
      *
-     * @var \ForeverPHP\Core\Settings
+     * @var \ForeverPHP\Core\Config
      */
     private static $instance;
 
-    private function __construct() {}
+    private function __construct()
+    {
+        //
+    }
 
     /**
-     * Obtiene o crea la instancia singleton de Settings.
+     * Obtiene o crea la instancia singleton de Config.
      *
-     * @return \ForeverPHP\Core\Settings
+     * @return \ForeverPHP\Core\Config
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static();
             static::$instance->load();
@@ -39,16 +44,17 @@ class Config {
     /*
      * Carga una vez el archivo de configuracion
      */
-    private function load() {
+    private function load()
+    {
         $path = APPS_ROOT . DS . 'settings.php';
 
         if (!file_exists($path)) {
             exit('El archivo de configuración settings.php no existe.');
         }
 
-        $this->settings = require $path;
+        $this->configs = require $path;
 
-        if (!is_array($this->settings)) {
+        if (!is_array($this->configs)) {
             exit('El archivo de configuración no tiene el formato correcto.');
         }
     }
@@ -59,8 +65,9 @@ class Config {
      * @param  string $name Nombre del item.
      * @return boolean
      */
-    public function exists($name) {
-        if (array_key_exists($name, $this->settings)) {
+    public function exists($name)
+    {
+        if (array_key_exists($name, $this->configs)) {
             return true;
         }
 
@@ -74,12 +81,13 @@ class Config {
      * @param mixed  $value Valor a asignar al item
      * @return boolean
      */
-    public function set($name, $value = null) {
+    public function set($name, $value = null)
+    {
         if ($value == null) {
             return false;
         }
 
-        $this->settings[$name] = $value;
+        $this->configs[$name] = $value;
     }
 
     /**
@@ -88,9 +96,10 @@ class Config {
      * @param  string $item Nombre del item a obtener.
      * @return mixed        Retorna el valor del item.
      */
-    public function get($name) {
+    public function get($name)
+    {
         if ($this->exists($name)) {
-            $value = $this->settings[$name];
+            $value = $this->configs[$name];
 
             /*
              * NO VA: Si el valor a devolver es una matriz se debe retornar una
@@ -121,7 +130,8 @@ class Config {
      *
      * @return boolean
      */
-    public function inDebug() {
+    public function inDebug()
+    {
         return $this->get('debug');
     }
 }

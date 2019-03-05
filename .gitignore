@@ -1,6 +1,8 @@
-vendor/
-.DS_Store
-*.sublime-*
-composer.lock
+/.vscode
+/vendor
 composer.phar
+composer.lock
+.DS_Store
 Thumbs.db
+/phpunit.xml
+.phpunit.result.cache

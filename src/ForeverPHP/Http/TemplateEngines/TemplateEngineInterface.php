@@ -3,9 +3,9 @@
 /**
  * Interface base para los motores de rendereo de templates.
  *
- * @author  Daniel Nuñez S. <dnunez@emarva.com>
- * @since   Version 0.2.0
+ * @since   Version 1.0.0
  */
-interface TemplateInterface {
+interface TemplateEngineInterface
+{
     public function render($template, $data);
 }

@@ -15,9 +15,6 @@ use ForeverPHP\Core\Helpers\ArrayHelpers;
 use ForeverPHP\Core\Helpers\RouteHelpers;
 use ForeverPHP\Core\Helpers\StringHelpers;
 
-$dotenv = \Dotenv\Dotenv::create('../');
-$dotenv->load();
-
 if (!function_exists('array_add')) {
     /**
      * [array_add description]
@@ -27,14 +24,16 @@ if (!function_exists('array_add')) {
      * @param  [type] $value [description]
      * @return [type]        [description]
      */
-    function array_add($array, $key, $value) {
+    function array_add($array, $key, $value)
+    {
         return ArrayHelpers::arrayAdd($array, $key, $value);
     }
 }
 
 if (!function_exists('camel_case')) {
-    function camel_case() {
-
+    function camel_case()
+    {
+        //
     }
 }
 
@@ -46,25 +45,29 @@ if (!function_exists('env')) {
 }
 
 if (!function_exists('length')) {
-    function length($string) {
+    function length($string)
+    {
         return StringHelpers::length($string);
     }
 }
 
 if (!function_exists('lower')) {
-    function lower($string) {
+    function lower($string)
+    {
         return StringHelpers::lower($string);
     }
 }
 
 if (!function_exists('snake_case')) {
-    function snake_case() {
-
+    function snake_case()
+    {
+        //
     }
 }
 
 if (!function_exists('upper')) {
-    function upper($string) {
+    function upper($string)
+    {
         return StringHelpers::upper($string);
     }
 }

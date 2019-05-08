@@ -15,6 +15,9 @@ use ForeverPHP\Core\Helpers\ArrayHelpers;
 use ForeverPHP\Core\Helpers\RouteHelpers;
 use ForeverPHP\Core\Helpers\StringHelpers;
 
+$dotenv = \Dotenv\Dotenv::create('../');
+$dotenv->load();
+
 if (!function_exists('array_add')) {
     /**
      * [array_add description]

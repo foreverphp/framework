@@ -1,7 +1,5 @@
 <?php namespace ForeverPHP\Core\Helpers;
 
-use ForeverPHP\Core\Facades\Storage;
-
 /**
  * Funciones auxiliares globales.
  *
@@ -10,26 +8,6 @@ use ForeverPHP\Core\Facades\Storage;
  */
 class GlobalHelpers
 {
-    /*public static function env($nombre, $valor = null)
-    {
-        //
-        // Cargar el .env aca esta mal ya que lo cargara por cada llamada a la función env,
-        // ver donde cargarlo de manera optima. Podria ser con alguna funcion register o al similar.
-        //
-        if (Storage::exists(ROOT_PATH . DS . '.env')) {
-            $dotenv = \Dotenv\Dotenv::create('../');
-            $dotenv->load();
-        }
-
-        if (!isset($_ENV[$nombre])) {
-            if ($valor != null) {
-                putenv("$nombre=$valor");
-            }
-        }
-
-        return getenv($nombre);
-    }*/
-
     public static function env($name, $value = null)
     {
         if (!isset($_ENV[$name])) {

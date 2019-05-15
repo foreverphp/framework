@@ -10,13 +10,16 @@
  * Nota este archivo se debe cargar al iniciar el framework
  */
 
+use ForeverPHP\Core\Facades\Storage;
 use ForeverPHP\Core\Helpers\GlobalHelpers;
 use ForeverPHP\Core\Helpers\ArrayHelpers;
 use ForeverPHP\Core\Helpers\RouteHelpers;
 use ForeverPHP\Core\Helpers\StringHelpers;
 
-$dotenv = \Dotenv\Dotenv::create('../');
-$dotenv->load();
+if (Storage::exists(ROOT_PATH . DS . '.env')) {
+    $dotenv = \Dotenv\Dotenv::create('../');
+    $dotenv->load();
+}
 
 if (!function_exists('array_add')) {
     /**

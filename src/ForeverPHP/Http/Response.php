@@ -42,7 +42,7 @@ class Response
      */
     public function render($template, $statusCode = 200)
     {
-        return new HtmlResponse($template);
+        return new HtmlResponse($template, $statusCode);
     }
 
     /**
@@ -54,7 +54,7 @@ class Response
     public function json($content, $statusCode = 200)
     {
         if (!is_null($content)) {
-            return new JsonResponse($content);
+            return new JsonResponse($content, $statusCode);
         }
 
         return false;

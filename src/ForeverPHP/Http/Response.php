@@ -9,7 +9,8 @@ use ForeverPHP\Http\JsonResponse;
  *
  * @since       Version 0.2.0
  */
-class Response {
+class Response
+{
     /**
      * Contiene los textos de estados los cuales se recuperar con su
      * respectivo codigo.
@@ -39,7 +40,8 @@ class Response {
      * @param  string $template
      * @return \ForeverPHP\Http\HtmlResponse
      */
-    public function render($template) {
+    public function render($template, $statusCode = 200)
+    {
         return new HtmlResponse($template);
     }
 
@@ -49,7 +51,8 @@ class Response {
      * @param  \ForeverPHP\View\Context|array $context
      * @return \ForeverPHP\Http\JsonResponse
      */
-    public function json($content) {
+    public function json($content, $statusCode = 200)
+    {
         if (!is_null($content)) {
             return new JsonResponse($content);
         }
@@ -63,11 +66,13 @@ class Response {
      * @param  string $url
      * @return mixed
      */
-    public function download($url) {
-
+    public function download($url)
+    {
+        //
     }
 
-    public static function getResponseStatus($status) {
+    public static function getResponseStatus($status)
+    {
         return static::$responseStatus[$status];
     }
 }

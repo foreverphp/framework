@@ -9,7 +9,8 @@ use ForeverPHP\Http\ResponseInterface;
  * @author  Daniel Nuñez S. <dnunez@emarva.com>
  * @since   Version 0.2.0
  */
-class JsonResponse implements ResponseInterface {
+class JsonResponse implements ResponseInterface
+{
     /**
      * Objeto de tipo Context o array que sera convertido a JSON.
      *
@@ -24,13 +25,15 @@ class JsonResponse implements ResponseInterface {
      */
     private $statusCode;
 
-    public function __construct($content, $charset = 'utf-8', $statusCode = 200) {
+    public function __construct($content, $statusCode = 200, $charset = 'utf-8')
+    {
         $this->content = $content;
-        $this->charset = $charset;
         $this->statusCode = $statusCode;
+        $this->charset = $charset;
     }
 
-    public function make() {
+    public function make()
+    {
         $data = array();
 
         if (is_array($this->content)) {
@@ -40,7 +43,8 @@ class JsonResponse implements ResponseInterface {
             $data = Context::all();
         }
 
-        header('HTTP/1.0 ' . $this->statusCode . ' ' . Response::getResponseStatus($this->statusCode), true, $this->statusCode);
+        header('HTTP/1.0 ' . $this->statusCode . ' ' .
+            Response::getResponseStatus($this->statusCode), true, $this->statusCode);
         header('Content-type: application/json; charset: ' . $this->charset);
         header('Accept-Charset: ' . $this->charset);
 

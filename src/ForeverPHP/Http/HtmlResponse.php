@@ -16,7 +16,8 @@ use ForeverPHP\Security\CSRF;
  * @author  Daniel Nuñez S. <dnunez@emarva.com>
  * @since   Version 0.2.0
  */
-class HtmlResponse implements ResponseInterface {
+class HtmlResponse implements ResponseInterface
+{
     /**
      * Nombre del template a renderizar.
      *
@@ -36,19 +37,23 @@ class HtmlResponse implements ResponseInterface {
      */
     private $usingCache;
 
-    public function __construct($template, $usingCache = false) {
+    public function __construct($template, $statusCode = 200, $usingCache = false)
+    {
         $this->template = $template;
+        $this->statusCode = $statusCode;
         $this->usingCache = $usingCache;
     }
 
-    public function make() {
+    public function make($returnRender = false)
+    {
         $data = array();
 
         // Valido el token CSRF, el cual solo esta disponible en GET o POST
         //if (Settings::getInstance()->inDebug()) {
         if (Settings::getInstance()->exists('csrfToken')) {
             if (!CSRF::validateToken()) {
-                throw new SecurityException('Access denied, invalid token. It becomes impossible to process your request to start or close this page.');
+                throw new SecurityException('Access denied, invalid token. It becomes impossible to process your ' .
+                    'request to start or close this page.');
             }
         }
         /*} else {
@@ -65,80 +70,84 @@ class HtmlResponse implements ResponseInterface {
         //if ($only_debug) {
         //    Router::redirectToError(500);
         //} else {
-            $tplEngine = Settings::getInstance()->get('templateEngine');
+        $tplEngine = Settings::getInstance()->get('templateEngine');
 
-            if ($tplEngine == 'chameleon') {
-                $tpl = new Chameleon();
+        if ($tplEngine == 'chameleon') {
+            $tpl = new Chameleon();
+        }
+
+        // Comienza la captura del buffer de salida
+        ob_start();
+
+        // Se construye la ruta del template
+        $templatesDir = '';
+        $staticDir = '';
+        $templatePath = '';
+        $appAndTemplate = null;
+
+        // Se definen las rutas de los templates y de los archivos estaticos
+        if (Settings::getInstance()->get('ForeverPHPTemplate')) {
+            // Se usaran templates de foreverPHP
+            $templatesDir = FOREVERPHP_TEMPLATES_PATH;
+            $staticDir = str_replace(DS, '/', FOREVERPHP_STATIC_PATH);
+        } else {
+            $templatesDir = TEMPLATES_PATH;
+            $staticDir = str_replace(DS, '/', STATIC_PATH);
+        }
+
+        $tpl->setTemplatesDir($templatesDir);
+
+        // Verifica si el template maneja aplicacion diferente y subdirectorios
+        if (strpos($this->template, '@')) {
+            $appAndTemplate = explode('@', $this->template);
+        }
+
+        if ($appAndTemplate != null) {
+            $templatesDir = APPS_ROOT . DS . $appAndTemplate[0] . DS . 'Templates' . DS;
+            $this->template = $appAndTemplate[1];
+        }
+
+        $subdirectories = explode('.', $this->template);
+        $totalSubdirectories = count($subdirectories);
+
+        if ($totalSubdirectories > 1) {
+            $this->template = $subdirectories[$totalSubdirectories - 1];
+
+            array_pop($subdirectories);
+
+            foreach ($subdirectories as $subdirectory) {
+                $templatesDir .= $subdirectory . DS;
             }
+        } else {
+            $this->template = $subdirectories[0];
+        }
 
-            // Comienza la captura del buffer de salida
-            ob_start();
+        // Se define la ruta del template
+        $templatePath = $templatesDir . $this->template;
 
-            // Se construye la ruta del template
-            $templatesDir = '';
-            $staticDir = '';
-            $templatePath = '';
-            $appAndTemplate = null;
+        // Le indico al motor de templates la ruta de los archivos estaticos
+        $tpl->setStaticDir($staticDir);
 
-            // Se definen las rutas de los templates y de los archivos estaticos
-            if (Settings::getInstance()->get('ForeverPHPTemplate')) {
-                // Se usaran templates de foreverPHP
-                $templatesDir = FOREVERPHP_TEMPLATES_PATH;
-                $staticDir = str_replace(DS, '/', FOREVERPHP_STATIC_PATH);
-            } else {
-                $templatesDir = TEMPLATES_PATH;
-                $staticDir = str_replace(DS, '/', STATIC_PATH);
+        // Renderea el template
+        $render = $tpl->render($templatePath, $data);
+
+        if (!$returnRender) {
+            echo $render;
+        }
+
+        /*
+            * Aca se controla el cache de templates.
+            */
+        if (ob_get_length() > 0) {
+            if ($this->usingCache) {
+                // Obtiene el contenido del template renderizado
+                $cacheValue = ob_get_contents();
+
+                // POR AHORA SOLO GUARDA EL CACHE PARA PRUEBAS NO VALIDA DURACION, NI SI EXISTE
+                // Guarda el template en el cache
+                Cache::set($this->template . '.template.cache', $cacheValue);
             }
-
-            $tpl->setTemplatesDir($templatesDir);
-
-            // Verifica si el template maneja aplicacion diferente y subdirectorios
-            if (strpos($this->template, '@')) {
-                $appAndTemplate = explode('@', $this->template);
-            }
-
-            if ($appAndTemplate != null) {
-                $templatesDir = APPS_ROOT . DS . $appAndTemplate[0] . DS . 'Templates' . DS;
-                $this->template = $appAndTemplate[1];
-            }
-
-            $subdirectories = explode('.', $this->template);
-            $totalSubdirectories = count($subdirectories);
-
-            if ($totalSubdirectories > 1) {
-                $this->template = $subdirectories[$totalSubdirectories - 1];
-
-                array_pop($subdirectories);
-
-                foreach ($subdirectories as $subdirectory) {
-                    $templatesDir .= $subdirectory . DS;
-                }
-            } else {
-                $this->template = $subdirectories[0];
-            }
-
-            // Se define la ruta del template
-            $templatePath = $templatesDir . $this->template;
-
-            // Le indico al motor de templates la ruta de los archivos estaticos
-            $tpl->setStaticDir($staticDir);
-
-            // Renderea el template
-            echo $tpl->render($templatePath, $data);
-
-            /*
-             * Aca se controla el cache de templates.
-             */
-            if (ob_get_length() > 0) {
-                if ($this->usingCache) {
-                    // Obtiene el contenido del template renderizado
-                    $cacheValue = ob_get_contents();
-
-                    // POR AHORA SOLO GUARDA EL CACHE PARA PRUEBAS NO VALIDA DURACION, NI SI EXISTE
-                    // Guarda el template en el cache
-                    Cache::set($this->template . '.template.cache', $cacheValue);
-                }
-            }
+        }
         //}
 
         // Rendereo el template
@@ -151,5 +160,12 @@ class HtmlResponse implements ResponseInterface {
          */
         // NOTA: al paracer esto ya no es necesario, validar despues
         Settings::getInstance()->set('viewState', 'render_ok');
+
+        http_response_code($this->statusCode);
+
+        // Devuelve el template rendereado si el parametro $returnRender esta en true
+        if ($returnRender) {
+            return $render;
+        }
     }
 }

@@ -9,8 +9,10 @@ use ForeverPHP\Core\Settings;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
-class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
-	public function connect() {
+class MariaDBEngine extends SQLEngine implements SQLEngineInterface
+{
+	public function connect()
+	{
 		$db = Settings::getInstance()->get('dbs');
         $db = $db[$this->dbSetting];
 
@@ -41,7 +43,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
         return true;
 	}
 
-	private function returnDataGenerator() {
+	private function returnDataGenerator()
+	{
 		$fields = null;	// Almacena los nombres de campos afectados en la consulta
 		$rows = null;	// Almacenas las filas obtenidas de la consulta
 		$return = array();
@@ -127,7 +130,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 		return $return;
 	}
 
-	private function executeQuery() {
+	private function executeQuery()
+	{
 		$return = false;
 
 		// Preparo la consulta
@@ -137,8 +141,12 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 		// Se procede con la ejecucion de la consulta
 		if ($this->queryType == 'other') {
 			if ($this->stmt->execute() === true) {
-				$return = true;
+				$this->stmt->store_result();
+				$this->numRows = $this->stmt->num_rows();
 
+				// Genera los datos de retorno
+				$return = $this->returnDataGenerator();
+			} else {
 				$this->errno = mysqli_errno($this->link);
 				$this->error = mysqli_error($this->link);
 			}
@@ -173,7 +181,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 		return $return;
 	}
 
-	private function executeQuery_eliminar() {
+	private function executeQuery_eliminar()
+	{
 		$return = false;
 
 		if ($this->queryType == 'other') {
@@ -217,7 +226,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 		return $return;
 	}
 
-	private function executeQueryWithParameters_eliminar() {
+	private function executeQueryWithParameters_eliminar()
+	{
 		$return = false;
 
 		if (count($this->parameters) != 0) {
@@ -366,7 +376,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 		return $return;
 	}
 
-	private function executeQueryWithParameters() {
+	private function executeQueryWithParameters()
+	{
 		$return = false;
 
 		if (count($this->parameters) != 0) {
@@ -402,8 +413,12 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 			// Se procede con la ejecucion de la consulta
 			if ($this->queryType == 'other') {
 				if ($this->stmt->execute() === true) {
-					$return = true;
+					$this->stmt->store_result();
+					$this->numRows = $this->stmt->num_rows();
 
+					// Genera los datos de retorno
+					$return = $this->returnDataGenerator();
+				} else {
 					$this->errno = mysqli_errno($this->link);
 					$this->error = mysqli_error($this->link);
 				}
@@ -439,7 +454,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 		return $return;
 	}
 
-	public function execute() {
+	public function execute()
+	{
         if (count($this->parameters) == 0) {
             return $this->executeQuery();
         } else {
@@ -447,7 +463,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
         }
     }
 
-	public function disconnect() {
+	public function disconnect()
+	{
 		if ($this->link != null) {
             // Cierro la conexion
             if (!mysqli_close($this->link)) {
@@ -460,14 +477,16 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
         }
 	}
 
-	public function startTransaction() {
+	public function startTransaction()
+	{
 		if ($this->link != null) {
 			mysqli_autocommit($this->link, false);
 			$this->useTransaction = true;
 		}
 	}
 
-	public function commit() {
+	public function commit()
+	{
 		if ($this->link != null) {
 			if ($this->useTransaction) {
 				mysqli_commit($this->link);
@@ -475,7 +494,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 		}
 	}
 
-	public function rollback() {
+	public function rollback()
+	{
 		if ($this->link != null) {
 			if ($this->useTransaction) {
 				mysqli_rollback($this->link);
@@ -483,7 +503,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface {
 		}
 	}
 
-	public function __destruct() {
+	public function __destruct()
+	{
 		$this->disconnect();
 	}
 }

@@ -222,7 +222,7 @@ class ExceptionManager
         }
 
         // Muestra los errores
-        static::showErrors();
+        //static::showErrors();
 
         /*
          * Como ultima funcion en ejecutarse, es aca donde se termina el flujo

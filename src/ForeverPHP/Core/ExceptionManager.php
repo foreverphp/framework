@@ -212,7 +212,7 @@ class ExceptionManager
     {
         if (count(static::$errors) == 0) {
             $error = error_get_last();
-            $isFatal = in_array($type, [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE]);
+            $isFatal = in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE]);
 
             if (!is_null($error) && $isFatal) {
                 ob_start();

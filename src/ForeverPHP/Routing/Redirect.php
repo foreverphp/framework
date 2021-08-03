@@ -1,9 +1,9 @@
 <?php namespace ForeverPHP\Routing;
 
+use ForeverPHP\Core\Facades\Context;
 use ForeverPHP\Core\Facades\Settings;
 use ForeverPHP\Http\RedirectResponse;
 use ForeverPHP\Http\Response;
-use ForeverPHP\View\Context;
 
 /**
  * Permite la redireccion con multiples opciones.
@@ -11,7 +11,8 @@ use ForeverPHP\View\Context;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since 0.2.0
  */
-class Redirect {
+class Redirect
+{
     /**
      * Redirecciona a una ruta especifica con un estado y encabezado
      * especificos.
@@ -21,7 +22,8 @@ class Redirect {
      * @param  array   $headers
      * @return \ForeverPHP\Http\RedirectResponse
      */
-    public function to($path, $status = 301, $headers = array()) {
+    public function to($path, $status = 301, $headers = array())
+    {
         return $this->makeRedirect($path, $status, $headers);
     }
 
@@ -31,7 +33,8 @@ class Redirect {
      * @param  string $name
      * @return \ForeverPHP\Http\RedirectResponse
      */
-    public function route($name) {
+    public function route($name)
+    {
         // Debe construir una ruta segun el nombre de la ruta
     }
 
@@ -41,22 +44,26 @@ class Redirect {
      * @param  integer $errno
      * @return void
      */
-    public function error($errno) {
+    public function error($errno)
+    {
         $response = new Response();
 
         header("HTTP/1.0 $errno " . $response->getResponseStatus($errno), true, $errno);
 
         /*
          * Retorna un Response para mostrar el mensaje de que algo salio mal
-         * este solo se muestra cuando esta en produccion.         *
+         * este solo se muestra cuando esta en produccion.
          */
         if (!Settings::inDebug()) {
             Settings::set('ForeverPHPTemplate', true);
-            $response->render('error', new Context(array('message' => 'Oops, al parecer algo salió mal.')))->make();
+            Context::set('errno', $errno);
+            Context::set('message', 'Oops, al parecer algo salió mal.');
+            $response->render('error')->make();
         }
     }
 
-    public function makeRedirect($path, $status, $headers) {
+    public function makeRedirect($path, $status, $headers)
+    {
         $redirect = new RedirectResponse($path, $status, $headers);
 
         return $redirect;

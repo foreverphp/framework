@@ -1,46 +1,52 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="utf-8">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+  <head>
+    <meta charset="utf-8" />
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700" rel="stylesheet" type="text/css" />
     <style>
-        body {
-            background-color: #dddddd;
-            background-repeat: no-repeat;
-            background-position: right top;
-            color: #fefefe;
-            font-family: "Open Sans", arial;
-            margin: 0;
-            overflow: hidden;
-            padding: 0;
-        }
-        section {
-            background-color: #fefefe;
-            border-top: 1px solid #cccccc;
-            border-right: 1px solid #cccccc;
-            border-bottom: 5px solid #8e9d18;
-            border-left: 1px solid #cccccc;
-            color: #333333;
-            height: auto;
-            margin: auto;
-            padding: 10px;
-            text-align: left;
-            overflow: hidden;
-            width: 800px;
-        }
-        #wrap {
-            height: 100%;
-            margin-top: 1%;
-            text-align: center;
-            width: 100%
-        }
+      body {
+        background-color: #dddddd;
+        background-repeat: no-repeat;
+        background-position: right top;
+        color: #fefefe;
+        font-family: 'Open Sans', arial;
+        margin: 0;
+        overflow: hidden;
+        padding: 0;
+      }
+      section {
+        background-color: #fefefe;
+        border-top: 1px solid #cccccc;
+        border-right: 1px solid #cccccc;
+        border-bottom: 5px solid #8e9d18;
+        border-left: 1px solid #cccccc;
+        color: #333333;
+        height: auto;
+        margin: auto;
+        padding: 10px;
+        text-align: left;
+        overflow: hidden;
+        width: 800px;
+      }
+      #wrap {
+        height: 100%;
+        margin-top: 1%;
+        text-align: center;
+        width: 100%;
+      }
+      h1 {
+        padding: 0;
+        padding-bottom: 10px;
+        margin: 0;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div id="wrap">
-        <section>
-            <div style="overflow: auto;">{{message}}</div>
-        </section>
+      <section>
+        <h1>{{errno}}</h1>
+        <div style="overflow: auto">{{message}}</div>
+      </section>
     </div>
-</body>
+  </body>
 </html>

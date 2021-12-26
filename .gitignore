@@ -1,7 +1,18 @@
-/.vscode
-/vendor
+# Editors
+.vscode/*
+*.sublime-*
+# Composer
 composer.phar
 composer.lock
+# Binarios y comprimidos
+*.rar
+*.zip
+# Directorios
+vendor/*
+# Vagrant
+.vagrant/*
+Vagrantfile
+# Others
 .DS_Store
 Thumbs.db
 /phpunit.xml

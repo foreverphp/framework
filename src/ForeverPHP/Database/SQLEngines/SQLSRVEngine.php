@@ -16,7 +16,12 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface {
 
         $dbName = ($this->database != false) ? $this->database : $db['database'];
 
-        $server = $db['server'] . ',' . $db['port'];
+        $server = $db['server'];
+
+        if ($db['port'] != '') {
+            $server .= ',' . $db['port'];
+        }
+
         $connectionInfo = array('UID' => $db['user'], 'PWD' => $db['password'], 'Database' => $dbName);
 
         // Me conecto a la base de datos

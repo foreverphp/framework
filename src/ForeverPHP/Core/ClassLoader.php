@@ -1,6 +1,7 @@
 <?php namespace ForeverPHP\Core;
 
-class ClassLoader {
+class ClassLoader
+{
     /**
      * Los directorios registrados.
      *
@@ -21,12 +22,13 @@ class ClassLoader {
      * @param  string $class
      * @return boolean
      */
-    public static function load($class) {
+    public static function load($class)
+    {
         $class = static::normalizeClass($class);
 
         foreach (static::$directories as $directory) {
             if (file_exists($path = $directory . DS . $class)) {
-                require_once $path ;
+                require_once $path;
 
                 return true;
             }
@@ -41,7 +43,8 @@ class ClassLoader {
      * @param  string $class
      * @return string
      */
-    public static function normalizeClass($class) {
+    public static function normalizeClass($class)
+    {
         if ($class[0] == '\\') {
             $class = substr($class, 1);
         }
@@ -54,7 +57,8 @@ class ClassLoader {
      *
      * @return void
      */
-    public static function register() {
+    public static function register()
+    {
         if (!static::$registered) {
             static::$registered = spl_autoload_register(array('ForeverPHP\Core\ClassLoader', 'load'));
         }
@@ -66,7 +70,8 @@ class ClassLoader {
      * @param  string|array $directories
      * @return void
      */
-    public static function addDirectories($directories) {
+    public static function addDirectories($directories)
+    {
         static::$directories = array_unique(array_merge(static::$directories, (array) $directories));
     }
 
@@ -76,7 +81,8 @@ class ClassLoader {
      * @param  string|array $directories
      * @return void
      */
-    public static function removeDirectories($directories = null) {
+    public static function removeDirectories($directories = null)
+    {
         if (is_null($directories)) {
             static::$directories = array();
         } else {
@@ -89,8 +95,8 @@ class ClassLoader {
      *
      * @return array
      */
-    public static function getDirectories() {
+    public static function getDirectories()
+    {
         return static::$directories;
     }
-
 }

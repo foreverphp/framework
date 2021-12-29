@@ -1,5 +1,6 @@
 <?php namespace ForeverPHP\Auth;
 
-interface AuthInterface {
-	// PARA TODAS LAS VERSIONES
+interface AuthInterface
+{
+    // PARA TODAS LAS VERSIONES
 }

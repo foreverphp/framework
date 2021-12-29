@@ -9,8 +9,10 @@ use ForeverPHP\Core\Settings;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.4.0
  */
-class MSSQLEngine extends SQLEngine implements SQLEngineInterface {
-    public function connect() {
+class MSSQLEngine extends SQLEngine implements SQLEngineInterface
+{
+    public function connect()
+    {
         $db = Settings::getInstance()->get('dbs');
         $db = $db[$this->dbSetting];
 
@@ -34,7 +36,8 @@ class MSSQLEngine extends SQLEngine implements SQLEngineInterface {
         return true;
     }
 
-    private function executeQuery() {
+    private function executeQuery()
+    {
         $return = false;
 
         if ($this->queryType == 'other') {
@@ -80,11 +83,12 @@ class MSSQLEngine extends SQLEngine implements SQLEngineInterface {
         return $return;
     }
 
-    /*
+    /**
      * Como el conector MSSQL de PHP no cuenta con consultas con
      * parametros, se deben emular.
      */
-    private function executeQueryWithParameters() {
+    private function executeQueryWithParameters()
+    {
         if (count($this->parameters) != 0) {
             $newQuery = '';
             $totalParams = substr_count($this->query, '?');
@@ -114,7 +118,8 @@ class MSSQLEngine extends SQLEngine implements SQLEngineInterface {
         return $this->executeQuery();
     }
 
-    public function execute() {
+    public function execute()
+    {
         if (count($this->parameters) == 0) {
             return $this->executeQuery();
         } else {
@@ -122,7 +127,8 @@ class MSSQLEngine extends SQLEngine implements SQLEngineInterface {
         }
     }
 
-    public function disconnect() {
+    public function disconnect()
+    {
         if ($this->link != null) {
             // Cierro la conexion
             if (!mssql_close($this->link)) {
@@ -134,7 +140,8 @@ class MSSQLEngine extends SQLEngine implements SQLEngineInterface {
         }
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->disconnect();
     }
 }

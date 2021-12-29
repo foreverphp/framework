@@ -8,16 +8,13 @@ use ForeverPHP\Http\RequestFile;
  *
  * @since       Version 0.1.0
  */
-class Request {
+class Request
+{
 
     private $registered = false;
-
     private $files = null;
-
     private $method = 'get';
-
     private $params = null;
-
     /**
      * Contiene la instancia singleton de Request.
      *
@@ -25,14 +22,18 @@ class Request {
      */
     private static $instance;
 
-    public function __construct() {}
+    public function __construct()
+    {
+        //
+    }
 
     /**
      * Obtiene o crea la instancia singleton de Request.
      *
      * @return \ForeverPHP\Http\Request
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static();
         }
@@ -40,7 +41,8 @@ class Request {
         return static::$instance;
     }
 
-    private function loadRequest() {
+    private function loadRequest()
+    {
         $requestParams = null;
 
         if ($this->params == null) {
@@ -55,7 +57,7 @@ class Request {
                 $this->method = 'post';
                 $requestParams = $_POST;
             } elseif ($requestMethod == 'PUT' || $requestMethod == 'DELETE') {
-                /*
+                /**
                  * PHP no tiene un método propiamente dicho para leer una petición PUT o DELETE,
                  * por lo que se usa un "truco".
                  * Leer el stream de entrada file_get_contents("php://input") que transfiere un
@@ -81,7 +83,7 @@ class Request {
                 }
             }
 
-            foreach($requestParams as $name => $value) {
+            foreach ($requestParams as $name => $value) {
                 if ($name == 'csrfToken') {
                     // Almaceno el token CSRF para luego validarlo
                     Settings::getInstance()->set($name, $value);
@@ -92,7 +94,8 @@ class Request {
         }
     }
 
-    public function register($params = null) {
+    public function register($params = null)
+    {
         if (!$this->registered) {
             if ($params == null) {
                 $this->loadRequest();
@@ -106,39 +109,48 @@ class Request {
         }
     }
 
-    public function path() {
+    public function path()
+    {
         // retorna la uri
     }
 
-    public function url() {
+    public function url()
+    {
         // retorna la url del request
     }
 
-    public function segment($number) {
+    public function segment($number)
+    {
         // devuelve el segmento de url indicado
     }
 
-    public function is($path) {
+    public function is($path)
+    {
         // valida si se esta en el path
     }
 
-    public function header($name) {
+    public function header($name)
+    {
         // devuelve el elemento del header ejemplo 'Content-Type'
     }
 
-    public function server($var) {
+    public function server($var)
+    {
         // retorna valores de $_SERVER
     }
 
-    public function host() {
+    public function host()
+    {
         return Host::getInstance();
     }
 
-    public function method() {
+    public function method()
+    {
         return self::$_method;
     }
 
-    public function isMethod($method) {
+    public function isMethod($method)
+    {
         if (strtolower($method) === $this->method) {
             return true;
         }
@@ -146,31 +158,37 @@ class Request {
         return false;
     }
 
-    public function secure() {
+    public function secure()
+    {
         // devuelve si esta en https o no
     }
 
-    public function ajax() {
+    public function ajax()
+    {
         // devuelve si esta en ajax o no
     }
 
-    public function isJson() {
+    public function isJson()
+    {
         // devuelve si el request content-type es de tipo json
     }
 
-    public function wantsJson() {
+    public function wantsJson()
+    {
         // devuelve si la solicitud esta pidiendo json o no
     }
 
-    public function format($format) {
+    public function format($format)
+    {
         /*
-        Comprobación del formato de respuesta de la petición de
+    Comprobación del formato de respuesta de la petición de
 
-        El método Request :: format devuelve el formato de respuesta solicitada basándose en la cabecera HTTP Accept header:
-         */
+    El método Request :: format devuelve el formato de respuesta solicitada basándose en la cabecera HTTP Accept header:
+     */
     }
 
-    public function exists($name) {
+    public function exists($name)
+    {
         if (!is_null($this->params)) {
             if (array_key_exists($name, $this->params)) {
                 return true;
@@ -180,7 +198,8 @@ class Request {
         return false;
     }
 
-    public function get($name) {
+    public function get($name)
+    {
         if ($this->exists($name)) {
             return $this->params[$name];
         }
@@ -188,15 +207,18 @@ class Request {
         return false;
     }
 
-    public function all() {
+    public function all()
+    {
         return $this->params;
     }
 
-    public function hasFile($name) {
+    public function hasFile($name)
+    {
         // indica si el parametro pasado por nombre es de tipo file
     }
 
-    public function file($name) {
+    public function file($name)
+    {
         return $this->files[$name];
     }
 }

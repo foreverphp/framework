@@ -6,21 +6,24 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.3.0
  */
-class FileNotFoundException extends \Exception {}
+class FileNotFoundException extends \Exception
+{}
 
 /*
  * Se debe poder trabajar con diferentes sistemas de archivos.
  * Como: local, google drive, amazon s3, dropbox
  */
 
-class Filesystem {
+class Filesystem
+{
     /**
      * Determina si un archivo existe.
      *
      * @param  string $path
      * @return bool
      */
-    public function exists($path) {
+    public function exists($path)
+    {
         return file_exists($path);
     }
 
@@ -32,7 +35,8 @@ class Filesystem {
      *
      * @throws \ForeverPHP\Filesystem\FileNotFoundException
      */
-    public function get($path) {
+    public function get($path)
+    {
         if ($this->isFile($path)) {
             return file_get_contents($path);
         }
@@ -48,7 +52,8 @@ class Filesystem {
      * @param  bool    $lock
      * @return int
      */
-    public function put($path, $contents, $lock = false) {
+    public function put($path, $contents, $lock = false)
+    {
         return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
     }
 
@@ -58,7 +63,8 @@ class Filesystem {
      * @param  string|array $paths
      * @return bool
      */
-    public function delete($paths) {
+    public function delete($paths)
+    {
         $paths = is_array($paths) ? $paths : func_get_args();
 
         $return = true;
@@ -83,7 +89,8 @@ class Filesystem {
      * @param  string $target
      * @return bool
      */
-    public function move($path, $target) {
+    public function move($path, $target)
+    {
         return rename($path, $target);
     }
 
@@ -94,7 +101,8 @@ class Filesystem {
      * @param  string  $target
      * @return bool
      */
-    public function copy($path, $target) {
+    public function copy($path, $target)
+    {
         return copy($path, $target);
     }
 
@@ -104,7 +112,8 @@ class Filesystem {
      * @param  string  $path
      * @return string
      */
-    public function name($path) {
+    public function name($path)
+    {
         return pathinfo($path, PATHINFO_FILENAME);
     }
 
@@ -114,7 +123,8 @@ class Filesystem {
      * @param  string  $path
      * @return string
      */
-    public function extension($path) {
+    public function extension($path)
+    {
         return pathinfo($path, PATHINFO_EXTENSION);
     }
 
@@ -124,7 +134,8 @@ class Filesystem {
      * @param  string  $path
      * @return string
      */
-    public function type($path) {
+    public function type($path)
+    {
         return filetype($path);
     }
 
@@ -134,7 +145,8 @@ class Filesystem {
      * @param  string  $path
      * @return string|false
      */
-    public function mimeType($path) {
+    public function mimeType($path)
+    {
         return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
     }
 
@@ -144,7 +156,8 @@ class Filesystem {
      * @param  string  $path
      * @return int
      */
-    public function size($path) {
+    public function size($path)
+    {
         return filesize($path);
     }
 
@@ -154,7 +167,8 @@ class Filesystem {
      * @param  string  $directory
      * @return bool
      */
-    public function isDirectory($directory) {
+    public function isDirectory($directory)
+    {
         return is_dir($directory);
     }
     /**
@@ -163,7 +177,8 @@ class Filesystem {
      * @param  string  $path
      * @return bool
      */
-    public function isWritable($path) {
+    public function isWritable($path)
+    {
         return is_writable($path);
     }
 
@@ -173,36 +188,37 @@ class Filesystem {
      * @param  string  $file
      * @return bool
      */
-    public function isFile($file) {
+    public function isFile($file)
+    {
         return is_file($file);
     }
 
     /*public function prueba() {
-        echo "prueba fachada.".'<br>';
+    echo "prueba fachada.".'<br>';
     }
 
     public function prueba1($p1) {
-        echo "prueba fachada.".$p1.'<br>';
+    echo "prueba fachada.".$p1.'<br>';
     }
 
     public function prueba2($p1, $p2) {
-        echo "prueba fachada.".$p1.$p2.'<br>';
+    echo "prueba fachada.".$p1.$p2.'<br>';
     }
 
     public function prueba3($p1, $p2, $p3) {
-        echo "prueba fachada.".$p1.$p2.$p3.'<br>';
+    echo "prueba fachada.".$p1.$p2.$p3.'<br>';
     }
 
     public function prueba4($p1, $p2, $p3, $p4) {
-        echo "prueba fachada.".$p1.$p2.$p3.$p4.'<br>';
+    echo "prueba fachada.".$p1.$p2.$p3.$p4.'<br>';
     }
 
     public function pruebaMas($p1, $p2, $p3, $p4, $p5) {
-        echo "prueba fachada.".$p1.$p2.$p3.$p4.$p5.'<br>';
+    echo "prueba fachada.".$p1.$p2.$p3.$p4.$p5.'<br>';
     }
 
     public function pruebaMas2($p1, $p2, $p3, $p4, $p5, $p6, $p7) {
-        echo "prueba fachada.".$p1.$p2.$p3.$p4.$p5.$p6.$p7.'<br>';
+    echo "prueba fachada.".$p1.$p2.$p3.$p4.$p5.$p6.$p7.'<br>';
     }*/
 
     /**
@@ -213,7 +229,8 @@ class Filesystem {
      * @param  boolean $recursive
      * @return boolean
      */
-    public function makeDirectory($path, $mode = 0755, $recursive = false) {
+    public function makeDirectory($path, $mode = 0755, $recursive = false)
+    {
         if (!file_exists($path)) {
             return mkdir($path, $mode, $recursive);
         }

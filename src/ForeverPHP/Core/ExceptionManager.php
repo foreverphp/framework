@@ -11,7 +11,8 @@ use ForeverPHP\Http\Response;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.2.0
  */
-class ExceptionManager {
+class ExceptionManager
+{
     /**
      * Almacena la pila de errores.
      *
@@ -26,7 +27,8 @@ class ExceptionManager {
      * @param  string $message
      * @return void
      */
-    private static function viewException($type, $message) {
+    private static function viewException($type, $message)
+    {
         $template = 'exception';
         $title = 'Excepción';
 
@@ -79,10 +81,11 @@ class ExceptionManager {
      * @param  Exception $exception
      * @return void
      */
-    public static function exceptionHandler($exception) {
+    public static function exceptionHandler($exception)
+    {
         $message = 'Tipo de excepción no valida.';
 
-        /*
+        /**
          * Primero se valida si viene el parametro $exception y que sea
          * de tipo Exception o herede de este.
          */
@@ -111,8 +114,9 @@ class ExceptionManager {
      * @param  int    $errline
      * @return void
      */
-    public static function errorHandler($errno, $errstr, $errfile, $errline) {
-        /*
+    public static function errorHandler($errno, $errstr, $errfile, $errline)
+    {
+        /**
          * Si la configuración "debugHideNotices" existe, indica si se
          * muestran o no los errores de tipo E_NOTICE.
          */
@@ -122,44 +126,59 @@ class ExceptionManager {
             }
         }
 
-        switch ($errno){
+        switch ($errno) {
             case E_ERROR: // 1
-                $type = 'E_ERROR'; break;
+                $type = 'E_ERROR';
+                break;
             case E_WARNING: // 2
-                $type = 'E_WARNING'; break;
+                $type = 'E_WARNING';
+                break;
             case E_PARSE: // 4
-                $type = 'E_PARSE'; break;
+                $type = 'E_PARSE';
+                break;
             case E_NOTICE: // 8
-                $type = 'E_NOTICE'; break;
+                $type = 'E_NOTICE';
+                break;
             case E_CORE_ERROR: // 16
-                $type = 'E_CORE_ERROR'; break;
+                $type = 'E_CORE_ERROR';
+                break;
             case E_CORE_WARNING: // 32
-                $type = 'E_CORE_WARNING'; break;
+                $type = 'E_CORE_WARNING';
+                break;
             case E_COMPILE_ERROR: // 64
-                $type = 'E_COMPILE_ERROR'; break;
+                $type = 'E_COMPILE_ERROR';
+                break;
             case E_CORE_WARNING: // 128
-                $type = 'E_COMPILE_WARNING'; break;
+                $type = 'E_COMPILE_WARNING';
+                break;
             case E_USER_ERROR: // 256
-                $type = 'E_USER_ERROR'; break;
+                $type = 'E_USER_ERROR';
+                break;
             case E_USER_WARNING: // 512
-                $type = 'E_USER_WARNING'; break;
+                $type = 'E_USER_WARNING';
+                break;
             case E_USER_NOTICE: // 1024
-                $type = 'E_USER_NOTICE'; break;
+                $type = 'E_USER_NOTICE';
+                break;
             case E_STRICT: // 2048
-                $type = 'E_STRICT'; break;
+                $type = 'E_STRICT';
+                break;
             case E_RECOVERABLE_ERROR: // 4096
-                $type = 'E_RECOVERABLE_ERROR'; break;
+                $type = 'E_RECOVERABLE_ERROR';
+                break;
             case E_DEPRECATED: // 8192
-                $type = 'E_DEPRECATED'; break;
+                $type = 'E_DEPRECATED';
+                break;
             case E_USER_DEPRECATED: // 16384
-                $type = 'E_USER_DEPRECATED'; break;
+                $type = 'E_USER_DEPRECATED';
+                break;
         }
 
         array_push(static::$errors, array(
             'type' => $type,
             'message' => $errstr,
             'file' => $errfile,
-            'line' => $errline
+            'line' => $errline,
         ));
     }
 
@@ -168,7 +187,8 @@ class ExceptionManager {
      *
      * @return void
      */
-    private static function showErrors() {
+    private static function showErrors()
+    {
         if (count(static::$errors) > 0) {
             $errorsList = '';
 
@@ -188,7 +208,8 @@ class ExceptionManager {
      *
      * @return void
      */
-    public static function shutdown() {
+    public static function shutdown()
+    {
         if (count(static::$errors) == 0) {
             $error = error_get_last();
 
@@ -202,7 +223,7 @@ class ExceptionManager {
         // Muestra los errores
         static::showErrors();
 
-        /*
+        /**
          * Como ultima funcion en ejecutarse, es aca donde se termina el flujo
          * del buffer de salida y lo muestra.
          */

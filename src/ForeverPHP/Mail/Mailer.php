@@ -1,8 +1,6 @@
 <?php namespace ForeverPHP\Mail;
 
-use ForeverPHP\Core\ClassLoader;
 use ForeverPHP\Core\Settings;
-use ForeverPHP\Core\Setup;
 use PHPMailer;
 
 /**
@@ -84,7 +82,7 @@ class Mailer
         $this->mail->isHTML(true);
 
         $this->mail->Subject = $this->subject;
-        $this->mail->Body    = $this->message;
+        $this->mail->Body = $this->message;
         $this->mail->AltBody = $this->message;
 
         if (!$this->mail->send()) {

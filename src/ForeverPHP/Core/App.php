@@ -1,9 +1,9 @@
 <?php namespace ForeverPHP\Core;
 
-use ForeverPHP\Core\ClassLoader;
 use ForeverPHP\Core\AppException;
-use ForeverPHP\Core\ViewException;
+use ForeverPHP\Core\ClassLoader;
 use ForeverPHP\Core\Setup;
+use ForeverPHP\Core\ViewException;
 
 /**
  * Funciones comunes para las aplicaciones
@@ -11,7 +11,7 @@ use ForeverPHP\Core\Setup;
  * @since       Version 1.0.0
  */
 
-/*
+/**
  * Deberia funcionar de otra forma deberia cargar las apps y correctar con
  * App::run($app);
  * o
@@ -96,7 +96,7 @@ class App
         // Agrego los directorias al cargador de clases
         ClassLoader::addDirectories(array(
             APPS_ROOT . DS . $this->appName . DS . 'models',
-            APPS_ROOT . DS . $this->appName . DS . 'views'
+            APPS_ROOT . DS . $this->appName . DS . 'views',
         ));
     }
 
@@ -149,7 +149,7 @@ class App
 
     private function makeResponse($response)
     {
-        /*
+        /**
          * Valida si el valor de retorno de la funcion, es un objeto que
          * implemente ResponseInterface
          */

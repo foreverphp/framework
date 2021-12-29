@@ -9,44 +9,45 @@ use ForeverPHP\Core\Facades\Settings;
  * @since   Version 0.4.0
  */
 
-/*
- given a URL, try finding that page in the cache
+/**
+given a URL, try finding that page in the cache
 if the page is in the cache:
-    return the cached page
+return the cached page
 else:
-    generate the page
-    save the generated page in the cache (for next time)
-    return the generated page
+generate the page
+save the generated page in the cache (for next time)
+return the generated page
  */
 
-/*
+/**
 OJO: no va por url
 
 ¿Como se almacenan los templates?
 
-    inicio.html.cache -> fonde inicio es el nombre del template
+inicio.html.cache -> fonde inicio es el nombre del template
 
-    Uso:
-        Cache::set($tamplate . '.html', $render);
+Uso:
+Cache::set($tamplate . '.html', $render);
 
 ¿Como se almacenan los resultados de las consultas?
 
-    mi_resultado_consulta.cache -> mi_resultado_consulta lo define el usuario
-    o el ORM (tentacles)
+mi_resultado_consulta.cache -> mi_resultado_consulta lo define el usuario
+o el ORM (tentacles)
 
-    Uso:
-        Cache::set('mi_resultado_consulta', $data);
+Uso:
+Cache::set('mi_resultado_consulta', $data);
 
-        Nota: Los resultados se deberian guardar en formato JSon para una mejor
-              comprension.
+Nota: Los resultados se deberian guardar en formato JSon para una mejor
+comprension.
 
 Cache::get: antes de devolver el objeto del cache debe verificar si ha expirado.
 
 Cache::set: antes de guardar el objeto en el cache debe verificar que no se
-            exceda el limite maximo de entidades.
-*/
+exceda el limite maximo de entidades.
+ */
 
-class Cache {
+class Cache
+{
     /**
      * Indica si el cache esta activo.
      *
@@ -96,7 +97,8 @@ class Cache {
      */
     private static $instance;
 
-    private function __construct() {
+    private function __construct()
+    {
         $this->cacheEnabled = false;
     }
 
@@ -105,7 +107,8 @@ class Cache {
      *
      * @return \ForeverPHP\Cache\Cache
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static();
             static::$instance->load();
@@ -120,7 +123,8 @@ class Cache {
      *
      * @return void
      */
-    private function load() {
+    private function load()
+    {
         // Verifico si el cache esta activo
         if (Settings::get('cacheEnabled')) {
             $this->cacheEnabled = true;
@@ -149,7 +153,8 @@ class Cache {
      * @param  string $key
      * @return boolean
      */
-    public function exists($key) {
+    public function exists($key)
+    {
         if ($this->cacheEnabled) {
             return $this->cacheEngine->exists($key);
         }
@@ -163,17 +168,20 @@ class Cache {
      * @param string $key
      * @param string $value
      */
-    public function set($key, $value) {
+    public function set($key, $value)
+    {
         if ($this->cacheEnabled) {
             $this->cacheEngine->set($key, $value);
         }
     }
 
-    public function get($key) {
+    public function get($key)
+    {
         // NO DISPONIBLE POR AHORA, YA QUE SE ESTAN HACIENDO PRUEBAS CON EL CACHE
     }
 
-    public function remove($key) {
+    public function remove($key)
+    {
         // NO DISPONIBLE POR AHORA, YA QUE SE ESTAN HACIENDO PRUEBAS CON EL CACHE
     }
 }

@@ -8,7 +8,8 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.2.0
  */
-class AliasLoader {
+class AliasLoader
+{
     /**
      * Matriz que contiene los alias de clase.
      *
@@ -36,7 +37,8 @@ class AliasLoader {
      * @param array $aliases
      * @return void
      */
-    public function __construct($aliases = array()) {
+    public function __construct($aliases = array())
+    {
         $this->aliases = $aliases;
     }
 
@@ -46,7 +48,8 @@ class AliasLoader {
      * @param  array $aliases
      * @return \ForeverPHP\Core\AliasLoader
      */
-    public static function getInstance($aliases) {
+    public static function getInstance($aliases)
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static($aliases);
         }
@@ -60,7 +63,8 @@ class AliasLoader {
      * @param  string $alias
      * @return void
      */
-    public function load($alias) {
+    public function load($alias)
+    {
         if (isset($this->aliases[$alias])) {
             return class_alias($this->aliases[$alias], $alias);
         }
@@ -71,7 +75,8 @@ class AliasLoader {
      *
      * @return void
      */
-    private function prependToLoaderStack() {
+    private function prependToLoaderStack()
+    {
         spl_autoload_register(array($this, 'load'), true, true);
     }
 
@@ -80,7 +85,8 @@ class AliasLoader {
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
         if (!$this->registered) {
             $this->prependToLoaderStack();
 

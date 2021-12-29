@@ -6,7 +6,8 @@
  *
  * @since       Version 0.2.0
  */
-class Context {
+class Context
+{
     /**
      * Almacena los contextos.
      *
@@ -36,7 +37,8 @@ class Context {
      */
     private static $instance;
 
-    private function __construct() {
+    private function __construct()
+    {
         $this->contexts = array();
         $this->globalContexts = array();
         $this->useGlobalContexts = true;
@@ -47,7 +49,8 @@ class Context {
      *
      * @return \ForeverPHP\View\Context
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static();
         }
@@ -55,7 +58,8 @@ class Context {
         return static::$instance;
     }
 
-    public function exists($name) {
+    public function exists($name)
+    {
         if (array_key_exists($name, $this->contexts)) {
             return true;
         } else {
@@ -67,7 +71,8 @@ class Context {
         return false;
     }
 
-    private function set($name, $value, $global = false) {
+    private function set($name, $value, $global = false)
+    {
         if ($global) {
             $this->globalContexts[$name] = $value;
         } else {
@@ -75,7 +80,8 @@ class Context {
         }
     }
 
-    private function setArray($values, $global) {
+    private function setArray($values, $global)
+    {
         foreach ($values as $key => $value) {
             $this->set($key, $value, $global);
         }
@@ -88,7 +94,8 @@ class Context {
      * @param  array $args
      * @return void
      */
-    public function __call($method, $args) {
+    public function __call($method, $args)
+    {
         switch (count($args)) {
             case 1:
                 if ($method === 'set' && is_array($args[0])) {
@@ -107,7 +114,8 @@ class Context {
         }
     }
 
-    public function get($name, $global = false) {
+    public function get($name, $global = false)
+    {
         $value = null;
 
         if ($this->exists($name)) {
@@ -121,11 +129,13 @@ class Context {
         return $value;
     }
 
-    public function useGlobal($value) {
+    public function useGlobal($value)
+    {
         $this->useGlobalContexts = $value;
     }
 
-    public function all() {
+    public function all()
+    {
         $contentContext = $this->contexts;
 
         if ($this->useGlobalContexts) {
@@ -135,13 +145,15 @@ class Context {
         return $contentContext;
     }
 
-    public function remove($name, $global = false) {
+    public function remove($name, $global = false)
+    {
         if ($this->exists($name)) {
             unset($this->contexts[$name]);
         }
     }
 
-    public function removeAll() {
+    public function removeAll()
+    {
         $this->contexts = array();
     }
 }

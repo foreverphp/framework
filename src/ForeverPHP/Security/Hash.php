@@ -8,7 +8,8 @@ use ForeverPHP\Core\Exceptions\SecurityException;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.2.0
  */
-class Hash {
+class Hash
+{
     /**
      * Contiene la instancia singleton de Hash.
      *
@@ -16,14 +17,18 @@ class Hash {
      */
     private static $instance;
 
-    public function __construct() {}
+    public function __construct()
+    {
+        //
+    }
 
     /**
      * Obtiene o crea la instancia singleton de App.
      *
      * @return \ForeverPHP\Security\Hash
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static();
         }
@@ -31,17 +36,20 @@ class Hash {
         return static::$instance;
     }
 
-    private function makeMD5($value) {
+    private function makeMD5($value)
+    {
         return md5($value);
     }
 
-    private function makeSHA1($value) {
-
+    private function makeSHA1($value)
+    {
+        //
     }
 
-    public function make($values, $type = 'md5') {
-        $valueToHash = '';    // Alamacena el valor a hashear, puede ser una matriz
-        $newHash = '';         // Alamacena el valor ya hasheado
+    public function make($values, $type = 'md5')
+    {
+        $valueToHash = ''; // Alamacena el valor a hashear, puede ser una matriz
+        $newHash = ''; // Alamacena el valor ya hasheado
 
         if (is_array($values)) {
             foreach ($values as $value) {

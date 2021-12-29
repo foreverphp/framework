@@ -101,13 +101,13 @@ class Config
         if ($this->exists($name)) {
             $value = $this->configs[$name];
 
-            /*
+            /**
              * NO VA: Si el valor a devolver es una matriz se debe retornar una
              * instancia de SubSettings para recorrer dicha matriz y asi
              * sucesivamente hasta recorrer toda la configuracion.
              */
 
-            /*
+            /**
              * Idea si se quiere llamar a una configuracion que esta en una matriz
              * dentro del settings.php
              *

@@ -5,7 +5,8 @@
  *
  * @since       Version 1.0.0
  */
-class RouteLoader {
+class RouteLoader
+{
     /**
      * Almacena todas las rutas.
      *
@@ -20,14 +21,18 @@ class RouteLoader {
      */
     private static $instance;
 
-    private function RouteLoader() {}
+    private function __construct()
+    {
+        //
+    }
 
     /**
      * Obtiene o crea la instancia singleton de RouteLoader.
      *
      * @return \ForeverPHP\Core\RouteLoader
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static();
         }
@@ -40,7 +45,8 @@ class RouteLoader {
      *
      * @return bool
      */
-    public function register() {
+    public function register()
+    {
         return true;
     }
 }

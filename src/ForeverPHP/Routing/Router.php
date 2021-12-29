@@ -1,11 +1,18 @@
 <?php namespace ForeverPHP\Routing;
 
-use ForeverPHP\Core\{App, Settings, Setup};
-use ForeverPHP\Core\Exceptions\{AppException, RouterException};
-use ForeverPHP\Core\Facades\{Redirect, Request, Storage};
+use ForeverPHP\Core\App;
+use ForeverPHP\Core\Exceptions\AppException;
+use ForeverPHP\Core\Exceptions\RouterException;
+
+use ForeverPHP\Core\Facades\Redirect;
+use ForeverPHP\Core\Facades\Request;
+
+use ForeverPHP\Core\Facades\Storage;
+use ForeverPHP\Core\Settings;
 use ForeverPHP\Http\Response;
 use ForeverPHP\Session\SessionManager;
-use ForeverPHP\View\{Context, View};
+
+use ForeverPHP\View\Context;
 
 /**
  * Almacena todas las rutas en una matriz para luego ejecutar la ruta
@@ -31,7 +38,7 @@ class Router
      */
     private static $instance;
 
-    public function Router()
+    public function __construct()
     {
         //
     }
@@ -116,7 +123,7 @@ class Router
         return $newRoute;
     }
 
-    /*
+    /**
      * ABSOLETA: Se eliminara esta version ya que ahora habra un directorio con rutas.
      */
     /**
@@ -139,21 +146,23 @@ class Router
         //
     }
 
-    /*
+    /**
      * ESTA FUNCION QUEDARA OBSOLETA SIENDO REEMPLAZADA POR get, post, ENTRE OTRAS, ESTA FUNCIONA AUN NO SE ELIMINARA
      * POR TEMAS DE COMPATIBILIDAD PERO SE MODIFICARA, Y ESTA SEGUN EL METODO DE LLAMADA DE LA RUTA LLAMARA A LA FUNCION
      * get, post, etc SEGUN SEA NECESARIO
      */
     public function add(string $route, string $view, $middlewares = null)
     {
-        $app = null;        // Aplicacion donde esta la vista
-        $v = null;          // Vista a buscar
-        $method = 'run';  // Metodo por defecto a ejecutar
+        $app = null; // Aplicacion donde esta la vista
+        $v = null; // Vista a buscar
+        $method = 'run'; // Metodo por defecto a ejecutar
 
         // Se valida si es una vista a ejecutar o una funcion anonima
         if (is_string($view)) {
             if (!strpos($view, '@')) {
-                throw new RouterException("Revise la ruta ($route) al parecer la ruta a la vista no esta correctamente escrita.");
+                throw new RouterException(
+                    "Revise la ruta ($route) al parecer la ruta a la vista no esta correctamente escrita."
+                );
             }
 
             // Dividir la vista en app, vista y funcion si es que esta definida
@@ -166,7 +175,7 @@ class Router
                 $method = $view[2];
             }
         } elseif (is_array($view)) {
-            /*
+            /**
              * Definicion de una vista con matriz.
              *
              * $view = array(
@@ -184,7 +193,7 @@ class Router
                 throw new RouterException("No existe el atributo 'name' de la vista en la matriz.");
             }
 
-            /*
+            /**
              * Almacena temporalmente el nombre de la ruta para que al volver a
              * llamar a add se agregue el nombre a la ruta.
              */
@@ -207,7 +216,7 @@ class Router
             'method' => $method,
             'paramsUrl' => $paramsUrl,
             'name' => $this->nameForRoute,
-            'middlewares' => $middlewares
+            'middlewares' => $middlewares,
         );
 
         // Valida si es ruta normal o compleja
@@ -217,8 +226,6 @@ class Router
             $this->complexRoutes[$route] = $routeContent;
         }
     }
-
-
 
     /**
      * Obtiene la ruta actual
@@ -297,7 +304,7 @@ class Router
                         $routeContent = $_routeContent['function'];
                     }
 
-                    /*
+                    /**
                      * Devuelvo la ruta compleja para obtener su nombre y
                      * decoradores.
                      */
@@ -343,7 +350,7 @@ class Router
             // Ejecuta la funcion anonima
             $returnValue = call_user_func($function);
 
-            /*
+            /**
              * Valida si el valor de retorno de la funcion, es un objeto que
              * implemente ResponseInterface
              */
@@ -413,7 +420,7 @@ class Router
         // Agrega las cabeceras a la respuesta de existir
         $this->setHeadersToResponse();
 
-        /*
+        /**
          * Almacena el nombre de la ruta actual si es que lo tiene, dependiendo
          * si es una ruta normal o compleja y si es funcion o vista.
          */
@@ -423,7 +430,7 @@ class Router
             $this->nameForRoute = $routeContent['name'];
         }
 
-        /*
+        /**
          * NOTA: Los decoradores solo pueden ser utilizados en rutas con vistas
          *       no en rutas con funciones anonimas.
          */

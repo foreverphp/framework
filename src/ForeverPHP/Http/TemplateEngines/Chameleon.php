@@ -52,7 +52,7 @@ class Chameleon implements TemplateEngineInterface
                 // Verifica si la App esta cargada, en settings.php
                 if (App::exists($result[0][6])) {
                     $extendsFile = APPS_ROOT . DS . $result[0][6] . DS .
-                                'Templates' . DS . $result[0][2] . '.html';
+                        'Templates' . DS . $result[0][2] . '.html';
                 }
             } else {
                 return false;
@@ -82,7 +82,7 @@ class Chameleon implements TemplateEngineInterface
         if (count($results) > 0) {
             foreach ($results as $include) {
                 $includeFile = '';
-                $templateFile = DS .'Templates' . DS;
+                $templateFile = DS . 'Templates' . DS;
 
                 // Verifica si la App esta cargada, en settings.php
                 $includeLength = count($include);
@@ -90,10 +90,10 @@ class Chameleon implements TemplateEngineInterface
                 if ($includeLength > 5) {
                     if (App::exists($include[6])) {
                         $templateFile = APPS_ROOT . DS . $include[6] . DS .
-                                        'Templates' . DS . $include[2] . '.html';
+                            'Templates' . DS . $include[2] . '.html';
                     }
                 } else {
-                    $templateFile = $this->templatesDir . $include[2] .'.html';
+                    $templateFile = $this->templatesDir . $include[2] . '.html';
                 }
 
                 if (Storage::exists($templateFile)) {
@@ -121,7 +121,7 @@ class Chameleon implements TemplateEngineInterface
         if (count($results) > 0) {
             foreach ($results as $block) {
                 $regexReplace = "#\{\% block " . $block[1] . $block[2] .
-                                $block[3] . " \%\}\{\% endblock \%\}#";
+                    $block[3] . " \%\}\{\% endblock \%\}#";
 
                 // Busco el bloque en el template base y lo reemplazo
                 $this->dataRenderBase = preg_replace($regexReplace, trim($block[4]), $this->dataRenderBase);
@@ -205,13 +205,13 @@ class Chameleon implements TemplateEngineInterface
     {
         if (lower($var) === 'true') {
             $var = true;
-        } else if (lower($var) === 'false') {
+        } elseif (lower($var) === 'false') {
             $var = false;
-        } else if (filter_var($var, FILTER_VALIDATE_INT)) {
+        } elseif (filter_var($var, FILTER_VALIDATE_INT)) {
             settype($var, 'int');
-        } else if (filter_var($var, FILTER_VALIDATE_FLOAT)) {
+        } elseif (filter_var($var, FILTER_VALIDATE_FLOAT)) {
             settype($var, 'float');
-        } else if (lower($var) === 'null') {
+        } elseif (lower($var) === 'null') {
             settype($var, 'null');
         } else {
             settype($var, 'string');
@@ -358,8 +358,8 @@ class Chameleon implements TemplateEngineInterface
         } else {
             if (Settings::getInstance()->inDebug()) {
                 throw new TemplateVarNotFound('The variable \'' . $varNotFound .
-                                            '\' is not defined for template \'' .
-                                            $this->template . '\'.');
+                    '\' is not defined for template \'' .
+                    $this->template . '\'.');
             } else {
                 $this->dataRender = str_replace($data[0], '', $this->dataRender);
             }
@@ -369,9 +369,13 @@ class Chameleon implements TemplateEngineInterface
     private function ifsTemplate()
     {
         $regexSimple = "#\{\% if(| not) ([0-9A-Za-z\-_\.]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
-        $regexDouble = "#\{\% if ([0-9A-Za-z\-_\.]*) (.*) ([0-9A-Za-z\-_\.'\"]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
-        //$regexQuad = "#\{\% if ([0-9A-Za-z\-_\.]*) (.*) ([0-9A-Za-z\-_\.'\"]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
-        //$regex_complex = "#\{\% if ([0-9a-zA-Z\-_]*) (.*) ([0-9a-zA-Z\-_]*) \%\}([\w|\t\|\r\|\W]*?)\{\% else \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
+        $regexDouble =
+            "#\{\% if ([0-9A-Za-z\-_\.]*) (.*) ([0-9A-Za-z\-_\.'\"]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
+        //$regexQuad =
+        //    "#\{\% if ([0-9A-Za-z\-_\.]*) (.*) ([0-9A-Za-z\-_\.'\"]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
+        //$regex_complex =
+        //    "#\{\% if ([0-9a-zA-Z\-_]*) (.*) ([0-9a-zA-Z\-_]*) \%\}([\w|\t\|\r\|\W]*?)\{\% else
+        //    \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
         $results = array();
 
         // Se buscan las apariciones de if de operando simple
@@ -416,7 +420,7 @@ class Chameleon implements TemplateEngineInterface
                     $contentToChange = $content;
 
                     foreach ($results as $vars => $var) {
-                        $contentToChange =   str_replace($var[0], trim($value[$var[1]]), $contentToChange);
+                        $contentToChange = str_replace($var[0], trim($value[$var[1]]), $contentToChange);
                     }
 
                     $contentFor .= $contentToChange;
@@ -502,12 +506,12 @@ class Chameleon implements TemplateEngineInterface
     private function loadTemplate()
     {
         /*if (Settings::getInstance()->get('ForeverPHPTemplate')) {
-            // Se usaran templates de foreverPHP
-            $this->templatesDir = FOREVERPHP_TEMPLATES_PATH;
-            $this->staticDir = str_replace(DS, '/', FOREVERPHP_STATIC_PATH);
+        // Se usaran templates de foreverPHP
+        $this->templatesDir = FOREVERPHP_TEMPLATES_PATH;
+        $this->staticDir = str_replace(DS, '/', FOREVERPHP_STATIC_PATH);
         } else {
-            $this->templatesDir = TEMPLATES_PATH;
-            $this->staticDir = str_replace(DS, '/', STATIC_PATH);
+        $this->templatesDir = TEMPLATES_PATH;
+        $this->staticDir = str_replace(DS, '/', STATIC_PATH);
         }
 
         // Cargo el contenido del template

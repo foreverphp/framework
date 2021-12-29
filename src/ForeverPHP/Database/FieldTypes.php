@@ -8,85 +8,100 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
-class FieldType {
-    protected function _load_attributes($attributes) {
+class FieldType
+{
+    protected function loadAttributes($attributes)
+    {
         // se deben mesclar los atributos y atributos por defecto
         print_r($default_attributes);
         print_r($attributes);
     }
 }
 
-class BigIntegerField extends FieldType {
-    private $_default_attributes = array(
+class BigIntegerField extends FieldType
+{
+    private $defaultAttributes = array(
         'autoincrement' => false,
         'null' => true,
         'unique' => false,
         'primary_key' => false,
-        'default' => null
+        'default' => null,
     );
 
-    public function __construct($attributes) {
-        $this->_load_attributes($attributes);
+    public function __construct($attributes)
+    {
+        $this->loadAttributes($attributes);
     }
 }
 
-class BinaryField {
+class BinaryField
+{
     private $snull = true;
     private $unique = false;
     private $primary_key = false;
     private $default = null;
 
-    public  function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class BooleanField {
+class BooleanField
+{
     private $null = true;
     private $unique = false;
     private $primary_key = false;
     private $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class CharField {
+class CharField
+{
     private $length = 10;
     private $null = true;
     private $unique = false;
     private $primary_key = false;
     private $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class DateField {
+class DateField
+{
     private $null = true;
     private $unique = false;
     private $primary_key = false;
     private $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class DateTimeField {
+class DateTimeField
+{
     private $null = true;
     private $unique = false;
     private $primary_key = false;
     private $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class DecimalField {
+class DecimalField
+{
     private $length = 10;
     private $decimals = 0;
     private $null = true;
@@ -94,47 +109,55 @@ class DecimalField {
     private $primary_key = false;
     private $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class EmailField {
+class EmailField
+{
     private $length = 80;
     private $null = true;
     private $unique = false;
     private $primary_key = false;
     private $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class FloatField {
+class FloatField
+{
     private $null = true;
     private $unique = false;
     private $primary_key = false;
     private $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class ImageField {
+class ImageField
+{
     private $null = true;
     private $unique = false;
     private $primary_key = false;
     private $upload_to = '';
     public $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class IntegerField extends FieldType {
+class IntegerField extends FieldType
+{
     private $attributes = array(
 
     );
@@ -144,53 +167,62 @@ class IntegerField extends FieldType {
     private $primary_key = false;
     private $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class TextField {
+class TextField
+{
     private $null = true;
     private $unique = false;
     private $primary_key = false;
     private $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class TimeField {
+class TimeField
+{
     private $null = true;
     private $unique = false;
     private $primary_key = false;
     private $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class URLField {
+class URLField
+{
     private $length = 80;
     private $null = true;
     private $unique = false;
     private $primary_key = false;
     private $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }
 
-class VarcharField {
+class VarcharField
+{
     private $length = 50;
     private $null = true;
     private $unique = false;
     private $primary_key = false;
     private $default = null;
 
-    public function __construct($attributes) {
-
+    public function __construct($attributes)
+    {
+        //
     }
 }

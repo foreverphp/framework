@@ -1,7 +1,9 @@
 <?php namespace ForeverPHP\Routing;
 
 use ForeverPHP\Core\Facades\Settings;
-use ForeverPHP\Http\{RedirectResponse, Response};
+
+use ForeverPHP\Http\RedirectResponse;
+use ForeverPHP\Http\Response;
 use ForeverPHP\View\Context;
 
 /**
@@ -10,7 +12,8 @@ use ForeverPHP\View\Context;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since 1.0.0
  */
-class Redirect {
+class Redirect
+{
     /**
      * Redirecciona a una ruta especifica con un estado y encabezado
      * especificos.
@@ -20,7 +23,8 @@ class Redirect {
      * @param  array   $headers
      * @return \ForeverPHP\Http\RedirectResponse
      */
-    public function to(string $path, int $status = 301, array $headers = array()) {
+    public function to(string $path, int $status = 301, array $headers = array())
+    {
         return $this->makeRedirect($path, $status, $headers);
     }
 
@@ -30,7 +34,8 @@ class Redirect {
      * @param  string $name
      * @return \ForeverPHP\Http\RedirectResponse
      */
-    public function route(string $name) {
+    public function route(string $name)
+    {
         // Debe construir una ruta segun el nombre de la ruta
     }
 
@@ -40,12 +45,13 @@ class Redirect {
      * @param  integer $errno
      * @return void
      */
-    public function error(int $errno) {
+    public function error(int $errno)
+    {
         $response = new Response();
 
         header("HTTP/1.0 $errno " . $response->getResponseStatus($errno), true, $errno);
 
-        /*
+        /**
          * Retorna un Response para mostrar el mensaje de que algo salio mal
          * este solo se muestra cuando esta en produccion.         *
          */
@@ -55,7 +61,8 @@ class Redirect {
         }
     }
 
-    public function makeRedirect(string $path, int $status, array $headers) {
+    public function makeRedirect(string $path, int $status, array $headers)
+    {
         $redirect = new RedirectResponse($path, $status, $headers);
 
         return $redirect;

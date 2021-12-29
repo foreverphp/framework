@@ -1,29 +1,23 @@
 <?php namespace ForeverPHP\Http;
 
-use ForeverPHP\Core\Settings;
-
 /**
  * Contiene información de un archivo enviado por el request.
  *
  * @since       Version 0.4.0
  */
-class RequestFile {
+class RequestFile
+{
 
     private $filename = '';
-
     private $name = '';
-
     private $extension = '';
-
     private $mimetype = '';
-
     private $realPath = '';
-
     private $error = null;
-
     private $size = 0;
 
-    public function __construct($fileInfo) {
+    public function __construct($fileInfo)
+    {
         $this->filename = $fileInfo['name'];
 
         // Valida si el nombre del archivo viene en array
@@ -42,27 +36,33 @@ class RequestFile {
         $this->size = $fileInfo['size'];
     }
 
-    public function getFilename() {
+    public function getFilename()
+    {
         return $this->filename;
     }
 
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function getExtension() {
+    public function getExtension()
+    {
         return $this->extension;
     }
 
-    public function getMimeType() {
+    public function getMimeType()
+    {
         return $this->mimetype;
     }
 
-    public function getRealPath() {
+    public function getRealPath()
+    {
         return $this->realPath;
     }
 
-    public function hasError() {
+    public function hasError()
+    {
         if ($this->error != 0) {
             return true;
         }
@@ -70,7 +70,8 @@ class RequestFile {
         return false;
     }
 
-    public function getSize() {
+    public function getSize()
+    {
         return $this->size;
     }
 
@@ -80,14 +81,15 @@ class RequestFile {
      * @param  string $path
      * @return boolean
      */
-    public function move($path, $filename = null) {
+    public function move($path, $filename = null)
+    {
         $newFilename = ($filename != null) ? $filename : $this->filename;
 
         // Valida si la ruta termina con slash
         $lastSlash = substr($path, strlen($path), 1);
 
         if ($lastSlash !== '/') {
-            $path .=  '/';
+            $path .= '/';
         }
 
         // Retorno TRUE si se movio el archivo, de lo contrario FALSE

@@ -16,10 +16,11 @@
  * @since       Version 0.5.0
  */
 
-/*
+/**
  * SERA LA ALTERNATIVA AVANZADA A MODEL
  */
 
-class Tentacles {
+class Tentacles
+{
     //put your code here
 }

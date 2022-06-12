@@ -8,7 +8,8 @@ use ForeverPHP\Cache\CacheInterface;
  * @author  Daniel Nuñez S. <dnunez@emarva.com>
  * @since   Version 0.4.0
  */
-class FileCache implements CacheInterface {
+class FileCache implements CacheInterface
+{
     /**
      * Ruta del directorio a usar para el cache.
      *
@@ -16,7 +17,8 @@ class FileCache implements CacheInterface {
      */
     private $location;
 
-    public function __construct($location) {
+    public function __construct($location)
+    {
         $this->location = $location;
 
         // Verifica si existe el directorio del cache, si no se crea
@@ -31,7 +33,8 @@ class FileCache implements CacheInterface {
      * @param  string $key
      * @return boolean
      */
-    public function exists($key) {
+    public function exists($key)
+    {
         $filenameCache = $this->location . DS . $key;
 
         if (file_exists($filenameCache)) {
@@ -47,25 +50,27 @@ class FileCache implements CacheInterface {
      * @param string $key
      * @param string $value
      */
-    public function set($key, $value) {
+    public function set($key, $value)
+    {
         try {
             $filenameCache = $this->location . DS . $key;
 
             // Escribe el archivo en cache
             file_put_contents($filenameCache, $value);
-        } catch (\Exception $e) {
+        } catch (\Exception$e) {
             return false;
         }
 
         return true;
     }
 
-    public function get($key) {
-
+    public function get($key)
+    {
 
     }
 
-    public function remove($key) {
+    public function remove($key)
+    {
 
     }
 }

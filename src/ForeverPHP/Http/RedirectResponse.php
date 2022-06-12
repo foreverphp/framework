@@ -7,7 +7,8 @@ use ForeverPHP\Session\SessionManager;
  *
  * @since 0.3.0
  */
-class RedirectResponse implements ResponseInterface {
+class RedirectResponse implements ResponseInterface
+{
     /**
      * Ruta a la cual redireccionar.
      *
@@ -36,7 +37,8 @@ class RedirectResponse implements ResponseInterface {
      */
     private $session;
 
-    public function __construct($path, $status, $headers) {
+    public function __construct($path, $status, $headers)
+    {
         $this->path = $path;
         $this->status = $status;
         $this->headers = $headers;
@@ -45,7 +47,8 @@ class RedirectResponse implements ResponseInterface {
         $this->session = SessionManager::getInstance();
     }
 
-    public function with($key, $value = null) {
+    public function with($key, $value = null)
+    {
         if (is_array($key)) {
             foreach ($key as $k => $value) {
                 $this->with($k, $value);
@@ -64,8 +67,9 @@ class RedirectResponse implements ResponseInterface {
      *
      * @return void
      */
-    public function make() {
-        /*
+    public function make()
+    {
+        /**
          * Se guardan los headers si es que hay en la configuracion
          * para luego utilizarlos al construir la redireccion
          */

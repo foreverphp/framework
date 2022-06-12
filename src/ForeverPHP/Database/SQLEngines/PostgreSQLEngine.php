@@ -1,13 +1,12 @@
 <?php namespace ForeverPHP\Database\SQLEngines;
 
-use ForeverPHP\Core\Settings;
-
 /**
  * Motor PostgreSQL permite trabajar con este motor de base de datos.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.4.0
  */
-class PostgreSQLEngine extends SQLEngine implements SQLEngineInterface {
+class PostgreSQLEngine extends SQLEngine implements SQLEngineInterface
+{
 
 }

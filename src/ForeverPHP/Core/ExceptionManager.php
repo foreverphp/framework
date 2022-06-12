@@ -30,7 +30,7 @@ class ExceptionManager
     private static function viewException($type, $message)
     {
         $template = 'exception';
-        $title = 'Excepción';
+        $title = 'Exception';
 
         // 1 es Error
         if ($type === 1) {
@@ -78,26 +78,26 @@ class ExceptionManager
     /**
      * Manipulador de excepciones.
      *
-     * @param  Exception $exception
+     * @param \Throwable $e
      * @return void
      */
-    public static function exceptionHandler($exception)
+    public static function exceptionHandler(\Throwable $e)
     {
-        $message = 'Tipo de excepción no valida.';
+        $message = 'Invalid exception type.';
 
-        /*
+        /**
          * Primero se valida si viene el parametro $exception y que sea
          * de tipo Exception o herede de este.
          */
-        if ($exception != null) {
-            if ($exception instanceof \Exception) {
+        if ($e != null) {
+            if ($e instanceof \Throwable) {
                 // Crear un mensaje mas detallado
-                $message = 'Message: ' . $exception->getMessage() . '<br />';
-                $message .= 'Previus: ' . $exception->getPrevious() . '<br />';
-                $message .= 'Code: ' . $exception->getCode() . '<br />';
-                $message .= 'File: ' . $exception->getFile() . '<br />';
-                $message .= 'Line: ' . $exception->getLine() . '<br />';
-                $message .= 'Trace: ' . $exception->getTraceAsString() . '<br />';
+                $message = 'Message: ' . $e->getMessage() . '<br />';
+                $message .= 'Previus: ' . $e->getPrevious() . '<br />';
+                $message .= 'Code: ' . $e->getCode() . '<br />';
+                $message .= 'File: ' . $e->getFile() . '<br />';
+                $message .= 'Line: ' . $e->getLine() . '<br />';
+                $message .= 'Trace: ' . $e->getTraceAsString() . '<br />';
             }
         }
 
@@ -116,7 +116,7 @@ class ExceptionManager
      */
     public static function errorHandler($errno, $errstr, $errfile, $errline)
     {
-        /*
+        /**
          * Si la configuración "debugHideNotices" existe, indica si se
          * muestran o no los errores de tipo E_NOTICE.
          */
@@ -212,19 +212,22 @@ class ExceptionManager
     {
         if (count(static::$errors) == 0) {
             $error = error_get_last();
-            $isFatal = in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE]);
 
-            if (!is_null($error) && $isFatal) {
-                ob_start();
+            if (!is_null($error)) {
+                $isFatal = in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE]);
 
-                static::errorHandler($error['type'], $error['message'], $error['file'], $error['line']);
+                if ($isFatal) {
+                    ob_start();
+
+                    static::errorHandler($error['type'], $error['message'], $error['file'], $error['line']);
+                }
             }
+        } else {
+            // Muestra los errores
+            static::showErrors();
         }
 
-        // Muestra los errores
-        //static::showErrors();
-
-        /*
+        /**
          * Como ultima funcion en ejecutarse, es aca donde se termina el flujo
          * del buffer de salida y lo muestra.
          */

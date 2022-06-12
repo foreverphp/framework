@@ -7,7 +7,8 @@ use ForeverPHP\Core\Settings;
  *
  * @since       Version 0.1.0
  */
-class SessionManager {
+class SessionManager
+{
     /**
      * Contiene la instancia singleton de SessionManager.
      *
@@ -15,14 +16,16 @@ class SessionManager {
      */
     private static $instance;
 
-    private function __construct() {}
+    private function __construct()
+    {}
 
     /**
      * Obtiene o crea la instancia singleton de SessionManager.
      *
      * @return \ForeverPHP\Session\SessionManager
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static();
         }
@@ -43,14 +46,16 @@ class SessionManager {
         return false;
     }
 
-    private function sessionStart() {
+    private function sessionStart()
+    {
         if (!$this->isSessionStarted()) {
             session_name(Settings::getInstance()->get('sessionName'));
             session_start();
         }
     }
 
-    public function exists($key, $section = 'main') {
+    public function exists($key, $section = 'main')
+    {
         $this->sessionStart();
 
         if ($this->isSessionStarted()) {
@@ -62,7 +67,8 @@ class SessionManager {
         return false;
     }
 
-    public function existsSection($section) {
+    public function existsSection($section)
+    {
         $this->sessionStart();
 
         if ($this->isSessionStarted()) {
@@ -74,7 +80,8 @@ class SessionManager {
         return false;
     }
 
-    public function set($key, $value, $section = 'main') {
+    public function set($key, $value, $section = 'main')
+    {
         $this->sessionStart();
 
         if ($this->isSessionStarted()) {
@@ -83,7 +90,8 @@ class SessionManager {
         }
     }
 
-    public function get($key, $section = 'main') {
+    public function get($key, $section = 'main')
+    {
         $this->sessionStart();
 
         if ($this->isSessionStarted()) {
@@ -96,7 +104,8 @@ class SessionManager {
         return null;
     }
 
-    public function remove($key, $section = 'main') {
+    public function remove($key, $section = 'main')
+    {
         $this->sessionStart();
 
         if ($this->isSessionStarted()) {
@@ -106,7 +115,8 @@ class SessionManager {
         }
     }
 
-    public function removeSection($section) {
+    public function removeSection($section)
+    {
         $this->sessionStart();
 
         if ($this->isSessionStarted()) {
@@ -116,7 +126,8 @@ class SessionManager {
         }
     }
 
-    public function regenerate($deleteOldSession = false) {
+    public function regenerate($deleteOldSession = false)
+    {
         $this->sessionStart();
 
         if ($this->isSessionStarted()) {
@@ -125,14 +136,15 @@ class SessionManager {
         }
     }
 
-    public function destroy() {
+    public function destroy()
+    {
         $this->sessionStart();
 
         if ($this->isSessionStarted()) {
             // Destruir todas las variables de sesión
             $_SESSION = array();
 
-            /*
+            /**
              * Si se desea destruir la sesión completamente, borre también la cookie de sesión.
              * Nota: ¡Esto destruirá la sesión, y no la información de la sesión!
              */

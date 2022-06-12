@@ -7,7 +7,8 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.4.0
  */
-interface KeyValueEngineInterface {
+interface KeyValueEngineInterface
+{
     public function __construct($dbSetting);
     /*public function selectDatabase($database);
     public function connect();

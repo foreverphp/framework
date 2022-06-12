@@ -8,13 +8,15 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.3.0
  */
-class Facade {
+class Facade
+{
     /**
      * Obtiene el objeto detras de la fachada.
      *
      * @return mixed
      */
-    private static function getInstanceFacade() {
+    private static function getInstanceFacade()
+    {
         return static::resolveFacadeInstance(static::getComponent());
     }
 
@@ -25,7 +27,8 @@ class Facade {
      *
      * @throws \RuntimeException
      */
-    protected static function getComponent() {
+    protected static function getComponent()
+    {
         throw new \RuntimeException('La fachada no implementa el metodo getComponent.');
     }
 
@@ -35,7 +38,8 @@ class Facade {
      * @param  mixed $name
      * @return mixed
      */
-    private static function resolveFacadeInstance($name) {
+    private static function resolveFacadeInstance($name)
+    {
         if (is_object($name)) {
             return $name;
         }
@@ -48,7 +52,8 @@ class Facade {
      * @param  array $args
      * @return void
      */
-    public static function __callStatic($method, $args) {
+    public static function __callStatic($method, $args)
+    {
         $instance = static::getInstanceFacade();
 
         switch (count($args)) {

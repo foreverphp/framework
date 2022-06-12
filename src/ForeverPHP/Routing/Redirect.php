@@ -50,7 +50,7 @@ class Redirect
 
         header("HTTP/1.0 $errno " . $response->getResponseStatus($errno), true, $errno);
 
-        /*
+        /**
          * Retorna un Response para mostrar el mensaje de que algo salio mal
          * este solo se muestra cuando esta en produccion.
          */

@@ -9,8 +9,10 @@ use ForeverPHP\Core\Settings;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.4.0
  */
-class SQLSRVEngine extends SQLEngine implements SQLEngineInterface {
-    public function connect() {
+class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
+{
+    public function connect()
+    {
         $db = Settings::getInstance()->get('dbs');
         $db = $db[$this->dbSetting];
 
@@ -35,7 +37,8 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface {
         return true;
     }
 
-    private function executeQuery() {
+    private function executeQuery()
+    {
         $return = false;
 
         if ($this->queryType == 'other') {
@@ -81,7 +84,8 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface {
         return $return;
     }
 
-    private function executeQueryWithParameters() {
+    private function executeQueryWithParameters()
+    {
         $return = false;
 
         if (count($this->parameters) != 0) {
@@ -141,7 +145,8 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface {
         return $return;
     }
 
-    public function execute() {
+    public function execute()
+    {
         if (count($this->parameters) == 0) {
             return $this->executeQuery();
         } else {
@@ -149,7 +154,8 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface {
         }
     }
 
-    public function disconnect() {
+    public function disconnect()
+    {
         if ($this->link != null) {
             // Cierro la conexion
             if (!sqlsrv_close($this->link)) {
@@ -161,19 +167,23 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface {
         }
     }
 
-    public function startTransaction() {
+    public function startTransaction()
+    {
         return false;
     }
 
-    public function commit() {
+    public function commit()
+    {
         return false;
     }
 
-    public function rollback() {
+    public function rollback()
+    {
         return false;
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->disconnect();
     }
 }

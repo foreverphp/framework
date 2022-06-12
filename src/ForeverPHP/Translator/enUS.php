@@ -1,4 +1,5 @@
 <?php
-class EnUSLang extends Context {
+class EnUSLang extends Context
+{
 
 }

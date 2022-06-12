@@ -5,5 +5,6 @@
  *
  * @since       Version 0.3.0
  */
-class Message {
+class Message
+{
 }

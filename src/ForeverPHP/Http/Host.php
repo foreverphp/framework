@@ -6,7 +6,8 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.2.0
  */
-class Host {
+class Host
+{
     /**
      * Instancia singleton de Host.
      *
@@ -14,14 +15,16 @@ class Host {
      */
     private static $instance;
 
-    public function __construct() {}
+    public function __construct()
+    {}
 
     /**
      * Obtiene o crea la instacia singleton de Host
      *
      * @return \ForeverPHP\Http\Host
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static();
         }
@@ -34,14 +37,15 @@ class Host {
      *
      * @return string
      */
-    public function getIP() {
+    public function getIP()
+    {
         $ip = "UNKNOWN";
 
         if (getenv("HTTP_CLIENT_IP")) {
             $ip = getenv("HTTP_CLIENT_IP");
-        } else if(getenv("HTTP_X_FORWARDED_FOR")) {
+        } elseif (getenv("HTTP_X_FORWARDED_FOR")) {
             $ip = getenv("HTTP_X_FORWARDED_FOR");
-        } else if(getenv("REMOTE_ADDR")) {
+        } elseif (getenv("REMOTE_ADDR")) {
             $ip = getenv("REMOTE_ADDR");
         }
 
@@ -53,7 +57,8 @@ class Host {
      *
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return gethostbyaddr(getenv('REMOTE_ADDR'));
     }
 
@@ -63,7 +68,8 @@ class Host {
      * @param  integer $lenght
      * @return string
      */
-    public function getUserAgent($lenght) {
+    public function getUserAgent($lenght)
+    {
         return substr(getenv('HTTP_USER_AGENT'), 0, $lenght);
     }
 }

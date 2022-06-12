@@ -8,33 +8,35 @@ use ForeverPHP\Core\Exceptions\SetupException;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
-class Setup {
+class Setup
+{
     /**
      * Inicializador, se encarga de cargar los requerimientos para la
      * ejecución.
      *
      * @return void
      */
-    public static function initialize() {
-        /*
+    public static function initialize()
+    {
+        /**
          * Defino la ruta de los templates y estaticos del framework.
          */
         static::toDefine('FOREVERPHP_ROOT', dirname(dirname(__FILE__)));
         static::toDefine('FOREVERPHP_TEMPLATES_PATH', FOREVERPHP_ROOT . DS . 'Static' . DS . 'templates' . DS);
         static::toDefine('FOREVERPHP_STATIC_PATH', basename(FOREVERPHP_ROOT) . DS . 'Static' . DS);
 
-        /*
+        /**
          * Establece como el manejador de errores ExceptionManager.
          */
         set_error_handler('\ForeverPHP\Core\ExceptionManager::errorHandler');
 
-        /*
+        /**
          * Establece como el manejador de excepciones no controladas a
          * ExceptionManager.
          */
         set_exception_handler('\ForeverPHP\Core\ExceptionManager::exceptionHandler');
 
-        /*
+        /**
          * Le deja el control de la función de cierre a ExceptionManager.
          */
         register_shutdown_function('\ForeverPHP\Core\ExceptionManager::shutdown');
@@ -45,7 +47,8 @@ class Setup {
      *
      * @param string $name
      */
-    public static function importLib($name) {
+    public static function importLib($name)
+    {
         $libPath = FOREVERPHP_ROOT . DS . 'libs' . DS . $name . '.php';
 
         if (file_exists($libPath)) {
@@ -60,7 +63,8 @@ class Setup {
      *
      * @param string $name
      */
-    public static function import($name) {
+    public static function import($name)
+    {
         $importPath = FOREVERPHP_ROOT . DS . $name . '.php';
 
         if (file_exists($importPath)) {
@@ -75,7 +79,8 @@ class Setup {
      *
      * @param string $path
      */
-    public static function importFromApp($path) {
+    public static function importFromApp($path)
+    {
         $importPath = APPS_ROOT . DS . $path . '.php';
 
         if (file_exists($importPath)) {
@@ -92,7 +97,8 @@ class Setup {
      * @param string $define
      * @param string $value
      */
-    public static function toDefine($define, $value) {
+    public static function toDefine($define, $value)
+    {
         if (!defined($define)) {
             define($define, $value);
         }

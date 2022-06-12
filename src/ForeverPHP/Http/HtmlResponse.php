@@ -135,9 +135,9 @@ class HtmlResponse implements ResponseInterface
             echo $render;
         }
 
-        /*
-            * Aca se controla el cache de templates.
-            */
+        /**
+         * Aca se controla el cache de templates.
+         */
         if (ob_get_length() > 0) {
             if ($this->usingCache) {
                 // Obtiene el contenido del template renderizado
@@ -153,7 +153,7 @@ class HtmlResponse implements ResponseInterface
         // Rendereo el template
         //echo $this->_template->render($template, $data);
 
-        /*
+        /**
          * Guardo en la configuracion el estado de la vista para evitar
          * conflictos, por ejemplo intentar acceder a la session despues de
          * haber rendereado.

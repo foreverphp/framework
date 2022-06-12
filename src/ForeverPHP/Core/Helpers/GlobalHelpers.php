@@ -21,7 +21,7 @@ class GlobalHelpers
         if (strtolower($varEnv) === 'true' || strtolower($varEnv) === 'false') {
             $varEnv = $varEnv === 'true' ? true : false;
         } elseif (is_numeric($varEnv)) {
-            $varEnv = (int)$varEnv;
+            $varEnv = (int) $varEnv;
         }
 
         return $varEnv;

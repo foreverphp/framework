@@ -12,7 +12,7 @@ use ForeverPHP\Core\Setup;
  * @since       Version 0.1.0
  */
 
-/*
+/**
  * Deberia funcionar de otra forma deberia cargar las apps y correctar con
  * App::run($app);
  * o
@@ -24,7 +24,8 @@ use ForeverPHP\Core\Setup;
  * y la carga de modelos y vistas
  * ademas de los contextos globales
  */
-class App {
+class App
+{
     /**
      * Nombre de la aplicación actual.
      *
@@ -46,14 +47,16 @@ class App {
      */
     private static $instance;
 
-    public function __construct() {}
+    public function __construct()
+    {}
 
     /**
      * Obtiene o crea la instancia singleton de App.
      *
      * @return \ForeverPHP\Core\App
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static();
         }
@@ -61,7 +64,8 @@ class App {
         return static::$instance;
     }
 
-    public function exists($app) {
+    public function exists($app)
+    {
         $apps = Settings::getInstance()->get('apps');
 
         if (in_array($app, $apps)) {
@@ -71,7 +75,8 @@ class App {
         return false;
     }
 
-    private function loadOptional($optional) {
+    private function loadOptional($optional)
+    {
         $optionalPath = APPS_ROOT . DS . $optional . '.php';
 
         if (file_exists($optionalPath)) {
@@ -79,7 +84,8 @@ class App {
         }
     }
 
-    public function load($app) {
+    public function load($app)
+    {
         $this->appName = $app;
 
         // Carga los archivos opcionales de las apps
@@ -89,7 +95,7 @@ class App {
         // Agrego los directorias al cargador de clases
         ClassLoader::addDirectories(array(
             APPS_ROOT . DS . $this->appName . DS . 'models',
-            APPS_ROOT . DS . $this->appName . DS . 'views'
+            APPS_ROOT . DS . $this->appName . DS . 'views',
         ));
     }
 
@@ -99,7 +105,8 @@ class App {
      * @param  string $name
      * @return bool
      */
-    public function existsMiddleware($name) {
+    public function existsMiddleware($name)
+    {
         if (array_key_exists($name, $this->middlewares)) {
             return true;
         }
@@ -114,7 +121,8 @@ class App {
      * @param clousure
      * @return boolean
      */
-    public function setMiddleware($name, $function) {
+    public function setMiddleware($name, $function)
+    {
         if (!is_callable($function)) {
             return false;
         }
@@ -129,7 +137,8 @@ class App {
      * @param  array  $arguments
      * @return mixed
      */
-    public function getMiddleware($name, $arguments = null) {
+    public function getMiddleware($name, $arguments = null)
+    {
         if ($this->existsMiddleware($name)) {
             return $this->middlewares[$name]();
         }
@@ -137,8 +146,9 @@ class App {
         return false;
     }
 
-    private function makeResponse($response) {
-        /*
+    private function makeResponse($response)
+    {
+        /**
          * Valida si el valor de retorno de la funcion, es un objeto que
          * implemente ResponseInterface
          */
@@ -153,7 +163,8 @@ class App {
      * @param  mixed $route
      * @return void
      */
-    public function run($route) {
+    public function run($route)
+    {
         if (!is_array($route)) {
             $this->makeResponse($route);
         }
@@ -206,7 +217,8 @@ class App {
      *
      * @return string
      */
-    public function getAppName() {
+    public function getAppName()
+    {
         return $this->appName;
     }
 
@@ -216,7 +228,8 @@ class App {
      * @param  string $view
      * @param  string $appName
      */
-    public function importView($view, $appName = null) {
+    public function importView($view, $appName = null)
+    {
         $appName = ($appName === null) ? $this->appName : $appName;
         $importPath = APPS_ROOT . DS . $appName . DS . 'views' . DS . $view . '.php';
 

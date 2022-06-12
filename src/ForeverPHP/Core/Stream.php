@@ -8,7 +8,8 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.4.0
  */
-class Stream {
+class Stream
+{
     /**
      * [$data description]
      *
@@ -44,7 +45,8 @@ class Stream {
      */
     private static $instance;
 
-    private function __construct() {
+    private function __construct()
+    {
         $this->data = array();
         $this->headerData = array();
         $this->buffer = '';
@@ -56,7 +58,8 @@ class Stream {
      *
      * @return \ForeverPHP\Core\Stream
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static();
         }
@@ -75,7 +78,7 @@ class Stream {
     {
         // Nota: el valor $name es sensible a mayúsculas.
         echo "Llamando al método de objeto '$name' "
-             . implode(', ', $arguments). "\n";
+        . implode(', ', $arguments) . "\n";
     }
 
     /**
@@ -86,7 +89,8 @@ class Stream {
      * @param  boolean $isHeader
      * @return [type]            [description]
      */
-    public function pipe($data, $index, $isHeader = false) {
+    public function pipe($data, $index, $isHeader = false)
+    {
         $this->lastIndex++;
         $this->data[$this->lastIndex] = $data;
 
@@ -97,12 +101,13 @@ class Stream {
      *
      * @return array
      */
-    public function getAll() {
+    public function getAll()
+    {
         return $this->data;
     }
 
     /*public function getBuffer() {
-        return $this->buffer;
+    return $this->buffer;
     }*/
 
     /**
@@ -111,14 +116,16 @@ class Stream {
      * @param  integer $index
      * @return [type]        [description]
      */
-    public function remove($index) {
+    public function remove($index)
+    {
 
     }
 
     /**
      * Limpia el Stream.
      */
-    public function clean() {
+    public function clean()
+    {
         $this->data = array();
         $this->buffer = '';
         $this->lastIndex = 0;
@@ -127,7 +134,8 @@ class Stream {
     /**
      * Renderiza el contenido de Stream para ser enviado al cliente.
      */
-    public function render() {
+    public function render()
+    {
         echo $this->buffer;
     }
 }

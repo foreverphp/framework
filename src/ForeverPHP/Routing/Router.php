@@ -7,11 +7,9 @@ use ForeverPHP\Core\Facades\Redirect;
 use ForeverPHP\Core\Facades\Request;
 use ForeverPHP\Core\Facades\Storage;
 use ForeverPHP\Core\Settings;
-use ForeverPHP\Core\Setup;
 use ForeverPHP\Http\Response;
 use ForeverPHP\Session\SessionManager;
 use ForeverPHP\View\Context;
-use ForeverPHP\View\View;
 
 /**
  * Almacena todas las rutas en una matriz para luego ejecutar la ruta
@@ -20,7 +18,8 @@ use ForeverPHP\View\View;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
-class Router {
+class Router
+{
     private $uriBase = '/';
     private $routes = array();
     private $complexRoutes = array();
@@ -33,14 +32,16 @@ class Router {
      */
     private static $instance;
 
-    public function __construct() {}
+    public function __construct()
+    {}
 
     /**
      * Obtiene o crea la instancia singleton de Router.
      *
      * @return \ForeverPHP\Routing\Router
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static();
         }
@@ -48,7 +49,8 @@ class Router {
         return static::$instance;
     }
 
-    private function addSlash($route) {
+    private function addSlash($route)
+    {
         $url = $route;
 
         if (strlen($url) == 0) {
@@ -63,7 +65,8 @@ class Router {
         return $url;
     }
 
-    private function removeSlash($route) {
+    private function removeSlash($route)
+    {
         $url = $route;
 
         if ($url[strlen($url) - 1] == '/') {
@@ -73,11 +76,13 @@ class Router {
         return $url;
     }
 
-    private function getUriBase() {
+    private function getUriBase()
+    {
         $this->uriBase = str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
     }
 
-    private function parseRoute($route, &$paramsUrl) {
+    private function parseRoute($route, &$paramsUrl)
+    {
         $newRoute = $route;
         $matches = array();
 
@@ -115,14 +120,16 @@ class Router {
      *
      * @param  string $appName
      */
-    public function fromApp($appName) {
+    public function fromApp($appName)
+    {
         require_once APPS_ROOT . DS . $appName . DS . 'approutes.php';
     }
 
-    public function add($route, $view, $middlewares = null) {
-        $app = null;        // Aplicacion donde esta la vista
-        $v = null;          // Vista a buscar
-        $method = 'run';  // Metodo por defecto a ejecutar
+    public function add($route, $view, $middlewares = null)
+    {
+        $app = null; // Aplicacion donde esta la vista
+        $v = null; // Vista a buscar
+        $method = 'run'; // Metodo por defecto a ejecutar
 
         // Se valida si es una vista a ejecutar o una funcion anonima
         if (is_string($view)) {
@@ -140,7 +147,7 @@ class Router {
                 $method = $view[2];
             }
         } elseif (is_array($view)) {
-            /*
+            /**
              * Definicion de una vista con matriz.
              *
              * $view = array(
@@ -158,7 +165,7 @@ class Router {
                 throw new RouterException("No existe el atributo 'name' de la vista en la matriz.");
             }
 
-            /*
+            /**
              * Almacena temporalmente el nombre de la ruta para que al volver a
              * llamar a add se agregue el nombre a la ruta.
              */
@@ -181,7 +188,7 @@ class Router {
             'method' => $method,
             'paramsUrl' => $paramsUrl,
             'name' => $this->nameForRoute,
-            'middlewares' => $middlewares
+            'middlewares' => $middlewares,
         );
 
         // Valida si es ruta normal o compleja
@@ -192,14 +199,13 @@ class Router {
         }
     }
 
-
-
     /**
      * Obtiene la ruta actual
      *
      * @return string
      */
-    public function getRoute() {
+    public function getRoute()
+    {
         $uri = $_SERVER['REQUEST_URI'];
 
         // Extraigo la URI base si esta es diferente a /
@@ -226,11 +232,13 @@ class Router {
      *
      * @return string
      */
-    public function getRouteName() {
+    public function getRouteName()
+    {
         return $this->nameForRoute;
     }
 
-    private function loadParamsRoute(&$route, &$routeContent) {
+    private function loadParamsRoute(&$route, &$routeContent)
+    {
         $noMatch = true; // Indica si hay o no coincidencias de ruta
 
         if (count($this->complexRoutes) > 0) {
@@ -268,7 +276,7 @@ class Router {
                         $routeContent = $_routeContent['function'];
                     }
 
-                    /*
+                    /**
                      * Devuelvo la ruta compleja para obtener su nombre y
                      * decoradores.
                      */
@@ -290,7 +298,8 @@ class Router {
         }
     }
 
-    private function notView() {
+    private function notView()
+    {
         if (Settings::getInstance()->inDebug()) {
             Context::getInstance()->set('exception', 'Framework MVT');
             Context::getInstance()->set('details', 'Hurra ForeverPHP esta corriendo, ahora genera una vista.');
@@ -307,12 +316,13 @@ class Router {
         }
     }
 
-    private function runFunction($function) {
+    private function runFunction($function)
+    {
         if (!is_string($function)) {
             // Ejecuta la funcion anonima
             $returnValue = call_user_func($function);
 
-            /*
+            /**
              * Valida si el valor de retorno de la funcion, es un objeto que
              * implemente ResponseInterface
              */
@@ -324,7 +334,8 @@ class Router {
         }
     }
 
-    private function setHeadersToResponse() {
+    private function setHeadersToResponse()
+    {
         if (SessionManager::getInstance()->exists('headersInRedirect', 'redirect')) {
             $redirectPath = SessionManager::getInstance()->get('redirectPath', 'redirect');
             $requestURI = $_SERVER['REQUEST_URI'];
@@ -346,7 +357,8 @@ class Router {
     /**
      * Ejecuta la ruta solicitada
      */
-    public function run() {
+    public function run()
+    {
         // Obtiene la Url base
         $this->getUriBase();
 
@@ -380,7 +392,7 @@ class Router {
         // Agrega las cabeceras a la respuesta de existir
         $this->setHeadersToResponse();
 
-        /*
+        /**
          * Almacena el nombre de la ruta actual si es que lo tiene, dependiendo
          * si es una ruta normal o compleja y si es funcion o vista.
          */
@@ -390,11 +402,10 @@ class Router {
             $this->nameForRoute = $routeContent['name'];
         }
 
-        /*
+        /**
          * NOTA: Los decoradores solo pueden ser utilizados en rutas con vistas
          *       no en rutas con funciones anonimas.
          */
-
         if (is_array($routeContent)) {
             if ($appName == null) {
                 $appName = $routeContent['app'];

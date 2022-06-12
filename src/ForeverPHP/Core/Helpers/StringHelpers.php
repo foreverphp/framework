@@ -6,14 +6,16 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.4.0
  */
-class StringHelpers {
+class StringHelpers
+{
     /**
      * Devuelve el largo de la cadena.
      *
      * @param  string $string
      * @return string
      */
-    public static function length($string) {
+    public static function length($string)
+    {
         return strlen($string);
     }
 
@@ -23,7 +25,8 @@ class StringHelpers {
      * @param  string $string
      * @return string
      */
-    public static function lower($string) {
+    public static function lower($string)
+    {
         return mb_strtolower($string);
     }
 
@@ -33,7 +36,8 @@ class StringHelpers {
      * @param  string $string
      * @return string
      */
-    public static function upper($string) {
+    public static function upper($string)
+    {
         return mb_strtoupper($string);
     }
 }

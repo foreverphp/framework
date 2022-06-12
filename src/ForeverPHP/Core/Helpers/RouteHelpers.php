@@ -6,8 +6,10 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.4.0
  */
-class RouteHelpers {
-    public static function base_path() {
+class RouteHelpers
+{
+    public static function base_path()
+    {
 
     }
 }

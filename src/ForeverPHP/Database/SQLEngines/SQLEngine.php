@@ -7,7 +7,8 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.3.0
  */
-class SQLEngine {
+class SQLEngine
+{
     protected $dbSetting;
     protected $database;
     protected $link;
@@ -21,13 +22,15 @@ class SQLEngine {
 
     protected static $instance;
 
-    public function __construct($dbSetting) {
+    public function __construct($dbSetting)
+    {
         $this->dbSetting = $dbSetting;
         $this->numRows = 0;
         $this->parameters = array();
     }
 
-    public static function getInstance($dbSetting = 'default') {
+    public static function getInstance($dbSetting = 'default')
+    {
         if (is_null(static::$instance)) {
             static::$instance = new static($dbSetting);
         }
@@ -35,33 +38,40 @@ class SQLEngine {
         return static::$instance;
     }
 
-    public function selectDatabase($database) {
+    public function selectDatabase($database)
+    {
         $this->database = $database;
     }
 
-    public function query($query, $type = 'other', $return = 'num') {
+    public function query($query, $type = 'other', $return = 'num')
+    {
         $this->query = $query;
         $this->queryType = $type;
         $this->queryReturn = $return;
     }
 
-    public function setParameters($parameters) {
+    public function setParameters($parameters)
+    {
         $this->parameters = $parameters;
     }
 
-    public function getErrorNumber() {
+    public function getErrorNumber()
+    {
         return $this->errno;
     }
 
-    public function getError() {
+    public function getError()
+    {
         return $this->error;
     }
 
-    public function getNumRows() {
+    public function getNumRows()
+    {
         return $this->numRows;
     }
 
-    public function get() {
+    public function get()
+    {
         echo $this->dbSetting;
     }
 }

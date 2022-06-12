@@ -6,4 +6,5 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.2.0
  */
-class AppException extends \Exception {}
+class AppException extends \Exception
+{}

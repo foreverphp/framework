@@ -17,7 +17,7 @@ use ForeverPHP\Core\Helpers\RouteHelpers;
 use ForeverPHP\Core\Helpers\StringHelpers;
 
 if (Storage::exists(ROOT_PATH . DS . '.env')) {
-    $dotenv = \Dotenv\Dotenv::create('../');
+    $dotenv = \Dotenv\Dotenv::createImmutable(ROOT_PATH);
     $dotenv->load();
 }
 

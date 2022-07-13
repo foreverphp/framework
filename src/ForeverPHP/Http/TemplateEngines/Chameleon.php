@@ -463,7 +463,11 @@ class Chameleon implements TemplateInterface
         // Reemplazo las variables por contenido
         if (count($results) != 0) {
             foreach ($results as $var) {
-                $this->dataRender = str_replace($var[0], $this->data[$var[1]], $this->dataRender);
+                $this->dataRender = str_replace(
+                    $var[0],
+                    $this->data[$var[1]] != null ? $this->data[$var[1]] : '',
+                    $this->dataRender
+                );
             }
         }
 

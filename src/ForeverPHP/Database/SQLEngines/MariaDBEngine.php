@@ -70,7 +70,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
              * Se llama a la funcion 'bind_result' del stmt y como segundo parametro
              * se le entrega una matriz con los nombres de los campos
              */
-            call_user_func_array(array($this->stmt, 'bind_result'), $fields);
+            call_user_func_array(array($this->stmt, 'bind_result'), array_values($fields));
 
             // Se recorren el resultado de la consulta para llenar $rows
             $rows = array();
@@ -408,7 +408,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
             }
 
             // Se ejecuta la funcion 'bind_param' pasandole todos los parametros en una matriz
-            call_user_func_array(array($this->stmt, 'bind_param'), $paramsRef);
+            call_user_func_array(array($this->stmt, 'bind_param'), array_values($paramsRef));
 
             // Se procede con la ejecucion de la consulta
             if ($this->queryType == 'other') {

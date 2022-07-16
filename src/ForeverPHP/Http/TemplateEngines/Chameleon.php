@@ -465,7 +465,7 @@ class Chameleon implements TemplateInterface
             foreach ($results as $var) {
                 $this->dataRender = str_replace(
                     $var[0],
-                    $this->data[$var[1]] != null ? $this->data[$var[1]] : '',
+                    $this->data[$var[1]] !== null ? $this->data[$var[1]] : '',
                     $this->dataRender
                 );
             }

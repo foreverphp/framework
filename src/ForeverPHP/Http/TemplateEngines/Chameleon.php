@@ -312,7 +312,7 @@ class Chameleon implements TemplateInterface
                         if ($var1 == $var2) {
                             $met = true;
                         }
-                         break;
+                        break;
                     case '===':
                         if ($var1 === $var2) {
                             $met = true;
@@ -374,9 +374,13 @@ class Chameleon implements TemplateInterface
     private function ifsTemplate()
     {
         $regexSimple = "#\{\% if(| not) ([0-9A-Za-z\-_\.]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
-        $regexDouble = "#\{\% if ([0-9A-Za-z\-_\.]*) (.*) ([0-9A-Za-z\-_\.'\"]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
-        //$regexQuad = "#\{\% if ([0-9A-Za-z\-_\.]*) (.*) ([0-9A-Za-z\-_\.'\"]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
-        //$regex_complex = "#\{\% if ([0-9a-zA-Z\-_]*) (.*) ([0-9a-zA-Z\-_]*) \%\}([\w|\t\|\r\|\W]*?)\{\% else \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
+        $regexDouble =
+            "#\{\% if ([0-9A-Za-z\-_\.]*) (.*) ([0-9A-Za-z\-_\.'\"]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
+        //$regexQuad =
+        //    "#\{\% if ([0-9A-Za-z\-_\.]*) (.*) ([0-9A-Za-z\-_\.'\"]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
+        //$regex_complex =
+        //    "#\{\% if ([0-9a-zA-Z\-_]*) (.*) ([0-9a-zA-Z\-_]*) \%\}([\w|\t\|\r\|\W]*?)\{\% else \%\}" .
+        //    "([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
         $results = array();
 
         // Se buscan las apariciones de if de operando simple
@@ -421,7 +425,11 @@ class Chameleon implements TemplateInterface
                     $contentToChange = $content;
 
                     foreach ($results as $vars => $var) {
-                        $contentToChange = str_replace($var[0], trim($value[$var[1]]), $contentToChange);
+                        $contentToChange = str_replace(
+                            $var[0],
+                            trim($value[$var[1]] !== null ? $value[$var[1]] : ''),
+                            $contentToChange
+                        );
                     }
 
                     $contentFor .= $contentToChange;

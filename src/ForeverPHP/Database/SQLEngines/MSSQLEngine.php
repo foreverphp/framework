@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Database\SQLEngines;
+<?php
+
+namespace ForeverPHP\Database\SQLEngines;
 
 use ForeverPHP\Core\Settings;
 
@@ -21,14 +23,14 @@ class MSSQLEngine extends SQLEngine implements SQLEngineInterface
         $server = $db['server'] . ':' . $db['port'];
 
         // Me conecto a la base de datos
-        $this->link = mssql_pconnect($server, $db['user'], $db['password']);
+        $this->conn = mssql_pconnect($server, $db['user'], $db['password']);
 
-        if (!$this->link) {
+        if (!$this->conn) {
             $this->error = mssql_get_last_message();
             return false;
         }
 
-        if (!mssql_select_db($dbName, $this->link)) {
+        if (!mssql_select_db($dbName, $this->conn)) {
             $this->error = mssql_get_last_message();
             return false;
         }
@@ -41,18 +43,20 @@ class MSSQLEngine extends SQLEngine implements SQLEngineInterface
         $return = false;
 
         if ($this->queryType == 'other') {
-            if (mssql_query($this->query, $this->link) === true) {
+            if (mssql_query($this->query, $this->conn) === true) {
                 $return = true;
 
                 $this->error = mssql_get_last_message();
             }
         } else {
-            if ($result = mssql_query($this->query, $this->link)) {
+            if ($result = mssql_query($this->query, $this->conn)) {
                 // Conteo de registros
-                if ($this->queryType == 'insert' ||
+                if (
+                    $this->queryType == 'insert' ||
                     $this->queryType == 'update' ||
-                    $this->queryType == 'delete') {
-                    $this->numRows = mssql_rows_affected($this->link);
+                    $this->queryType == 'delete'
+                ) {
+                    $this->numRows = mssql_rows_affected($this->conn);
 
                     $return = true;
                 } else {
@@ -127,16 +131,21 @@ class MSSQLEngine extends SQLEngine implements SQLEngineInterface
         }
     }
 
+    public function executeInsertBulk(string $query, array $bulkData)
+    {
+        // No implementada
+    }
+
     public function disconnect()
     {
-        if ($this->link != null) {
+        if ($this->conn != null) {
             // Cierro la conexion
-            if (!mssql_close($this->link)) {
+            if (!mssql_close($this->conn)) {
                 $this->error = mssql_get_last_message();
                 return false;
             }
 
-            $this->link = null;
+            $this->conn = null;
         }
     }
 

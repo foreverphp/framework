@@ -1,17 +1,19 @@
-<?php namespace ForeverPHP\Database\SQLEngines;
+<?php
+
+namespace ForeverPHP\Database\SQLEngines;
 
 /**
  * Clase base para los motores de base de datos, que
  * interpreten SQL.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @since       Version 0.3.0
+ * @since       Version 0.4.0
  */
 class SQLEngine
 {
     protected $dbSetting;
     protected $database;
-    protected $link;
+    protected $conn;
     protected $query;
     protected $queryType = 'other';
     protected $queryReturn = 'num';
@@ -26,7 +28,8 @@ class SQLEngine
     {
         $this->dbSetting = $dbSetting;
         $this->numRows = 0;
-        $this->parameters = array();
+        $this->parameters = [];
+        $this->bulkData = null;
     }
 
     public static function getInstance($dbSetting = 'default')

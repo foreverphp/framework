@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Database\SQLEngines;
+<?php
+
+namespace ForeverPHP\Database\SQLEngines;
 
 use ForeverPHP\Core\Settings;
 
@@ -27,9 +29,9 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
         $connectionInfo = array('UID' => $db['user'], 'PWD' => $db['password'], 'Database' => $dbName);
 
         // Me conecto a la base de datos
-        $this->link = sqlsrv_connect($server, $connectionInfo);
+        $this->conn = sqlsrv_connect($server, $connectionInfo);
 
-        if (!$this->link) {
+        if (!$this->conn) {
             $this->error = sqlsrv_errors();
             return false;
         }
@@ -42,17 +44,19 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
         $return = false;
 
         if ($this->queryType == 'other') {
-            if (sqlsrv_query($this->link, $this->query) !== false) {
+            if (sqlsrv_query($this->conn, $this->query) !== false) {
                 $return = true;
 
                 $this->error = sqlsrv_errors();
             }
         } else {
-            if ($stmt = sqlsrv_query($this->link, $this->query)) {
+            if ($stmt = sqlsrv_query($this->conn, $this->query)) {
                 // Conteo de registros
-                if ($this->queryType == 'insert' ||
+                if (
+                    $this->queryType == 'insert' ||
                     $this->queryType == 'update' ||
-                    $this->queryType == 'delete') {
+                    $this->queryType == 'delete'
+                ) {
                     $this->numRows = sqlsrv_rows_affected($stmt);
 
                     $return = true;
@@ -97,7 +101,7 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
             }
 
             // Preparo la consulta
-            $stmt = sqlsrv_prepare($this->link, $this->query, $params);
+            $stmt = sqlsrv_prepare($this->conn, $this->query, $params);
 
             // Se procede con la ejecucion de la consulta
             if ($this->queryType == 'other') {
@@ -109,9 +113,11 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
             } else {
                 if (sqlsrv_execute($stmt) === true) {
                     // Conteo de registros
-                    if ($this->queryType == 'insert' ||
+                    if (
+                        $this->queryType == 'insert' ||
                         $this->queryType == 'update' ||
-                        $this->queryType == 'delete') {
+                        $this->queryType == 'delete'
+                    ) {
                         $this->numRows = sqlsrv_rows_affected($stmt);
 
                         $return = true;
@@ -154,16 +160,21 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
         }
     }
 
+    public function executeInsertBulk(string $query, array $bulkData)
+    {
+        // No implementada
+    }
+
     public function disconnect()
     {
-        if ($this->link != null) {
+        if ($this->conn != null) {
             // Cierro la conexion
-            if (!sqlsrv_close($this->link)) {
+            if (!sqlsrv_close($this->conn)) {
                 $this->error = sqlsrv_errors();
                 return false;
             }
 
-            $this->link = null;
+            $this->conn = null;
         }
     }
 

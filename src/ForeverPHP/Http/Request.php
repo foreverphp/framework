@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Http;
+<?php
+
+namespace ForeverPHP\Http;
 
 use ForeverPHP\Core\Settings;
 use ForeverPHP\Http\RequestFile;
@@ -10,7 +12,6 @@ use ForeverPHP\Http\RequestFile;
  */
 class Request
 {
-
     private $registered = false;
 
     private $files = null;
@@ -27,7 +28,8 @@ class Request
     private static $instance;
 
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Obtiene o crea la instancia singleton de Request.

@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Security;
+<?php
+
+namespace ForeverPHP\Security;
 
 use ForeverPHP\Core\Exceptions\SecurityException;
 
@@ -18,7 +20,8 @@ class Hash
     private static $instance;
 
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Obtiene o crea la instancia singleton de App.
@@ -41,7 +44,6 @@ class Hash
 
     private function makeSHA1($value)
     {
-
     }
 
     public function make($values, $type = 'md5')

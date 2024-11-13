@@ -1,6 +1,9 @@
-<?php namespace ForeverPHP\Core\Facades;
+<?php
+
+namespace ForeverPHP\Core\Facades;
 
 /**
+ * @method static void import(string $type, string $toImport)
  * @see \ForeverPHP\View\Context
  */
 class Context extends Facade

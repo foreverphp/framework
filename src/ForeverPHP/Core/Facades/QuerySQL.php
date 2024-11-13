@@ -1,6 +1,20 @@
-<?php namespace ForeverPHP\Core\Facades;
+<?php
+
+namespace ForeverPHP\Core\Facades;
 
 /**
+ * @method static void using(array $dbSetting)
+ * @method static void selectDatabase(string $database)
+ * @method static \ForeverPHP\Database\QuerySQL query(string $query, string $fetch = 'num')
+ * @method static void addParameter(string $key, mixed $value)
+ * @method static mixed execute(string $returnType = 'array')
+ * @method static bool executeInsertBulk(string $query, array $bulkData)
+ * @method static void startTransaction()
+ * @method static void commit()
+ * @method static void rollback()
+ * @method static bool hasError()
+ * @method static int getErrorNumber()
+ * @method static string getError()
  * @see \ForeverPHP\Database\QuerySQL
  */
 class QuerySQL extends Facade

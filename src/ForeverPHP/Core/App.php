@@ -118,8 +118,8 @@ class App
      * Agrega un middleware.
      *
      * @param string $name
-     * @param clousure
-     * @return boolean
+     * @param \Closure
+     * @return mixed
      */
     public function setMiddleware($name, $function)
     {

@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core;
+<?php
+
+namespace ForeverPHP\Core;
 
 /**
  * Controla y gestiona las cookies en el framework.
@@ -23,7 +25,8 @@ class Cookie
     private static $instance;
 
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Obtiene o crea la instancia singleton de Cookie.
@@ -131,7 +134,7 @@ class Cookie
      * Obtiene una cookie.
      *
      * @param  string $name Nombre de la cookie.
-     * @return boolean      De encontrarse la cookie se retorna si no, se retornara false.
+     * @return mixed      De encontrarse la cookie se retorna si no, se retornara false.
      */
     public function get($name)
     {

@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Database;
+<?php
+
+namespace ForeverPHP\Database;
 
 /**
  * Permite la ejecucion de consultas a motores NoSQL de tipo
@@ -26,7 +28,8 @@ class QueryKeyValue
     private static $instance;
 
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Obtiene o crea la instancia singleton de QueryKeyValue.
@@ -50,22 +53,18 @@ class QueryKeyValue
 
     public function exists($key)
     {
-
     }
 
     public function get($key)
     {
-
     }
 
     public function set($key, $value)
     {
-
     }
 
     public function remove($key)
     {
-
     }
 
     public function hasError()

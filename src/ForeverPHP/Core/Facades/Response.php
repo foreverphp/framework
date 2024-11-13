@@ -1,6 +1,12 @@
-<?php namespace ForeverPHP\Core\Facades;
+<?php
+
+namespace ForeverPHP\Core\Facades;
 
 /**
+ * @method static \ForeverPHP\Http\HtmlResponse render(string $template, int $statusCode = 200)
+ * @method static \ForeverPHP\Http\JsonResponse json(\ForeverPHP\View\Context|array $context, int $statusCode = 200)
+ * @method static void download(string $url)
+ * @method static mixed getResponseStatus(int $status = 301)
  * @see \ForeverPHP\Http\Response
  */
 class Response extends Facade
@@ -12,6 +18,6 @@ class Response extends Facade
      */
     protected static function getComponent()
     {
-        return new \ForeverPHP\Http\Response;
+        return new \ForeverPHP\Http\Response();
     }
 }

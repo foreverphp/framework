@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core;
+<?php
+
+namespace ForeverPHP\Core;
 
 /**
  * Permite administrar la configuracion del sistema y de las aplicaciones.
@@ -22,7 +24,8 @@ class Settings
     private static $instance;
 
     private function __construct()
-    {}
+    {
+    }
 
     /**
      * Obtiene o crea la instancia singleton de Settings.

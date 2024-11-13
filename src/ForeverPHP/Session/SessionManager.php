@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Session;
+<?php
+
+namespace ForeverPHP\Session;
 
 use ForeverPHP\Core\Settings;
 
@@ -17,7 +19,8 @@ class SessionManager
     private static $instance;
 
     private function __construct()
-    {}
+    {
+    }
 
     /**
      * Obtiene o crea la instancia singleton de SessionManager.

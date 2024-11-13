@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core\Facades;
+<?php
+
+namespace ForeverPHP\Core\Facades;
 
 /**
  * Permite crear fachadas de las clases de framework para

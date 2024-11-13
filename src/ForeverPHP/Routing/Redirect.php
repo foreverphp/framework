@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Routing;
+<?php
+
+namespace ForeverPHP\Routing;
 
 use ForeverPHP\Core\Facades\Context;
 use ForeverPHP\Core\Facades\Settings;

@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Routing;
+<?php
+
+namespace ForeverPHP\Routing;
 
 use ForeverPHP\Core\App;
 use ForeverPHP\Core\Exceptions\AppException;
@@ -33,7 +35,8 @@ class Router
     private static $instance;
 
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Obtiene o crea la instancia singleton de Router.

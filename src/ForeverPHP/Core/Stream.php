@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core;
+<?php
+
+namespace ForeverPHP\Core;
 
 /**
  * Permite controlar todo el flujo de salida canalizandolo por una tuberia,
@@ -93,7 +95,6 @@ class Stream
     {
         $this->lastIndex++;
         $this->data[$this->lastIndex] = $data;
-
     }
 
     /**
@@ -118,7 +119,6 @@ class Stream
      */
     public function remove($index)
     {
-
     }
 
     /**

@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Http;
+<?php
+
+namespace ForeverPHP\Http;
 
 use ForeverPHP\Http\HtmlResponse;
 use ForeverPHP\Http\JsonResponse;

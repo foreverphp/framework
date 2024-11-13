@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Filesystem;
+<?php
+
+namespace ForeverPHP\Filesystem;
 
 /**
  * Permite administrar el sistema de archivos.
@@ -7,7 +9,8 @@
  * @since       Version 0.3.0
  */
 class FileNotFoundException extends \Exception
-{}
+{
+}
 
 /**
  * Se debe poder trabajar con diferentes sistemas de archivos.

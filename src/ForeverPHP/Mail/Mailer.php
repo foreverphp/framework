@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Mail;
+<?php
+
+namespace ForeverPHP\Mail;
 
 use ForeverPHP\Core\Settings;
 use PHPMailer;
@@ -18,7 +20,8 @@ class Mailer
     private static $instance;
 
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Obtiene o crea la instancia singleton de App.

@@ -11,7 +11,7 @@ use ForeverPHP\Core\Settings;
  */
 class QuerySQL
 {
-    private $dbSetting = 'default';
+    private $dbSetting = "default";
 
     private $database = false;
 
@@ -19,17 +19,17 @@ class QuerySQL
 
     private $hasError = false;
 
-    private $errno = '';
+    private $errno = "";
 
-    private $error = '';
+    private $error = "";
 
     private $parameters = [];
 
     private $query = null;
 
-    private $queryType = 'select';
+    private $queryType = "select";
 
-    private $queryReturn = 'num';
+    private $queryReturn = "num";
 
     private $autocommit = false;
 
@@ -74,35 +74,35 @@ class QuerySQL
     $this->autocommit = $value;
     }*/
 
-    public function query($query, $fetch = 'num')
+    public function query($query, $fetch = "num")
     {
         $this->query = $query;
 
         // Debe detectar que tipo de consulta se va a ejecutar
         $queryInLCase = lower($query);
 
-        if (strpos($queryInLCase, 'insert') !== false) {
-            $this->queryType = 'insert';
-        } elseif (strpos($queryInLCase, 'select') !== false) {
-            $this->queryType = 'select';
-        } elseif (strpos($queryInLCase, 'update') !== false) {
-            $this->queryType = 'update';
-        } elseif (strpos($queryInLCase, 'delete') !== false) {
-            $this->queryType = 'delete';
+        if (strpos($queryInLCase, "insert") !== false) {
+            $this->queryType = "insert";
+        } elseif (strpos($queryInLCase, "select") !== false) {
+            $this->queryType = "select";
+        } elseif (strpos($queryInLCase, "update") !== false) {
+            $this->queryType = "update";
+        } elseif (strpos($queryInLCase, "delete") !== false) {
+            $this->queryType = "delete";
         } else {
-            $this->queryType = 'other';
+            $this->queryType = "other";
         }
 
         unset($queryInLCase);
 
-        if (lower($fetch) == 'assoc') {
-            $this->queryReturn = 'assoc';
-        } elseif (lower($fetch) == 'both') {
-            $this->queryReturn = 'both';
-        } elseif (lower($fetch) == 'object') {
-            $this->queryReturn = 'object';
+        if (lower($fetch) == "assoc") {
+            $this->queryReturn = "assoc";
+        } elseif (lower($fetch) == "both") {
+            $this->queryReturn = "both";
+        } elseif (lower($fetch) == "object") {
+            $this->queryReturn = "object";
         } else {
-            $this->queryReturn = 'num';
+            $this->queryReturn = "num";
         }
 
         return $this;
@@ -112,37 +112,47 @@ class QuerySQL
     {
         $count = count($this->parameters);
 
-        $this->parameters[$count] = ['type' => $type, 'value' => $value];
+        $this->parameters[$count] = ["type" => $type, "value" => $value];
     }
 
     private function createInstance()
     {
         // Obtengo la configuracion de la base de datos a utilizar
-        $selectDb = Settings::getInstance()->get('dbs');
+        $selectDb = Settings::getInstance()->get("dbs");
         $selectDb[$this->dbSetting];
-        $dbEngine = $selectDb[$this->dbSetting]['engine'];
+        $dbEngine = $selectDb[$this->dbSetting]["engine"];
 
-        if ($dbEngine == 'mariadb') {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MariaDBEngine($this->dbSetting);
-        } elseif ($dbEngine == 'mssql') {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MSSQLEngine($this->dbSetting);
-        } elseif ($dbEngine == 'pgsql') {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PgSQLEngine($this->dbSetting);
-        } elseif ($dbEngine == 'sqlsrv') {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\SQLSRVEngine($this->dbSetting);
-        } elseif ($dbEngine == 'pdo') {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PDOEngine($this->dbSetting);
+        if ($dbEngine == "mariadb") {
+            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MariaDBEngine(
+                $this->dbSetting
+            );
+        } elseif ($dbEngine == "mssql") {
+            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MSSQLEngine(
+                $this->dbSetting
+            );
+        } elseif ($dbEngine == "pgsql") {
+            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PgSQLEngine(
+                $this->dbSetting
+            );
+        } elseif ($dbEngine == "sqlsrv") {
+            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\SQLSRVEngine(
+                $this->dbSetting
+            );
+        } elseif ($dbEngine == "pdo") {
+            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PDOEngine(
+                $this->dbSetting
+            );
         } else {
-            $this->error = 'Database engine not found.';
+            $this->error = "Database engine not found.";
         }
     }
 
-    public function execute($returnType = 'array')
+    public function execute($returnType = "array")
     {
         $this->dbInstance = null;
         $this->hasError = false;
         $this->errno = 0;
-        $this->error = '';
+        $this->error = "";
         $return = false;
 
         $this->createInstance();
@@ -157,15 +167,17 @@ class QuerySQL
                 $this->dbInstance->query(
                     $this->query,
                     $this->queryType,
-                    ($this->queryReturn == 'object') ? 'assoc' : $this->queryReturn
+                    $this->queryReturn == "object"
+                        ? "assoc"
+                        : $this->queryReturn
                 );
                 $this->dbInstance->setParameters($this->parameters);
 
                 if ($result = $this->dbInstance->execute()) {
-                    if (lower($returnType) == 'json') {
+                    if (lower($returnType) == "json") {
                         $return = json_encode($result, JSON_FORCE_OBJECT);
                     } else {
-                        if ($this->queryReturn == 'object') {
+                        if ($this->queryReturn == "object") {
                             // object
                             //$return = (object)$result;
                             $return = json_decode(json_encode($result));
@@ -181,8 +193,13 @@ class QuerySQL
             }
 
             // Recupera el ultimo error ocurrido en el motor de datos
-            $this->errno = $this->dbInstance->getErrorNumber();
-            $this->error = $this->dbInstance->getError();
+            if (is_array($this->dbInstance->getError())) {
+                $this->errno = $this->dbInstance->getError()[0]["code"];
+                $this->error = $this->dbInstance->getError()[0]["message"];
+            } else {
+                $this->errno = $this->dbInstance->getErrorNumber();
+                $this->error = $this->dbInstance->getError();
+            }
 
             if (!empty($this->error)) {
                 $this->hasError = true;
@@ -193,13 +210,16 @@ class QuerySQL
         // Se limpian las variables
         $this->dbInstance = null;
         $this->parameters = [];
-        $this->query = '';
-        $this->queryType = 'select';
-        $this->queryReturn = 'num';
+        $this->query = "";
+        $this->queryType = "select";
+        $this->queryReturn = "num";
 
         // Agrego este control de error para lanzar una excepción para no tener que usar siempre QuerySQL::hasError
         if (!empty($this->error) && $this->error != null) {
-            throw new \Exception($this->error, is_string($this->errno) ? 0 : $this->errno);
+            throw new \Exception(
+                $this->error,
+                is_string($this->errno) ? 0 : $this->errno
+            );
         }
 
         return $return;
@@ -219,10 +239,15 @@ class QuerySQL
         }
 
         // Agrego este control de error para lanzar una excepción para no tener que usar siempre QuerySQL::hasError
-        if (!empty($this->dbInstance->getError()) && $this->dbInstance->getError() != null) {
+        if (
+            !empty($this->dbInstance->getError()) &&
+            $this->dbInstance->getError() != null
+        ) {
             throw new \Exception(
                 $this->dbInstance->getError(),
-                is_string($this->dbInstance->getErrorNumber()) ? 0 : $this->dbInstance->getErrorNumber()
+                is_string($this->dbInstance->getErrorNumber())
+                    ? 0
+                    : $this->dbInstance->getErrorNumber()
             );
         }
 

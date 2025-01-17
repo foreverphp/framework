@@ -6,7 +6,7 @@ namespace ForeverPHP\Core\Facades;
  * @method static bool exists(string $key, string $section = 'main')
  * @method static bool existsSection(string $section = 'main')
  * @method static void set(string $key, mixed $value, string $section = 'main')
- * @method static void get(string $key, string $section = 'main')
+ * @method static mixed get(string $key, string $section = 'main')
  * @method static void remove(string $key, string $section = 'main')
  * @method static void removeSection(string $section = 'main')
  * @method static void regenerate(bool $deleteOldSession = false)

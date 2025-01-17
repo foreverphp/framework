@@ -15,18 +15,23 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
 {
     public function connect()
     {
-        $db = Settings::getInstance()->get('dbs');
+        $db = Settings::getInstance()->get("dbs");
         $db = $db[$this->dbSetting];
 
-        $dbName = ($this->database != false) ? $this->database : $db['database'];
+        $dbName = $this->database != false ? $this->database : $db["database"];
 
-        $server = $db['server'];
+        $server = $db["server"];
 
-        if ($db['port'] != '') {
-            $server .= ',' . $db['port'];
+        if ($db["port"] != "") {
+            $server .= "," . $db["port"];
         }
 
-        $connectionInfo = array('UID' => $db['user'], 'PWD' => $db['password'], 'Database' => $dbName);
+        $connectionInfo = [
+            "UID" => $db["user"],
+            "PWD" => $db["password"],
+            "Database" => $dbName,
+            "TrustServerCertificate" => $db["trustServerCertificate"],
+        ];
 
         // Me conecto a la base de datos
         $this->conn = sqlsrv_connect($server, $connectionInfo);
@@ -43,7 +48,7 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
     {
         $return = false;
 
-        if ($this->queryType == 'other') {
+        if ($this->queryType == "other") {
             if (sqlsrv_query($this->conn, $this->query) !== false) {
                 $return = true;
 
@@ -53,9 +58,9 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
             if ($stmt = sqlsrv_query($this->conn, $this->query)) {
                 // Conteo de registros
                 if (
-                    $this->queryType == 'insert' ||
-                    $this->queryType == 'update' ||
-                    $this->queryType == 'delete'
+                    $this->queryType == "insert" ||
+                    $this->queryType == "update" ||
+                    $this->queryType == "delete"
                 ) {
                     $this->numRows = sqlsrv_rows_affected($stmt);
 
@@ -64,13 +69,13 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
                     $this->numRows = sqlsrv_num_rows($stmt);
                     $fetchType = SQLSRV_FETCH_NUMERIC;
 
-                    if ($this->queryReturn == 'assoc') {
+                    if ($this->queryReturn == "assoc") {
                         $fetchType = SQLSRV_FETCH_ASSOC;
-                    } elseif ($this->queryReturn == 'both') {
+                    } elseif ($this->queryReturn == "both") {
                         $fetchType = SQLSRV_FETCH_BOTH;
                     }
 
-                    $return = array();
+                    $return = [];
 
                     while ($row = sqlsrv_fetch_array($stmt, $fetchType)) {
                         array_push($return, $row);
@@ -94,17 +99,17 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
 
         if (count($this->parameters) != 0) {
             // Prepato los parametros
-            $params = array();
+            $params = [];
 
             foreach ($this->parameters as $param => $paramContent) {
-                $params[] = &$paramContent['value'];
+                $params[] = &$paramContent["value"];
             }
 
             // Preparo la consulta
             $stmt = sqlsrv_prepare($this->conn, $this->query, $params);
 
             // Se procede con la ejecucion de la consulta
-            if ($this->queryType == 'other') {
+            if ($this->queryType == "other") {
                 if (sqlsrv_execute($stmt) === true) {
                     $return = true;
 
@@ -114,9 +119,9 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
                 if (sqlsrv_execute($stmt) === true) {
                     // Conteo de registros
                     if (
-                        $this->queryType == 'insert' ||
-                        $this->queryType == 'update' ||
-                        $this->queryType == 'delete'
+                        $this->queryType == "insert" ||
+                        $this->queryType == "update" ||
+                        $this->queryType == "delete"
                     ) {
                         $this->numRows = sqlsrv_rows_affected($stmt);
 
@@ -126,13 +131,13 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
                         $this->numRows = sqlsrv_num_rows($stmt);
                         $fetchType = SQLSRV_FETCH_NUMERIC;
 
-                        if ($this->queryReturn == 'assoc') {
+                        if ($this->queryReturn == "assoc") {
                             $fetchType = SQLSRV_FETCH_ASSOC;
-                        } elseif ($this->queryReturn == 'both') {
+                        } elseif ($this->queryReturn == "both") {
                             $fetchType = SQLSRV_FETCH_BOTH;
                         }
 
-                        $return = array();
+                        $return = [];
 
                         while ($row = sqlsrv_fetch_array($stmt, $fetchType)) {
                             array_push($return, $row);

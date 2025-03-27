@@ -34,7 +34,7 @@ class SQLEngine
 
     public static function getInstance($dbSetting = 'default')
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static($dbSetting);
         }
 

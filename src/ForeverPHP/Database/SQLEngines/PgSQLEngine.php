@@ -46,11 +46,10 @@ class PgSQLEngine extends SQLEngine implements SQLEngineInterface
         if ($this->numRows > 0) {
             $resultType = PGSQL_NUM;
 
-            if ($this->queryReturn == 'assoc') {
-                $resultType = PGSQL_ASSOC;
-            } elseif ($this->queryReturn == 'both') {
-                $resultType = PGSQL_BOTH;
-            }
+            $resultType = match ($this->queryReturn) {
+                'assoc' => PGSQL_ASSOC,
+                'both' => PGSQL_BOTH,
+            };
 
             $return = pg_fetch_all($resultQuery, $resultType);
         }
@@ -165,9 +164,9 @@ class PgSQLEngine extends SQLEngine implements SQLEngineInterface
     {
         if (count($this->parameters) == 0) {
             return $this->executeQuery();
-        } else {
-            return $this->executeQueryWithParameters();
         }
+
+        return $this->executeQueryWithParameters();
     }
 
     public function executeInsertBulk(string $query, array $bulkData)
@@ -189,7 +188,7 @@ class PgSQLEngine extends SQLEngine implements SQLEngineInterface
         }
     }
 
-    public function startTransaction()
+    public function beginTransaction()
     {
         if ($this->conn != null) {
             $this->query = 'BEGIN';

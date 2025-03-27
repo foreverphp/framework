@@ -42,13 +42,11 @@ class PDOEngine extends SQLEngine implements SQLEngineInterface
         $return = [];
 
         if ($this->numRows > 0) {
-            if ($this->queryReturn == 'assoc') {
-                $return = $this->stmt->fetchAll(\PDO::FETCH_ASSOC);
-            } elseif ($this->queryReturn == 'both') {
-                $return = $this->stmt->fetchAll(\PDO::FETCH_BOTH);
-            } elseif ($this->queryReturn == 'num') {
-                $return = $this->stmt->fetchAll(\PDO::FETCH_NUM);
-            }
+            $return = match ($this->queryReturn) {
+                'assoc' => $this->stmt->fetchAll(\PDO::FETCH_ASSOC),
+                'both' => $this->stmt->fetchAll(\PDO::FETCH_BOTH),
+                'num' => $this->stmt->fetchAll(\PDO::FETCH_NUM),
+            };
         }
 
         return $return;
@@ -159,9 +157,9 @@ class PDOEngine extends SQLEngine implements SQLEngineInterface
     {
         if (count($this->parameters) == 0) {
             return $this->executeQuery();
-        } else {
-            return $this->executeQueryWithParameters();
         }
+
+        return $this->executeQueryWithParameters();
     }
 
     public function executeInsertBulk(string $query, array $bulkData)
@@ -191,10 +189,10 @@ class PDOEngine extends SQLEngine implements SQLEngineInterface
         }
     }
 
-    public function startTransaction()
+    public function beginTransaction()
     {
         if ($this->conn != null) {
-            //mysqli_autocommit($this->conn, false);
+            $this->conn->beginTransaction();
             $this->useTransaction = true;
         }
     }
@@ -203,7 +201,7 @@ class PDOEngine extends SQLEngine implements SQLEngineInterface
     {
         if ($this->conn != null) {
             if ($this->useTransaction) {
-                //mysqli_commit($this->conn);
+                $this->conn->commit();
             }
         }
     }
@@ -212,7 +210,7 @@ class PDOEngine extends SQLEngine implements SQLEngineInterface
     {
         if ($this->conn != null) {
             if ($this->useTransaction) {
-                //mysqli_rollback($this->conn);
+                $this->conn->rollBack();
             }
         }
     }

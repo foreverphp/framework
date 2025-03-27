@@ -38,7 +38,7 @@ class QueryKeyValue
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static();
         }
 

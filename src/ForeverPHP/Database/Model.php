@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Database;
+<?php
+
+namespace ForeverPHP\Database;
 
 /**
  * ORM: para bases de datos relacionales.

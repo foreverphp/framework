@@ -122,28 +122,30 @@ class QuerySQL
         $selectDb[$this->dbSetting];
         $dbEngine = $selectDb[$this->dbSetting]["engine"];
 
-        if ($dbEngine == "mariadb") {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MariaDBEngine(
-                $this->dbSetting
-            );
-        } elseif ($dbEngine == "mssql") {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MSSQLEngine(
-                $this->dbSetting
-            );
-        } elseif ($dbEngine == "pgsql") {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PgSQLEngine(
-                $this->dbSetting
-            );
-        } elseif ($dbEngine == "sqlsrv") {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\SQLSRVEngine(
-                $this->dbSetting
-            );
-        } elseif ($dbEngine == "pdo") {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PDOEngine(
-                $this->dbSetting
-            );
-        } else {
-            $this->error = "Database engine not found.";
+        switch ($dbEngine) {
+            case "mariadb":
+                $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MariaDBEngine(
+                    $this->dbSetting
+                );
+                break;
+            case "pgsql":
+                $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PgSQLEngine(
+                    $this->dbSetting
+                );
+                break;
+            case "sqlsrv":
+                $this->dbInstance = new \ForeverPHP\Database\SQLEngines\SQLSRVEngine(
+                    $this->dbSetting
+                );
+                break;
+            case "pdo":
+                $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PDOEngine(
+                    $this->dbSetting
+                );
+                break;
+            default:
+                $this->error = "Database engine not found.";
+                break;
         }
     }
 
@@ -257,9 +259,9 @@ class QuerySQL
         return $return == null ? false : $return;
     }
 
-    public function startTransaction()
+    public function beginTransaction()
     {
-        $this->dbInstance->startTransaction();
+        $this->dbInstance->beginTransaction();
     }
 
     public function commit()

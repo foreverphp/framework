@@ -19,7 +19,7 @@ interface SQLEngineInterface
     public function execute();
     public function executeInsertBulk(string $query, array $bulkData);
     public function disconnect();
-    public function startTransaction();
+    public function beginTransaction();
     public function commit();
     public function rollback();
     public function __destruct();

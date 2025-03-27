@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Database;
+<?php
+
+namespace ForeverPHP\Database;
 
 /**
  * FieldTypes:

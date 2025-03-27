@@ -1,4 +1,5 @@
 <?php
+
 /**
  * foreverPHP - Framework MVT (Model - View - Template)
  *
@@ -17,29 +18,23 @@
 
 class QueryBuilder
 {
-
     private static function _build_create()
     {
-
     }
 
     private static function _build_read()
     {
-
     }
 
     private static function _build_update()
     {
-
     }
 
     private static function _build_delete()
     {
-
     }
 
     public static function build()
     {
-
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * foreverPHP - Framework MVT (Model - View - Template)
  *

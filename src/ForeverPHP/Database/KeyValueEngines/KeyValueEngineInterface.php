@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Database\KeyValueEngines;
+<?php
+
+namespace ForeverPHP\Database\KeyValueEngines;
 
 /**
  * Interface que deben implementar si o si todos los motores de datos,

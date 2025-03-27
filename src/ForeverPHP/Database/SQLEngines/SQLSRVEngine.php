@@ -13,10 +13,15 @@ use ForeverPHP\Core\Settings;
  */
 class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
 {
+    private $useTransaction = false;
+
     public function connect()
     {
         $db = Settings::getInstance()->get("dbs");
         $db = $db[$this->dbSetting];
+
+        // Las transacciones no estan activas
+        $this->useTransaction = false;
 
         $dbName = $this->database != false ? $this->database : $db["database"];
 
@@ -69,11 +74,10 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
                     $this->numRows = sqlsrv_num_rows($stmt);
                     $fetchType = SQLSRV_FETCH_NUMERIC;
 
-                    if ($this->queryReturn == "assoc") {
-                        $fetchType = SQLSRV_FETCH_ASSOC;
-                    } elseif ($this->queryReturn == "both") {
-                        $fetchType = SQLSRV_FETCH_BOTH;
-                    }
+                    $fetchType = match ($this->queryReturn) {
+                        "assoc" => SQLSRV_FETCH_ASSOC,
+                        "both" => SQLSRV_FETCH_BOTH,
+                    };
 
                     $return = [];
 
@@ -131,11 +135,10 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
                         $this->numRows = sqlsrv_num_rows($stmt);
                         $fetchType = SQLSRV_FETCH_NUMERIC;
 
-                        if ($this->queryReturn == "assoc") {
-                            $fetchType = SQLSRV_FETCH_ASSOC;
-                        } elseif ($this->queryReturn == "both") {
-                            $fetchType = SQLSRV_FETCH_BOTH;
-                        }
+                        $fetchType = match ($this->queryReturn) {
+                            "assoc" => SQLSRV_FETCH_ASSOC,
+                            "both" => SQLSRV_FETCH_BOTH,
+                        };
 
                         $return = [];
 
@@ -160,9 +163,9 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
     {
         if (count($this->parameters) == 0) {
             return $this->executeQuery();
-        } else {
-            return $this->executeQueryWithParameters();
         }
+
+        return $this->executeQueryWithParameters();
     }
 
     public function executeInsertBulk(string $query, array $bulkData)
@@ -183,19 +186,30 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
         }
     }
 
-    public function startTransaction()
+    public function beginTransaction()
     {
-        return false;
+        if ($this->conn != null) {
+            sqlsrv_begin_transaction($this->conn);
+            $this->useTransaction = true;
+        }
     }
 
     public function commit()
     {
-        return false;
+        if ($this->conn != null) {
+            if ($this->useTransaction) {
+                sqlsrv_commit($this->conn);
+            }
+        }
     }
 
     public function rollback()
     {
-        return false;
+        if ($this->conn != null) {
+            if ($this->useTransaction) {
+                sqlsrv_rollback($this->conn);
+            }
+        }
     }
 
     public function __destruct()

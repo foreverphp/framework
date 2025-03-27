@@ -32,11 +32,9 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
         }
 
         // Me conecto a la base de datos
-        if (!$socket) {
-            $this->conn = mysqli_connect($db['server'], $db['user'], $db['password'], $dbName, $db['port']);
-        } else {
-            $this->conn = mysqli_connect($db['server'], $db['user'], $db['password'], $dbName, $db['port'], $socket);
-        }
+        $this->conn = (!$socket)
+            ? mysqli_connect($db['server'], $db['user'], $db['password'], $dbName, $db['port'])
+            : mysqli_connect($db['server'], $db['user'], $db['password'], $dbName, $db['port'], $socket);
 
         if (mysqli_connect_errno()) {
             $this->errno = mysqli_errno($this->conn);
@@ -51,7 +49,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
     {
         $fields = null; // Almacena los nombres de campos afectados en la consulta
         $rows = null; // Almacenas las filas obtenidas de la consulta
-        $return = array();
+        $return = [];
 
         if ($this->numRows > 0) {
             // Se obtienen los metadatos del resultado para obtener los campos
@@ -59,7 +57,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
             $mdFields = $metadata->fetch_fields();
 
             if (count($mdFields) != 0) {
-                $fields = array();
+                $fields = [];
 
                 foreach ($mdFields as $field) {
                     if ($this->queryReturn == 'assoc' || $this->queryReturn == 'both') {
@@ -74,13 +72,13 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
              * Se llama a la funcion 'bind_result' del stmt y como segundo parametro
              * se le entrega una matriz con los nombres de los campos
              */
-            call_user_func_array(array($this->stmt, 'bind_result'), array_values($fields));
+            call_user_func_array([$this->stmt, 'bind_result'], array_values($fields));
 
             // Se recorren el resultado de la consulta para llenar $rows
-            $rows = array();
+            $rows = [];
 
             while ($this->stmt->fetch()) {
-                $rowData = array();
+                $rowData = [];
 
                 /**
                  * Se Deben extraer los datos de $fields con foreach de no acerlo se pisaran
@@ -99,10 +97,10 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
             // Si el tipo de retorno de los registros es Both se procede con lo siguiente
             if ($this->queryReturn == 'both') {
                 // Primero se crea una matriz temporal
-                $tempRows = array();
+                $tempRows = [];
 
                 // Crea una nueva matriz para pasar las claves de alfanumerico a numeros
-                $keyNums = array();
+                $keyNums = [];
 
                 for ($i = 0; $i < count($fields); $i++) {
                     array_push($keyNums, $i);
@@ -198,7 +196,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
 
             // Asigno los parametros a la consulta por defecto estara en tipo String('s')
             $fieldTypes = '';
-            $params = array();
+            $params = [];
 
             foreach ($this->parameters as $param => $paramContent) {
                 $fieldTypes .= $paramContent['type'];
@@ -212,14 +210,14 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
              * Se reasignan todos los parametros a una nueva matriz con los parametros pasados
              * por referencia
              */
-            $paramsRef = array();
+            $paramsRef = [];
 
             foreach ($params as $key => $value) {
                 $paramsRef[$key] = &$params[$key];
             }
 
             // Se ejecuta la funcion 'bind_param' pasandole todos los parametros en una matriz
-            call_user_func_array(array($this->stmt, 'bind_param'), array_values($paramsRef));
+            call_user_func_array([$this->stmt, 'bind_param'], array_values($paramsRef));
 
             // Se procede con la ejecucion de la consulta
             if ($this->queryType == 'other') {
@@ -271,9 +269,9 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
     {
         if (count($this->parameters) == 0) {
             return $this->executeQuery();
-        } else {
-            return $this->executeQueryWithParameters();
         }
+
+        return $this->executeQueryWithParameters();
     }
 
     public function executeInsertBulk(string $query, array $bulkData)
@@ -295,7 +293,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
         }
     }
 
-    public function startTransaction()
+    public function beginTransaction()
     {
         if ($this->conn != null) {
             mysqli_autocommit($this->conn, false);

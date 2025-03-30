@@ -203,6 +203,7 @@ class PgSQLEngine extends SQLEngine implements SQLEngineInterface
             if ($this->useTransaction) {
                 $this->query = 'COMMIT';
                 $this->executeQuery();
+                $this->useTransaction = false;
             }
         }
     }
@@ -213,6 +214,7 @@ class PgSQLEngine extends SQLEngine implements SQLEngineInterface
             if ($this->useTransaction) {
                 $this->query = 'ROLLBACK';
                 $this->executeQuery();
+                $this->useTransaction = false;
             }
         }
     }

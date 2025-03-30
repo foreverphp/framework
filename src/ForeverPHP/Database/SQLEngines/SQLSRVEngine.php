@@ -199,6 +199,7 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
         if ($this->conn != null) {
             if ($this->useTransaction) {
                 sqlsrv_commit($this->conn);
+                $this->useTransaction = false;
             }
         }
     }
@@ -208,6 +209,7 @@ class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
         if ($this->conn != null) {
             if ($this->useTransaction) {
                 sqlsrv_rollback($this->conn);
+                $this->useTransaction = false;
             }
         }
     }

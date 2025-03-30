@@ -33,12 +33,12 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
 
         // Me conecto a la base de datos
         $this->conn = (!$socket)
-            ? mysqli_connect($db['server'], $db['user'], $db['password'], $dbName, $db['port'])
-            : mysqli_connect($db['server'], $db['user'], $db['password'], $dbName, $db['port'], $socket);
+            ? new \mysqli($db['server'], $db['user'], $db['password'], $dbName, $db['port'])
+            : new \mysqli($db['server'], $db['user'], $db['password'], $dbName, $db['port'], $socket);
 
         if (mysqli_connect_errno()) {
-            $this->errno = mysqli_errno($this->conn);
-            $this->error = mysqli_connect_error();
+            $this->errno = $this->conn->errno;
+            $this->error = $this->conn->connect_error;
             return false;
         }
 
@@ -137,8 +137,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
         $return = false;
 
         // Preparo la consulta
-        $this->stmt = mysqli_stmt_init($this->conn);
-        mysqli_stmt_prepare($this->stmt, $this->query);
+        $this->stmt = $this->conn->stmt_init();
+        $this->stmt->prepare($this->query);
 
         // Se procede con la ejecucion de la consulta
         if ($this->queryType == 'other') {
@@ -149,8 +149,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
                 // Genera los datos de retorno
                 $return = $this->returnDataGenerator();
             } else {
-                $this->errno = mysqli_errno($this->conn);
-                $this->error = mysqli_error($this->conn);
+                $this->errno = $this->conn->errno;
+                $this->error = $this->conn->error;
             }
         } else {
             if ($this->stmt->execute() === true) {
@@ -172,11 +172,11 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
                     $return = $this->returnDataGenerator();
                 }
 
-                $this->errno = mysqli_errno($this->conn);
-                $this->error = mysqli_error($this->conn);
+                $this->errno = $this->conn->errno;
+                $this->error = $this->conn->error;
             } else {
-                $this->errno = mysqli_errno($this->conn);
-                $this->error = mysqli_error($this->conn);
+                $this->errno = $this->conn->errno;
+                $this->error = $this->conn->error;
             }
         }
 
@@ -191,8 +191,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
 
         if (count($this->parameters) != 0) {
             // Preparo la consulta
-            $this->stmt = mysqli_stmt_init($this->conn);
-            mysqli_stmt_prepare($this->stmt, $this->query);
+            $this->stmt = $this->conn->stmt_init();
+            $this->stmt->prepare($this->query);
 
             // Asigno los parametros a la consulta por defecto estara en tipo String('s')
             $fieldTypes = '';
@@ -228,8 +228,8 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
                     // Genera los datos de retorno
                     $return = $this->returnDataGenerator();
                 } else {
-                    $this->errno = mysqli_errno($this->conn);
-                    $this->error = mysqli_error($this->conn);
+                    $this->errno = $this->conn->errno;
+                    $this->error = $this->conn->error;
                 }
             } else {
                 if ($this->stmt->execute() === true) {
@@ -251,11 +251,11 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
                         $return = $this->returnDataGenerator();
                     }
 
-                    $this->errno = mysqli_errno($this->conn);
-                    $this->error = mysqli_error($this->conn);
+                    $this->errno = $this->conn->errno;
+                    $this->error = $this->conn->error;
                 } else {
-                    $this->errno = mysqli_errno($this->conn);
-                    $this->error = mysqli_error($this->conn);
+                    $this->errno = $this->conn->errno;
+                    $this->error = $this->conn->error;
                 }
             }
 
@@ -283,9 +283,9 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
     {
         if ($this->conn != null) {
             // Cierro la conexion
-            if (!mysqli_close($this->conn)) {
-                $this->errno = mysqli_errno($this->conn);
-                $this->error = mysqli_error($this->conn);
+            if (!$this->conn->close()) {
+                $this->errno = $this->conn->errno;
+                $this->error = $this->conn->error;
                 return false;
             }
 
@@ -296,7 +296,9 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
     public function beginTransaction()
     {
         if ($this->conn != null) {
-            mysqli_autocommit($this->conn, false);
+            $this->conn->autocommit(false);
+            $this->conn->begin_transaction();
+
             $this->useTransaction = true;
         }
     }
@@ -305,7 +307,10 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
     {
         if ($this->conn != null) {
             if ($this->useTransaction) {
-                mysqli_commit($this->conn);
+                if ($this->conn->commit()) {
+                    $this->conn->autocommit(true);
+                    $this->useTransaction = false;
+                }
             }
         }
     }
@@ -314,7 +319,10 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
     {
         if ($this->conn != null) {
             if ($this->useTransaction) {
-                mysqli_rollback($this->conn);
+                if ($this->conn->rollback()) {
+                    $this->conn->autocommit(true);
+                    $this->useTransaction = false;
+                }
             }
         }
     }

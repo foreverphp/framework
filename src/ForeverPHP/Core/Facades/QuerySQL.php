@@ -9,7 +9,7 @@ namespace ForeverPHP\Core\Facades;
  * @method static void addParameter(string $key, mixed $value)
  * @method static mixed execute(string $returnType = 'array')
  * @method static bool executeInsertBulk(string $query, array $bulkData)
- * @method static void startTransaction()
+ * @method static void beginTransaction()
  * @method static void commit()
  * @method static void rollback()
  * @method static bool hasError()

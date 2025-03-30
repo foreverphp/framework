@@ -13,6 +13,8 @@ class QuerySQL
 {
     private $dbSetting = "default";
 
+    private $connected = false;
+
     private $database = false;
 
     private $dbInstance = null;
@@ -33,6 +35,8 @@ class QuerySQL
 
     private $autocommit = false;
 
+    private $useTransaction = false;
+
     /**
      * Contiene la instancia singleton de QuerySQL.
      *
@@ -52,7 +56,7 @@ class QuerySQL
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static();
         }
 
@@ -69,10 +73,6 @@ class QuerySQL
     {
         $this->database = $database;
     }
-
-    /*public function autocommit($value = false) {
-    $this->autocommit = $value;
-    }*/
 
     public function query($query, $fetch = "num")
     {
@@ -95,15 +95,12 @@ class QuerySQL
 
         unset($queryInLCase);
 
-        if (lower($fetch) == "assoc") {
-            $this->queryReturn = "assoc";
-        } elseif (lower($fetch) == "both") {
-            $this->queryReturn = "both";
-        } elseif (lower($fetch) == "object") {
-            $this->queryReturn = "object";
-        } else {
-            $this->queryReturn = "num";
-        }
+        $this->queryReturn = match (lower($fetch)) {
+            "assoc" => "assoc",
+            "both" => "both",
+            "object" => "object",
+            default => "num",
+        };
 
         return $this;
     }
@@ -117,41 +114,48 @@ class QuerySQL
 
     private function createInstance()
     {
-        // Obtengo la configuracion de la base de datos a utilizar
-        $selectDb = Settings::getInstance()->get("dbs");
-        $selectDb[$this->dbSetting];
-        $dbEngine = $selectDb[$this->dbSetting]["engine"];
+        if (!$this->useTransaction) {
+            $this->dbInstance = null;
 
-        switch ($dbEngine) {
-            case "mariadb":
-                $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MariaDBEngine(
-                    $this->dbSetting
-                );
-                break;
-            case "pgsql":
-                $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PgSQLEngine(
-                    $this->dbSetting
-                );
-                break;
-            case "sqlsrv":
-                $this->dbInstance = new \ForeverPHP\Database\SQLEngines\SQLSRVEngine(
-                    $this->dbSetting
-                );
-                break;
-            case "pdo":
-                $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PDOEngine(
-                    $this->dbSetting
-                );
-                break;
-            default:
-                $this->error = "Database engine not found.";
-                break;
+            // Obtengo la configuracion de la base de datos a utilizar
+            $selectDb = Settings::getInstance()->get("dbs");
+            $selectDb[$this->dbSetting];
+            $dbEngine = $selectDb[$this->dbSetting]["engine"];
+
+            switch ($dbEngine) {
+                case "mariadb":
+                    $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MariaDBEngine(
+                        $this->dbSetting
+                    );
+                    break;
+                case "pgsql":
+                    $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PgSQLEngine(
+                        $this->dbSetting
+                    );
+                    break;
+                case "sqlsrv":
+                    $this->dbInstance = new \ForeverPHP\Database\SQLEngines\SQLSRVEngine(
+                        $this->dbSetting
+                    );
+                    break;
+                case "pdo":
+                    $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PDOEngine(
+                        $this->dbSetting
+                    );
+                    break;
+                default:
+                    $this->error = "Database engine not found.";
+                    break;
+            }
+
+            if ($this->dbInstance->connect()) {
+                $this->connected = true;
+            }
         }
     }
 
     public function execute($returnType = "array")
     {
-        $this->dbInstance = null;
         $this->hasError = false;
         $this->errno = 0;
         $this->error = "";
@@ -165,7 +169,7 @@ class QuerySQL
             }
 
             // Me conecto al motor de datos
-            if ($this->dbInstance->connect()) {
+            if ($this->connected) {
                 $this->dbInstance->query(
                     $this->query,
                     $this->queryType,
@@ -191,7 +195,9 @@ class QuerySQL
                 }
 
                 // Me desconecto
-                $this->dbInstance->disconnect();
+                if (!$this->useTransaction) {
+                    $this->releaseInstance();
+                }
             }
 
             // Recupera el ultimo error ocurrido en el motor de datos
@@ -210,7 +216,6 @@ class QuerySQL
         }
 
         // Se limpian las variables
-        $this->dbInstance = null;
         $this->parameters = [];
         $this->query = "";
         $this->queryType = "select";
@@ -230,12 +235,11 @@ class QuerySQL
     public function executeInsertBulk(string $query, array $bulkData)
     {
         $return = false;
-        $this->dbInstance = null;
 
         $this->createInstance();
 
         if ($this->dbInstance != null) {
-            if ($this->dbInstance->connect()) {
+            if ($this->connected) {
                 $this->dbInstance->executeInsertBulk($query, $bulkData);
             }
         }
@@ -254,24 +258,30 @@ class QuerySQL
         }
 
         // Me desconecto
-        $this->dbInstance->disconnect();
+        if (!$this->useTransaction) {
+            $this->releaseInstance();
+        }
 
         return $return == null ? false : $return;
     }
 
     public function beginTransaction()
     {
+        $this->createInstance();
+        $this->useTransaction = true;
         $this->dbInstance->beginTransaction();
     }
 
     public function commit()
     {
         $this->dbInstance->commit();
+        $this->releaseInstance();
     }
 
     public function rollback()
     {
         $this->dbInstance->rollback();
+        $this->releaseInstance();
     }
 
     public function hasError()
@@ -287,5 +297,11 @@ class QuerySQL
     public function getError()
     {
         return $this->error;
+    }
+
+    private function releaseInstance()
+    {
+        $this->dbInstance->disconnect();
+        $this->connected = false;
     }
 }

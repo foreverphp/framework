@@ -202,6 +202,7 @@ class PDOEngine extends SQLEngine implements SQLEngineInterface
         if ($this->conn != null) {
             if ($this->useTransaction) {
                 $this->conn->commit();
+                $this->useTransaction = false;
             }
         }
     }
@@ -211,6 +212,7 @@ class PDOEngine extends SQLEngine implements SQLEngineInterface
         if ($this->conn != null) {
             if ($this->useTransaction) {
                 $this->conn->rollBack();
+                $this->useTransaction = false;
             }
         }
     }

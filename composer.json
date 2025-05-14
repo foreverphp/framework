@@ -1,23 +1,26 @@
 {
-    "name": "foreverphp/framework",
-    "description": "ForeverPHP Framework.",
-    "keywords": ["framework", "foreverphp"],
-    "license": "MIT",
-    "version": "0.4.32",
-    "authors": [
-        {
-            "name": "Daniel Nuñez",
-            "email": "dnunez@emarva.com"
-        }
-    ],
-    "require": {
-        "php": ">=7.4",
-        "vlucas/phpdotenv": "^5.4.1",
-        "phpmailer/phpmailer": "^6.6.0"
-    },
-    "autoload": {
-        "psr-0": {
-            "ForeverPHP": "src/"
-        }
+  "name": "foreverphp/framework",
+  "description": "ForeverPHP Framework.",
+  "keywords": [
+    "framework",
+    "foreverphp"
+  ],
+  "license": "MIT",
+  "version": "0.4.32",
+  "authors": [
+    {
+      "name": "Daniel Nuñez",
+      "email": "dnunez@emarva.com"
     }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "vlucas/phpdotenv": "^5.4.1",
+    "phpmailer/phpmailer": "^6.6.0"
+  },
+  "autoload": {
+    "psr-0": {
+      "ForeverPHP": "src/"
+    }
+  }
 }

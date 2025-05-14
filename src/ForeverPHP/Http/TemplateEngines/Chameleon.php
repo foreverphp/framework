@@ -11,46 +11,53 @@ use ForeverPHP\Security\CSRF;
  *
  * @since   Version 0.1.0
  */
-class TemplateVarNotFound extends \Exception
-{}
+class TemplateVarNotFound extends \Exception {}
 
 class Chameleon implements TemplateInterface
 {
-    private $templatesDir = '';
-    private $staticDir = '';
-    private $template = '';
-    private $data = array();
-    private $dataRenderBase = '';
-    private $dataRender = '';
+    private $templatesDir = "";
+    private $staticDir = "";
+    private $template = "";
+    private $data = [];
+    private $dataRenderBase = "";
+    private $dataRender = "";
 
     private function removeQuotes($data)
     {
-        $dataTemp = str_replace("'", '', $data);
-        $dataTemp = str_replace('"', '', $dataTemp);
+        $dataTemp = str_replace("'", "", $data);
+        $dataTemp = str_replace('"', "", $dataTemp);
 
         return $dataTemp;
     }
 
     private function extendsTemplate()
     {
-        $regex = "#\{\% extends ('|\")([0-9A-Za-z\-_]*)('|\")(| from ('|\")([0-9A-Za-z\-_]*)('|\")) \%\}#";
-        $results = array();
+        $regex =
+            "#\{\% extends ('|\")([0-9A-Za-z\-_]*)('|\")(| from ('|\")([0-9A-Za-z\-_]*)('|\")) \%\}#";
+        $results = [];
 
         preg_match_all($regex, $this->dataRender, $result, PREG_SET_ORDER);
 
         $resultLength = count($result);
 
         if ($resultLength == 1) {
-            $extendsFile = '';
+            $extendsFile = "";
             $extendsLength = count($result[0]);
 
             if ($extendsLength == 5) {
-                $extendsFile = $this->templatesDir . $result[0][2] . '.html';
+                $extendsFile = $this->templatesDir . $result[0][2] . ".html";
             } elseif ($extendsLength == 8) {
                 // Verifica si la App esta cargada, en settings.php
                 if (App::exists($result[0][6])) {
-                    $extendsFile = APPS_ROOT . DS . $result[0][6] . DS .
-                        'Templates' . DS . $result[0][2] . '.html';
+                    $extendsFile =
+                        APPS_ROOT .
+                        DS .
+                        $result[0][6] .
+                        DS .
+                        "Templates" .
+                        DS .
+                        $result[0][2] .
+                        ".html";
                 }
             } else {
                 return false;
@@ -72,33 +79,45 @@ class Chameleon implements TemplateInterface
 
     private function includesTemplate()
     {
-        $regex = "#\{\% include ('|\")([0-9A-Za-z\-_]*)('|\")(| from ('|\")([0-9A-Za-z\-_]*)('|\")) \%\}#";
-        $results = array();
+        $regex =
+            "#\{\% include ('|\")([0-9A-Za-z\-_]*)('|\")(| from ('|\")([0-9A-Za-z\-_]*)('|\")) \%\}#";
+        $results = [];
 
         preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);
 
         if (count($results) > 0) {
             foreach ($results as $include) {
-                $includeFile = '';
-                $templateFile = DS . 'Templates' . DS;
+                $includeFile = "";
+                $templateFile = DS . "Templates" . DS;
 
                 // Verifica si la App esta cargada, en settings.php
                 $includeLength = count($include);
 
                 if ($includeLength > 5) {
                     if (App::exists($include[6])) {
-                        $templateFile = APPS_ROOT . DS . $include[6] . DS .
-                            'Templates' . DS . $include[2] . '.html';
+                        $templateFile =
+                            APPS_ROOT .
+                            DS .
+                            $include[6] .
+                            DS .
+                            "Templates" .
+                            DS .
+                            $include[2] .
+                            ".html";
                     }
                 } else {
-                    $templateFile = $this->templatesDir . $include[2] . '.html';
+                    $templateFile = $this->templatesDir . $include[2] . ".html";
                 }
 
                 if (Storage::exists($templateFile)) {
                     $includeFile = Storage::get($templateFile);
                 }
 
-                $this->dataRender = str_replace($include[0], trim($includeFile), $this->dataRender);
+                $this->dataRender = str_replace(
+                    $include[0],
+                    trim($includeFile),
+                    $this->dataRender
+                );
             }
 
             // Vuelvo a llamar la función en busca de mas tags include
@@ -114,15 +133,20 @@ class Chameleon implements TemplateInterface
 
     private function blocksTemplate()
     {
-        $regex = "#\{\% block ('|\")([0-9A-Za-z\-_]*)('|\") \%\}([\w|\t|\r|\W]*?)\{\% endblock \%\}#";
-        $results = array();
+        $regex =
+            "#\{\% block ('|\")([0-9A-Za-z\-_]*)('|\") \%\}([\w|\t|\r|\W]*?)\{\% endblock \%\}#";
+        $results = [];
 
         preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);
 
         if (count($results) > 0) {
             foreach ($results as $block) {
-                $regexReplace = "#\{\% block " . $block[1] . $block[2] .
-                    $block[3] . " \%\}\{\% endblock \%\}#";
+                $regexReplace =
+                    "#\{\% block " .
+                    $block[1] .
+                    $block[2] .
+                    $block[3] .
+                    " \%\}\{\% endblock \%\}#";
 
                 // Busco el bloque en el template base y lo reemplazo
                 $this->dataRenderBase = preg_replace(
@@ -145,7 +169,7 @@ class Chameleon implements TemplateInterface
     private function staticsTemplate()
     {
         $regex = "#\{\% static ('|\")(.*?)('|\") \%\}#";
-        $results = array();
+        $results = [];
 
         preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);
 
@@ -157,7 +181,11 @@ class Chameleon implements TemplateInterface
                 //$static_file = $url_base . $this->static_dir . $static[1];
                 $staticFile = $this->staticDir . $static[1];
 
-                $this->dataRender = preg_replace($regexReplace, trim($staticFile), $this->dataRender);
+                $this->dataRender = preg_replace(
+                    $regexReplace,
+                    trim($staticFile),
+                    $this->dataRender
+                );
             }
         } else {
             return false;
@@ -171,7 +199,7 @@ class Chameleon implements TemplateInterface
     private function urlsTemplate()
     {
         $regex = "#\{\% url ('|\")(.*?)('|\") \%\}#";
-        $results = array();
+        $results = [];
 
         preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);
 
@@ -184,7 +212,11 @@ class Chameleon implements TemplateInterface
                 //$static_file = URL_BASE . $static[1];
                 $staticFile = $static[1];
 
-                $this->dataRender = preg_replace($regexReplace, trim($staticFile), $this->dataRender);
+                $this->dataRender = preg_replace(
+                    $regexReplace,
+                    trim($staticFile),
+                    $this->dataRender
+                );
             }
         } else {
             return false;
@@ -198,7 +230,7 @@ class Chameleon implements TemplateInterface
     private function isVarLoop($var)
     {
         if (is_string($var)) {
-            if (!preg_match('#\'([0-9A-Za-z\-_]+)\'#', $var)) {
+            if (!preg_match("#\'([0-9A-Za-z\-_]+)\'#", $var)) {
                 return true;
             }
         }
@@ -208,18 +240,18 @@ class Chameleon implements TemplateInterface
 
     private function setTypeVarLoop(&$var)
     {
-        if (lower($var) === 'true') {
+        if (strtolower($var) === "true") {
             $var = true;
-        } elseif (lower($var) === 'false') {
+        } elseif (strtolower($var) === "false") {
             $var = false;
         } elseif (filter_var($var, FILTER_VALIDATE_INT)) {
-            settype($var, 'int');
+            settype($var, "int");
         } elseif (filter_var($var, FILTER_VALIDATE_FLOAT)) {
-            settype($var, 'float');
-        } elseif (lower($var) === 'null') {
-            settype($var, 'null');
+            settype($var, "float");
+        } elseif (strtolower($var) === "null") {
+            settype($var, "null");
         } else {
-            settype($var, 'string');
+            settype($var, "string");
         }
     }
 
@@ -227,7 +259,7 @@ class Chameleon implements TemplateInterface
     {
         $varNotFound = false;
         $withElse = false;
-        $operador = '';
+        $operador = "";
 
         // Operandos y operador
         if ($operands == 1 && count($data) == 4) {
@@ -243,12 +275,17 @@ class Chameleon implements TemplateInterface
         }
 
         // Contenidos del if else endif
-        $content1 = ($operands == 1) ? ((count($data) == 4) ? $data[3] : $data[2]) : $data[4];
-        $content2 = '';
+        $content1 =
+            $operands == 1
+                ? (count($data) == 4
+                    ? $data[3]
+                    : $data[2])
+                : $data[4];
+        $content2 = "";
 
         // Verifica si hay un {% else %}
         $regex = "#([\w|\t|\r|\W]*?)\{\% else \%\}([\w|\t|\r|\W]*)#";
-        $results = array();
+        $results = [];
 
         preg_match($regex, $content1, $results);
 
@@ -293,7 +330,7 @@ class Chameleon implements TemplateInterface
 
             if ($operands == 1) {
                 switch ($operador) {
-                    case 'not':
+                    case "not":
                         if (!$var1) {
                             $met = true;
                         }
@@ -308,42 +345,42 @@ class Chameleon implements TemplateInterface
                 $var2 = $this->removeQuotes($var2);
 
                 switch ($operator) {
-                    case '==':
+                    case "==":
                         if ($var1 == $var2) {
                             $met = true;
                         }
                         break;
-                    case '===':
+                    case "===":
                         if ($var1 === $var2) {
                             $met = true;
                         }
                         break;
-                    case '!=':
+                    case "!=":
                         if ($var1 != $var2) {
                             $met = true;
                         }
                         break;
-                    case '!==':
+                    case "!==":
                         if ($var1 !== $var2) {
                             $met = true;
                         }
                         break;
-                    case '>':
+                    case ">":
                         if ($var1 > $var2) {
                             $met = true;
                         }
                         break;
-                    case '<':
+                    case "<":
                         if ($var1 < $var2) {
                             $met = true;
                         }
                         break;
-                    case '>=':
+                    case ">=":
                         if ($var1 >= $var2) {
                             $met = true;
                         }
                         break;
-                    case '<=':
+                    case "<=":
                         if ($var1 <= $var2) {
                             $met = true;
                         }
@@ -352,28 +389,49 @@ class Chameleon implements TemplateInterface
             }
 
             if ($met) {
-                $this->dataRender = str_replace($data[0], trim($content1), $this->dataRender);
+                $this->dataRender = str_replace(
+                    $data[0],
+                    trim($content1),
+                    $this->dataRender
+                );
             } else {
                 if ($withElse) {
-                    $this->dataRender = str_replace($data[0], trim($content2), $this->dataRender);
+                    $this->dataRender = str_replace(
+                        $data[0],
+                        trim($content2),
+                        $this->dataRender
+                    );
                 } else {
-                    $this->dataRender = str_replace($data[0], '', $this->dataRender);
+                    $this->dataRender = str_replace(
+                        $data[0],
+                        "",
+                        $this->dataRender
+                    );
                 }
             }
         } else {
             if (Settings::getInstance()->inDebug()) {
-                throw new TemplateVarNotFound('The variable \'' . $varNotFound .
-                    '\' is not defined for template \'' .
-                    $this->template . '\'.');
+                throw new TemplateVarNotFound(
+                    'The variable \'' .
+                        $varNotFound .
+                        '\' is not defined for template \'' .
+                        $this->template .
+                        '\'.'
+                );
             } else {
-                $this->dataRender = str_replace($data[0], '', $this->dataRender);
+                $this->dataRender = str_replace(
+                    $data[0],
+                    "",
+                    $this->dataRender
+                );
             }
         }
     }
 
     private function ifsTemplate()
     {
-        $regexSimple = "#\{\% if(| not) ([0-9A-Za-z\-_\.]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
+        $regexSimple =
+            "#\{\% if(| not) ([0-9A-Za-z\-_\.]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
         $regexDouble =
             "#\{\% if ([0-9A-Za-z\-_\.]*) (.*) ([0-9A-Za-z\-_\.'\"]*) \%\}([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
         //$regexQuad =
@@ -381,10 +439,15 @@ class Chameleon implements TemplateInterface
         //$regex_complex =
         //    "#\{\% if ([0-9a-zA-Z\-_]*) (.*) ([0-9a-zA-Z\-_]*) \%\}([\w|\t\|\r\|\W]*?)\{\% else \%\}" .
         //    "([\w|\t\|\r\|\W]*?)\{\% endif \%\}#";
-        $results = array();
+        $results = [];
 
         // Se buscan las apariciones de if de operando simple
-        preg_match_all($regexSimple, $this->dataRender, $results, PREG_SET_ORDER);
+        preg_match_all(
+            $regexSimple,
+            $this->dataRender,
+            $results,
+            PREG_SET_ORDER
+        );
 
         if (count($results) > 0) {
             foreach ($results as $if) {
@@ -393,7 +456,12 @@ class Chameleon implements TemplateInterface
         }
 
         // Se buscan las apariciones de if de doble operando
-        preg_match_all($regexDouble, $this->dataRender, $results, PREG_SET_ORDER);
+        preg_match_all(
+            $regexDouble,
+            $this->dataRender,
+            $results,
+            PREG_SET_ORDER
+        );
 
         if (count($results) > 0) {
             foreach ($results as $if) {
@@ -414,12 +482,12 @@ class Chameleon implements TemplateInterface
         if (array_key_exists($arrayExpr, $this->data)) {
             $regex = "#\{\{" . $valueVar . ".([0-9A-Za-z\-_]*)\}\}#";
             $regex2 = "#\{\{([0-9A-Za-z\-_.]*)\}\}#";
-            $results = array();
+            $results = [];
 
             preg_match_all($regex, $content, $results, PREG_SET_ORDER);
 
             if (count($results) > 0) {
-                $contentFor = '';
+                $contentFor = "";
 
                 foreach ($this->data[$arrayExpr] as $key => $value) {
                     $contentToChange = $content;
@@ -427,7 +495,9 @@ class Chameleon implements TemplateInterface
                     foreach ($results as $vars => $var) {
                         $contentToChange = str_replace(
                             $var[0],
-                            trim($value[$var[1]] !== null ? $value[$var[1]] : ''),
+                            trim(
+                                $value[$var[1]] !== null ? $value[$var[1]] : ""
+                            ),
                             $contentToChange
                         );
                     }
@@ -435,20 +505,29 @@ class Chameleon implements TemplateInterface
                     $contentFor .= $contentToChange;
                 }
 
-                $this->dataRender = str_replace($data[0], trim($contentFor), $this->dataRender);
+                $this->dataRender = str_replace(
+                    $data[0],
+                    trim($contentFor),
+                    $this->dataRender
+                );
             }
 
             unset($results);
         } else {
             // Si no se elimina la etiqueta for
-            $this->dataRender = str_replace($data[0], trim(''), $this->dataRender);
+            $this->dataRender = str_replace(
+                $data[0],
+                trim(""),
+                $this->dataRender
+            );
         }
     }
 
     private function forsTemplate()
     {
-        $regex = "#\{\% for ([0-9A-Za-z\-_]*) as ([0-9A-Za-z\-_]*) \%\}([\w|\t|\r|\W]*?)\{\% endfor \%\}#";
-        $results = array();
+        $regex =
+            "#\{\% for ([0-9A-Za-z\-_]*) as ([0-9A-Za-z\-_]*) \%\}([\w|\t|\r|\W]*?)\{\% endfor \%\}#";
+        $results = [];
 
         preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);
 
@@ -464,7 +543,7 @@ class Chameleon implements TemplateInterface
     private function varsTemplate()
     {
         $regex = "#\{\{([0-9A-Za-z\-_]*)\}\}#";
-        $results = array();
+        $results = [];
 
         preg_match_all($regex, $this->dataRender, $results, PREG_SET_ORDER);
 
@@ -473,7 +552,7 @@ class Chameleon implements TemplateInterface
             foreach ($results as $var) {
                 $this->dataRender = str_replace(
                     $var[0],
-                    $this->data[$var[1]] !== null ? $this->data[$var[1]] : '',
+                    $this->data[$var[1]] !== null ? $this->data[$var[1]] : "",
                     $this->dataRender
                 );
             }
@@ -489,17 +568,21 @@ class Chameleon implements TemplateInterface
         $regex = "#\{\% urlbase \%\}#";
         //$url_base = (URL_BASE === '/') ? '' : URL_BASE;
 
-        $this->dataRender = preg_replace($regex, '/', $this->dataRender);
+        $this->dataRender = preg_replace($regex, "/", $this->dataRender);
 
         // Tag url_static
         $regex = "#\{\% urlstatic \%\}#";
 
-        $this->dataRender = preg_replace($regex, '/' . 'static/', $this->dataRender);
+        $this->dataRender = preg_replace(
+            $regex,
+            "/" . "static/",
+            $this->dataRender
+        );
     }
 
     private function securityTagsTemplate()
     {
-        $results = array();
+        $results = [];
 
         // Tag csrf_token
         $regex = "#\{\% csrftoken \%\}#";
@@ -508,9 +591,16 @@ class Chameleon implements TemplateInterface
 
         if (count($results) > 0) {
             $token = CSRF::generateToken();
-            $inputTag = '<input type="hidden" name="csrfToken" value="' . $token . '" />';
+            $inputTag =
+                '<input type="hidden" name="csrfToken" value="' .
+                $token .
+                '" />';
 
-            $this->dataRender = preg_replace($regex, $inputTag, $this->dataRender);
+            $this->dataRender = preg_replace(
+                $regex,
+                $inputTag,
+                $this->dataRender
+            );
         }
 
         unset($results);
@@ -529,7 +619,7 @@ class Chameleon implements TemplateInterface
 
         // Cargo el contenido del template
         $this->dataRender = file_get_contents($this->templatesDir . $this->template . '.html');*/
-        $this->dataRender = file_get_contents($this->template . '.html');
+        $this->dataRender = file_get_contents($this->template . ".html");
 
         // Verifica si el template extiende otro
         if ($this->extendsTemplate()) {
@@ -576,9 +666,9 @@ class Chameleon implements TemplateInterface
     private function minify($dataRender)
     {
         return preg_replace(
-            array('/<!--(.*)-->/Uis', "/[[:blank:]]+/"),
-            array('', ' '),
-            str_replace(array("\n", "\r", "\t"), '', $dataRender)
+            ["/<!--(.*)-->/Uis", "/[[:blank:]]+/"],
+            ["", " "],
+            str_replace(["\n", "\r", "\t"], "", $dataRender)
         );
     }
 
@@ -607,7 +697,7 @@ class Chameleon implements TemplateInterface
      */
     public function render($template, $data)
     {
-        $tplReady = '';
+        $tplReady = "";
         $this->template = $template;
         $this->data = $data;
 
@@ -616,7 +706,10 @@ class Chameleon implements TemplateInterface
         }
 
         // Se verifica si hay que minificar el resultado
-        if (Settings::getInstance()->get('minifyTemplate') && !Settings::getInstance()->inDebug()) {
+        if (
+            Settings::getInstance()->get("minifyTemplate") &&
+            !Settings::getInstance()->inDebug()
+        ) {
             $tplReady = $this->minify($tplReady);
         }
 

@@ -79,7 +79,7 @@ class QuerySQL
         $this->query = $query;
 
         // Debe detectar que tipo de consulta se va a ejecutar
-        $queryInLCase = lower($query);
+        $queryInLCase = strtolower($query);
 
         if (strpos($queryInLCase, "insert") !== false) {
             $this->queryType = "insert";
@@ -95,7 +95,7 @@ class QuerySQL
 
         unset($queryInLCase);
 
-        $this->queryReturn = match (lower($fetch)) {
+        $this->queryReturn = match (strtolower($fetch)) {
             "assoc" => "assoc",
             "both" => "both",
             "object" => "object",
@@ -180,7 +180,7 @@ class QuerySQL
                 $this->dbInstance->setParameters($this->parameters);
 
                 if ($result = $this->dbInstance->execute()) {
-                    if (lower($returnType) == "json") {
+                    if (strtolower($returnType) == "json") {
                         $return = json_encode($result, JSON_FORCE_OBJECT);
                     } else {
                         if ($this->queryReturn == "object") {

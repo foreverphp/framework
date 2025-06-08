@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Http\TemplateEngines;
+<?php
+
+namespace ForeverPHP\Http\TemplateEngines;
 
 use ForeverPHP\Core\Facades\App;
 use ForeverPHP\Core\Facades\Storage;
@@ -11,7 +13,9 @@ use ForeverPHP\Security\CSRF;
  *
  * @since   Version 0.1.0
  */
-class TemplateVarNotFound extends \Exception {}
+class TemplateVarNotFound extends \Exception
+{
+}
 
 class Chameleon implements TemplateInterface
 {
@@ -277,10 +281,10 @@ class Chameleon implements TemplateInterface
         // Contenidos del if else endif
         $content1 =
             $operands == 1
-                ? (count($data) == 4
-                    ? $data[3]
-                    : $data[2])
-                : $data[4];
+            ? (count($data) == 4
+                ? $data[3]
+                : $data[2])
+            : $data[4];
         $content2 = "";
 
         // Verifica si hay un {% else %}
@@ -413,10 +417,10 @@ class Chameleon implements TemplateInterface
             if (Settings::getInstance()->inDebug()) {
                 throw new TemplateVarNotFound(
                     'The variable \'' .
-                        $varNotFound .
-                        '\' is not defined for template \'' .
-                        $this->template .
-                        '\'.'
+                    $varNotFound .
+                    '\' is not defined for template \'' .
+                    $this->template .
+                    '\'.'
                 );
             } else {
                 $this->dataRender = str_replace(
@@ -606,6 +610,24 @@ class Chameleon implements TemplateInterface
         unset($results);
     }
 
+    private function specialTagsTemplate()
+    {
+        $results = [];
+
+        // Tag value_from_settings
+        $regexVFS = "/\{%\s*value_from_settings\(\'([0-9A-Za-z_-]+)\'\)\s*%\}/";
+
+        $this->dataRender = preg_replace_callback(
+            $regexVFS,
+            fn($matches) => Settings::getInstance()->exists($matches[1])
+                ? Settings::getInstance()->get($matches[1])
+                : $matches[0],
+            $this->dataRender
+        );
+
+        unset($results);
+    }
+
     private function loadTemplate()
     {
         /*if (Settings::getInstance()->get('ForeverPHPTemplate')) {
@@ -619,7 +641,7 @@ class Chameleon implements TemplateInterface
 
         // Cargo el contenido del template
         $this->dataRender = file_get_contents($this->templatesDir . $this->template . '.html');*/
-        $this->dataRender = file_get_contents($this->template . ".html");
+        $this->dataRender = file_get_contents("{$this->template}.html");
 
         // Verifica si el template extiende otro
         if ($this->extendsTemplate()) {
@@ -652,6 +674,9 @@ class Chameleon implements TemplateInterface
 
         // Verifica la aparicion de tags de seguridad
         $this->securityTagsTemplate();
+
+        // Verifica la aparicion de tags especiales
+        $this->specialTagsTemplate();
 
         return true;
     }

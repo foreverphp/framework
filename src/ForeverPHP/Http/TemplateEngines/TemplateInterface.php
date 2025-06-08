@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Http\TemplateEngines;
+<?php
+
+namespace ForeverPHP\Http\TemplateEngines;
 
 /**
  * Interface base para los motores de rendereo de templates.

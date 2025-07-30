@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\View;
+<?php
+
+namespace ForeverPHP\View;
 
 use ForeverPHP\Core\App;
 use ForeverPHP\Core\Exceptions\ViewException;
@@ -17,7 +19,8 @@ class View
     public $restful = false;
 
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Importa ya sea modelos o vistas de la App en ejecución o
@@ -62,9 +65,9 @@ class View
 
         // Valida el tipo de objeto a importar
         if ($type === 'model') {
-            $pathToImport .= 'models/' . $import;
+            $pathToImport .= "models/$import";
         } elseif ($type === 'view') {
-            $pathToImport .= 'views/' . $import;
+            $pathToImport .= "views/$import";
         } else {
             throw new ViewException("Imported object type ($type) is invalid.");
         }
@@ -86,7 +89,8 @@ $data = array();
 if (DEBUG) {
 if (Settings::exists('csrf_token')) {
 if (!CSRF::validate_token()) {
-throw new SecurityException('Acceso denegado, token inválido. Es imposible procesar tu solicitud vuelve al inicio o cierra esta página.');
+throw new SecurityException('Acceso denegado, token inválido. Es imposible procesar tu solicitud
+vuelve al inicio o cierra esta página.');
 //return;
 }
 }

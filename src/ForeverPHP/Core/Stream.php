@@ -49,8 +49,8 @@ class Stream
 
     private function __construct()
     {
-        $this->data = array();
-        $this->headerData = array();
+        $this->data = [];
+        $this->headerData = [];
         $this->buffer = '';
         $this->lastIndex = 0;
     }
@@ -62,7 +62,7 @@ class Stream
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static();
         }
 
@@ -126,7 +126,7 @@ class Stream
      */
     public function clean()
     {
-        $this->data = array();
+        $this->data = [];
         $this->buffer = '';
         $this->lastIndex = 0;
     }

@@ -15,7 +15,7 @@ class Cookie
      *
      * @var array
      */
-    private $cookiesExpires = array();
+    private $cookiesExpires = [];
 
     /**
      * Contiene la instancia singleton de Cookie.
@@ -35,7 +35,7 @@ class Cookie
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static();
         }
 
@@ -159,7 +159,7 @@ class Cookie
     public function remove($name, $path = null, $domain = null, $secure = false, $httpOnly = false)
     {
         if ($this->exists($name)) {
-            $expire = time() - (3600 * 24 * 365);
+            $expire = time() - 3600 * 24 * 365;
 
             $this->set($name, '', $expire, $path, $domain, $secure, $httpOnly);
         }

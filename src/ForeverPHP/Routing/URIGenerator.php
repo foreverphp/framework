@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Routing;
+<?php
+
+namespace ForeverPHP\Routing;
 
 /**
  * Generador de URIs.
@@ -8,5 +10,4 @@
  */
 class URIGenerator
 {
-
 }

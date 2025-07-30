@@ -1,4 +1,4 @@
-## ForeverPHP
+# ForeverPHP
 
 [![Latest Stable Version](https://poser.pugx.org/foreverphp/framework/v/stable)](https://packagist.org/packages/foreverphp/framework)
 [![Total Downloads](https://poser.pugx.org/foreverphp/framework/downloads)](https://packagist.org/packages/foreverphp/framework)
@@ -8,6 +8,6 @@ ForeverPHP es un framework pensado para una o múltiples aplicaciones, desarroll
 
 Con el puedes crear desde un simple sitio web hasta complejos sistemas.
 
-### Licencia
+## Licencia
 
 ForeverPHP es software de código abierto bajo licencia [MIT licence](http://opensource.org/licences/MIT)

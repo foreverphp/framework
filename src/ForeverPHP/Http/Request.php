@@ -38,7 +38,7 @@ class Request
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static();
         }
 
@@ -51,8 +51,8 @@ class Request
 
         if ($this->params == null) {
             $requestMethod = $_SERVER['REQUEST_METHOD'];
-            $this->files = array();
-            $this->params = array();
+            $this->files = [];
+            $this->params = [];
 
             if ($requestMethod == 'GET') {
                 $this->method = 'get';
@@ -73,11 +73,7 @@ class Request
                 $requestContent = file_get_contents("php://input");
                 parse_str($requestContent, $requestParams);
 
-                if ($requestMethod == 'PUT') {
-                    $this->method = 'put';
-                } else {
-                    $this->method = 'delete';
-                }
+                $this->method = ($requestMethod == 'PUT') ? 'put' : 'delete';
             }
 
             // Verifica si hay archivos enviados
@@ -88,11 +84,13 @@ class Request
             }
 
             foreach ($requestParams as $name => $value) {
-                if ($name == 'csrfToken') {
-                    // Almaceno el token CSRF para luego validarlo
-                    Settings::getInstance()->set($name, $value);
-                } else {
-                    $this->params[$name] = $value;
+                switch ($name) {
+                    case 'csrfToken':
+                        Settings::getInstance()->set($name, $value);
+                        break;
+                    default:
+                        $this->params[$name] = $value;
+                        break;
                 }
             }
         }
@@ -101,12 +99,13 @@ class Request
     public function register($params = null)
     {
         if (!$this->registered) {
-            if ($params == null) {
-                $this->loadRequest();
-            } else {
-                // Parametros pasados por Url
-                // Ejemplo: posts/post/12 (posts/post/{id})
-                $this->params = $params;
+            switch ($params) {
+                case null:
+                    $this->loadRequest();
+                    break;
+                default:
+                    $this->params = $params;
+                    break;
             }
 
             $this->registered = true;
@@ -150,7 +149,7 @@ class Request
 
     public function method()
     {
-        return self::$_method;
+        return self::$method;
     }
 
     public function isMethod($method)
@@ -193,7 +192,7 @@ class Request
 
     public function exists($name)
     {
-        if (!is_null($this->params)) {
+        if ($this->params !== null) {
             if (array_key_exists($name, $this->params)) {
                 return true;
             }

@@ -1,5 +1,7 @@
 <?php
 
+namespace ForeverPHP\Database;
+
 /**
  * foreverPHP - Framework MVT (Model - View - Template)
  *
@@ -16,12 +18,6 @@
  * @link        http://www.emarva.com/foreverphp
  * @since       Version 0.5.0
  */
-
-/**
- * SERA LA ALTERNATIVA AVANZADA A MODEL
- */
-
 class Tentacles
 {
-    //put your code here
 }

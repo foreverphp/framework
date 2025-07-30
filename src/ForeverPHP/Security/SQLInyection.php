@@ -1,4 +1,7 @@
 <?php
+
+namespace ForeverPHP\Security;
+
 /**
  * foreverPHP - Framework MVT (Model - View - Template)
  *
@@ -17,15 +20,22 @@
 
 class SQLInyection
 {
-    private $_keywords = array(
-        'SELECT', 'select',
-        'COPY', 'copy',
-        'DELETE', 'delete',
-        'DROP', 'drop',
-        'DUMP', 'dump',
-        ' OR ', ' or ',
+    private $keywords = [
+        'SELECT',
+        'select',
+        'COPY',
+        'copy',
+        'DELETE',
+        'delete',
+        'DROP',
+        'drop',
+        'DUMP',
+        'dump',
+        ' OR ',
+        ' or ',
         '%',
-        'LIKE', 'like',
+        'LIKE',
+        'like',
         '--',
         '^',
         '[',
@@ -36,10 +46,9 @@ class SQLInyection
         '?',
         '=',
         '&',
-    );
+    ];
 
     public static function analize($query)
     {
-
     }
 }

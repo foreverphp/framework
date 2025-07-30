@@ -30,7 +30,7 @@ class Hash
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static();
         }
 
@@ -44,6 +44,7 @@ class Hash
 
     private function makeSHA1($value)
     {
+        return sha1($value);
     }
 
     public function make($values, $type = 'md5')

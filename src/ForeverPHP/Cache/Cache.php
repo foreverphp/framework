@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Cache;
+<?php
+
+namespace ForeverPHP\Cache;
 
 use ForeverPHP\Core\Facades\Settings;
 
@@ -109,7 +111,7 @@ class Cache
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static();
             static::$instance->load();
         }

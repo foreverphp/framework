@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Cache;
+<?php
+
+namespace ForeverPHP\Cache;
 
 use ForeverPHP\Cache\CacheInterface;
 
@@ -66,11 +68,9 @@ class FileCache implements CacheInterface
 
     public function get($key)
     {
-
     }
 
     public function remove($key)
     {
-
     }
 }

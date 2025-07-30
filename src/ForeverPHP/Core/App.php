@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core;
+<?php
+
+namespace ForeverPHP\Core;
 
 use ForeverPHP\Core\ClassLoader;
 use ForeverPHP\Core\Exceptions\AppException;
@@ -38,7 +40,7 @@ class App
      *
      * @var array
      */
-    private $middlewares = array();
+    private $middlewares = [];
 
     /**
      * Contiene la instancia singleton de App.
@@ -48,7 +50,8 @@ class App
     private static $instance;
 
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Obtiene o crea la instancia singleton de App.
@@ -57,7 +60,7 @@ class App
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static();
         }
 
@@ -200,7 +203,7 @@ class App
 
         // Creo la vista y la ejecuto y le asigno el request a la vista para manipulacion interna
         if (Settings::getInstance()->get('usingNamespaces')) {
-            $view = '\\Apps\\' . $this->appName . '\\Views\\' . $viewPath . $view;
+            $view = "\\Apps\\{$this->appName}\\Views\\$viewPath$view";
         }
 
         $v = new $view();

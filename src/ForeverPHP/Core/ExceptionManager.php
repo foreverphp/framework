@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core;
+<?php
+
+namespace ForeverPHP\Core;
 
 use ForeverPHP\Core\Facades\Context;
 use ForeverPHP\Core\Facades\Redirect;
@@ -18,7 +20,19 @@ class ExceptionManager
      *
      * @var string
      */
-    private static $errors = array();
+    private static $errors = [];
+
+    /**
+     * Almacena los errores manejados.
+     * @var array
+     */
+    private static $handledErrors = [];
+
+    /**
+     * Flag para evitar recursión infinita
+     * @var bool
+     */
+    private static $handling;
 
     /**
      * Permite mostrar un excepción propia.
@@ -29,6 +43,12 @@ class ExceptionManager
      */
     private static function viewException($type, $message)
     {
+        if (static::$handling) {
+            return;
+        }
+
+        static::$handling = true;
+
         $template = 'exception';
         $title = 'Exception';
 
@@ -53,11 +73,10 @@ class ExceptionManager
 
             if (is_array($contentBuffer)) {
                 $contentBuffer['ForeverPHPException'] = Context::all();
-
                 $response->json($contentBuffer)->make();
             } else {
                 // Si hay buffer de salida previo cambio el template
-                if (ob_get_length() != 0) {
+                if (ob_get_level() > 0 && ob_get_length() > 0) {
                     $template = 'exception-block';
                 }
 
@@ -67,12 +86,44 @@ class ExceptionManager
                 $response->render($template)->make();
             }
         } else {
-            // Termino el buffer de salida y lo limpio
-            ob_end_clean();
+            // Termino el buffer de salida y lo limpio de forma segura
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
 
             // Redirijo a un error 500
             return Redirect::error(500);
         }
+
+        static::$handling = false;
+    }
+
+    /**
+     * Marca un error como manejado.
+     * @param array $errorDetails
+     * @return void
+     */
+    private static function markErrorAsHandled(array $errorDetails)
+    {
+        $signature = md5("{$errorDetails['message']}|{$errorDetails['file']}|{$errorDetails['line']}");
+        static::$handledErrors[$signature] = true;
+
+        // Actualizar el estado en el array de errores
+        foreach (static::getErrors() as &$error) {
+            if ($error['signature'] === $signature) {
+                $error['handled'] = true;
+            }
+        }
+    }
+
+    /**
+     * Verifica si un error ya fue manejado
+     * @param string $signature
+     * @return bool
+     */
+    private static function isErrorHandled($signature)
+    {
+        return isset(static::$handledErrors[$signature]);
     }
 
     /**
@@ -89,16 +140,31 @@ class ExceptionManager
          * Primero se valida si viene el parametro $exception y que sea
          * de tipo Exception o herede de este.
          */
-        if ($e != null) {
-            if ($e instanceof \Throwable) {
-                // Crear un mensaje mas detallado
-                $message = 'Message: ' . $e->getMessage() . '<br />';
-                $message .= 'Previus: ' . $e->getPrevious() . '<br />';
-                $message .= 'Code: ' . $e->getCode() . '<br />';
-                $message .= 'File: ' . $e->getFile() . '<br />';
-                $message .= 'Line: ' . $e->getLine() . '<br />';
-                $message .= 'Trace: ' . $e->getTraceAsString() . '<br />';
+        if ($e !== null && $e instanceof \Throwable) {
+            // Crear signature del error
+            $errorDetails = [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ];
+
+            $signature = md5("{$errorDetails['message']}|{$errorDetails['file']}|{$errorDetails['line']}");
+
+            // Si ya fue manejado, no procesarlo nuevamente
+            if (static::isErrorHandled($signature)) {
+                return;
             }
+
+            // Crear un mensaje más detallado
+            $message = 'Message: ' . $e->getMessage() . '<br />';
+            $message .= 'Previous: ' . ($e->getPrevious() ? $e->getPrevious()->getMessage() : 'None') . '<br />';
+            $message .= 'Code: ' . $e->getCode() . '<br />';
+            $message .= 'File: ' . $e->getFile() . '<br />';
+            $message .= 'Line: ' . $e->getLine() . '<br />';
+            $message .= 'Trace: <pre>' . $e->getTraceAsString() . '</pre><br />';
+
+            // Marcar el error como manejado ANTES de procesarlo
+            static::markErrorAsHandled($errorDetails);
         }
 
         static::viewException(0, $message);
@@ -112,91 +178,113 @@ class ExceptionManager
      * @param  string $errstr
      * @param  string $errfile
      * @param  int    $errline
-     * @return void
+     * @return bool
      */
     public static function errorHandler($errno, $errstr, $errfile, $errline)
     {
+        // Si el error ya fue manejado, ignorarlo
+        $errorSignature = md5("$errstr|$errfile|$errline");
+
+        if (static::isErrorHandled($errorSignature)) {
+            return true;
+        }
+
         /**
          * Si la configuración "debugHideNotices" existe, indica si se
          * muestran o no los errores de tipo E_NOTICE.
          */
         if (Settings::getInstance()->exists('debugHideNotices')) {
             if ($errno == E_NOTICE && Settings::getInstance()->get('debugHideNotices')) {
-                return;
+                return true;
             }
         }
 
-        switch ($errno) {
-            case E_ERROR: // 1
-                $type = 'E_ERROR';
-                break;
-            case E_WARNING: // 2
-                $type = 'E_WARNING';
-                break;
-            case E_PARSE: // 4
-                $type = 'E_PARSE';
-                break;
-            case E_NOTICE: // 8
-                $type = 'E_NOTICE';
-                break;
-            case E_CORE_ERROR: // 16
-                $type = 'E_CORE_ERROR';
-                break;
-            case E_CORE_WARNING: // 32
-                $type = 'E_CORE_WARNING';
-                break;
-            case E_COMPILE_ERROR: // 64
-                $type = 'E_COMPILE_ERROR';
-                break;
-            case E_CORE_WARNING: // 128
-                $type = 'E_COMPILE_WARNING';
-                break;
-            case E_USER_ERROR: // 256
-                $type = 'E_USER_ERROR';
-                break;
-            case E_USER_WARNING: // 512
-                $type = 'E_USER_WARNING';
-                break;
-            case E_USER_NOTICE: // 1024
-                $type = 'E_USER_NOTICE';
-                break;
-            case E_STRICT: // 2048
-                $type = 'E_STRICT';
-                break;
-            case E_RECOVERABLE_ERROR: // 4096
-                $type = 'E_RECOVERABLE_ERROR';
-                break;
-            case E_DEPRECATED: // 8192
-                $type = 'E_DEPRECATED';
-                break;
-            case E_USER_DEPRECATED: // 16384
-                $type = 'E_USER_DEPRECATED';
-                break;
-        }
+        $type = match ($errno) {
+            E_ERROR => 'E_ERROR',
+            E_WARNING => 'E_WARNING',
+            E_PARSE => 'E_PARSE',
+            E_NOTICE => 'E_NOTICE',
+            E_CORE_ERROR => 'E_CORE_ERROR',
+            E_CORE_WARNING => 'E_CORE_WARNING',
+            E_COMPILE_ERROR => 'E_COMPILE_ERROR',
+            E_COMPILE_WARNING => 'E_COMPILE_WARNING',
+            E_USER_ERROR => 'E_USER_ERROR',
+            E_USER_WARNING => 'E_USER_WARNING',
+            E_USER_NOTICE => 'E_USER_NOTICE',
+            E_STRICT => 'E_STRICT',
+            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+            E_DEPRECATED => 'E_DEPRECATED',
+            E_USER_DEPRECATED => 'E_USER_DEPRECATED',
+        };
 
-        array_push(static::$errors, array(
+        // Agregar el error al array ANTES de marcarlo como manejado
+        static::$errors[] = [
             'type' => $type,
             'message' => $errstr,
             'file' => $errfile,
+            'line' => $errline,
+            'handled' => false,
+            'signature' => $errorSignature,
+            'errno' => $errno,
+            'timestamp' => microtime(true)
+        ];
+
+        // Marcar como manejado inmediatamente
+        $errorDetails = [
+            'message' => $errstr,
+            'file' => $errfile,
             'line' => $errline
-        ));
+        ];
+        static::markErrorAsHandled($errorDetails);
+
+        // Para errores fatales, no lanzar excepción, solo registrar
+        $fatalErrors = [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE];
+        if (in_array($errno, $fatalErrors)) {
+            return true; // No lanzar excepción para errores fatales
+        }
+
+        // Para otros tipos de errores, lanzar excepción
+        throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 
     /**
-     * Muestra los errores.
+     * Obtiene la lista de errores de forma segura
+     * @return array
+     */
+    private static function getErrors(): array
+    {
+        return is_array(static::$errors) ? static::$errors : [];
+    }
+
+    /**
+     * Obtiene solo los errores no manejados
+     * @return array
+     */
+    private static function getUnhandledErrors(): array
+    {
+        return array_filter(static::getErrors(), fn($error) => !$error['handled']);
+    }
+
+    /**
+     * Muestra los errores no manejados.
      *
      * @return void
      */
     private static function showErrors()
     {
-        if (count(static::$errors) > 0) {
-            $errorsList = '';
+        $unhandledErrors = static::getUnhandledErrors();
 
-            foreach (static::$errors as $error) {
-                $errorsList .= 'Tipo: ' . $error['type'] . '<br>';
-                $errorsList .= 'Mensaje: ' . $error['message'] . '<br>';
-                $errorsList .= 'Archivo: ' . $error['file'] . '<br>';
-                $errorsList .= 'Line: ' . $error['line'] . '<br><br>';
+        if (count($unhandledErrors) > 0) {
+            $errorsList = '<h3>Unhandled Errors:</h3>';
+
+            foreach ($unhandledErrors as $error) {
+                $errorsList .= '<div style="margin-bottom: 15px; padding: 10px; border-left: 3px solid #ff0000;">';
+                $errorsList .= '<strong>Type:</strong> ' . $error['type'] . '<br>';
+                $errorsList .= '<strong>Message:</strong> ' . htmlspecialchars($error['message']) . '<br>';
+                $errorsList .= '<strong>File:</strong> ' . $error['file'] . '<br>';
+                $errorsList .= '<strong>Line:</strong> ' . $error['line'] . '<br>';
+                $errorsList .= '<strong>Timestamp:</strong> ' . date('Y-m-d H:i:s', $error['timestamp']) . '<br>';
+                $errorsList .= '</div>';
             }
 
             static::viewException(1, $errorsList);
@@ -210,27 +298,71 @@ class ExceptionManager
      */
     public static function shutdown()
     {
-        if (count(static::$errors) == 0) {
+        // Verificar si hay errores no manejados
+        $unhandledErrors = static::getUnhandledErrors();
+
+        if (empty($unhandledErrors)) {
             $error = error_get_last();
 
-            if (!is_null($error)) {
+            if ($error !== null) {
                 $isFatal = in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE]);
 
                 if ($isFatal) {
-                    ob_start();
+                    $signature = md5("{$error['message']}|{$error['file']}|{$error['line']}");
 
-                    static::errorHandler($error['type'], $error['message'], $error['file'], $error['line']);
+                    // Solo procesar si no fue manejado previamente
+                    if (!static::isErrorHandled($signature)) {
+                        // Iniciar buffer de salida para capturar cualquier output
+                        if (ob_get_level() === 0) {
+                            ob_start();
+                        }
+
+                        static::errorHandler($error['type'], $error['message'], $error['file'], $error['line']);
+                        static::showErrors();
+                        return; // No llamar ob_end_flush si ya mostramos errores
+                    }
                 }
             }
         } else {
-            // Muestra los errores
             static::showErrors();
+            return;
         }
 
         /**
-         * Como ultima funcion en ejecutarse, es aca donde se termina el flujo
-         * del buffer de salida y lo muestra.
+         * Como ultima función en ejecutarse, es acá donde se termina el flujo
+         * del buffer de salida y lo muestra - solo si no se mostraron errores.
          */
-        ob_end_flush();
+        if (ob_get_level() > 0) {
+            ob_end_flush();
+        }
+    }
+
+    /**
+     * Método para obtener estadísticas de errores (útil para debugging)
+     * @return array
+     */
+    public static function getErrorStats(): array
+    {
+        $errors = static::getErrors();
+        $handled = array_filter($errors, fn($error) => $error['handled']);
+        $unhandled = array_filter($errors, fn($error) => !$error['handled']);
+
+        return [
+            'total' => count($errors),
+            'handled' => count($handled),
+            'unhandled' => count($unhandled),
+            'errors' => $errors
+        ];
+    }
+
+    /**
+     * Limpia el registro de errores (útil para testing)
+     * @return void
+     */
+    public static function clearErrors(): void
+    {
+        static::$errors = [];
+        static::$handledErrors = [];
+        static::$handling = false;
     }
 }

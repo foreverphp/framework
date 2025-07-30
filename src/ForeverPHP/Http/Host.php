@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Http;
+<?php
+
+namespace ForeverPHP\Http;
 
 /**
  * Permite obtener informacion del cliente
@@ -16,7 +18,8 @@ class Host
     private static $instance;
 
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Obtiene o crea la instacia singleton de Host
@@ -25,7 +28,7 @@ class Host
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static();
         }
 

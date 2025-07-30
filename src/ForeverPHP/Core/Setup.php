@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core;
+<?php
+
+namespace ForeverPHP\Core;
 
 use ForeverPHP\Core\Exceptions\SetupException;
 

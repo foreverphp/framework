@@ -98,11 +98,11 @@ class Response
      * Devuelve una respuesta en formato JSON.
      *
      * @param  \ForeverPHP\View\Context|array $context
-     * @return \ForeverPHP\Http\JsonResponse
+     * @return mixed
      */
-    public function json($content, $statusCode = 200)
+    public function json($content, $statusCode = 200): JsonResponse | bool
     {
-        if (!is_null($content)) {
+        if ($content !== null) {
             return new JsonResponse($content, $statusCode);
         }
 

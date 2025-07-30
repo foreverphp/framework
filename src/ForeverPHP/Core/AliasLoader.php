@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core;
+<?php
+
+namespace ForeverPHP\Core;
 
 /**
  * Realiza la carga de los alias de clases.
@@ -37,7 +39,7 @@ class AliasLoader
      * @param array $aliases
      * @return void
      */
-    public function __construct($aliases = array())
+    public function __construct($aliases = [])
     {
         $this->aliases = $aliases;
     }
@@ -50,7 +52,7 @@ class AliasLoader
      */
     public static function getInstance($aliases)
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static($aliases);
         }
 
@@ -77,7 +79,7 @@ class AliasLoader
      */
     private function prependToLoaderStack()
     {
-        spl_autoload_register(array($this, 'load'), true, true);
+        spl_autoload_register([$this, 'load'], true, true);
     }
 
     /**

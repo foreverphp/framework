@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core\Helpers;
+<?php
+
+namespace ForeverPHP\Core\Helpers;
 
 /**
  * Funciones auxiliares globales.

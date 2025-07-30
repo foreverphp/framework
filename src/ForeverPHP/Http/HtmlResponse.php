@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Http;
+<?php
+
+namespace ForeverPHP\Http;
 
 use ForeverPHP\Core\App;
 use ForeverPHP\Core\Exceptions\SecurityException;
@@ -37,6 +39,13 @@ class HtmlResponse implements ResponseInterface
      */
     private $usingCache;
 
+     /**
+     * Codigo de estado de la respuesta.
+     *
+     * @var integer
+     */
+    private $statusCode;
+
     public function __construct($template, $statusCode = 200, $usingCache = false)
     {
         $this->template = $template;
@@ -46,14 +55,16 @@ class HtmlResponse implements ResponseInterface
 
     public function make($returnRender = false)
     {
-        $data = array();
+        $data = [];
 
         // Valido el token CSRF, el cual solo esta disponible en GET o POST
         //if (Settings::getInstance()->inDebug()) {
         if (Settings::getInstance()->exists('csrfToken')) {
             if (!CSRF::validateToken()) {
-                throw new SecurityException('Access denied, invalid token. It becomes impossible to process your ' .
-                    'request to start or close this page.');
+                throw new SecurityException(
+                    'Access denied, invalid token. It becomes impossible to process your ' .
+                    'request to start or close this page.'
+                );
             }
         }
         /*} else {
@@ -145,7 +156,7 @@ class HtmlResponse implements ResponseInterface
 
                 // POR AHORA SOLO GUARDA EL CACHE PARA PRUEBAS NO VALIDA DURACION, NI SI EXISTE
                 // Guarda el template en el cache
-                Cache::set($this->template . '.template.cache', $cacheValue);
+                Cache::set("{$this->template}.template.cache", $cacheValue);
             }
         }
         //}

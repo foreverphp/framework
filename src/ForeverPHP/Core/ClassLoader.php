@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core;
+<?php
+
+namespace ForeverPHP\Core;
 
 class ClassLoader
 {
@@ -49,7 +51,7 @@ class ClassLoader
             $class = substr($class, 1);
         }
 
-        return str_replace(array('\\', '_'), DS, $class) . '.php';
+        return str_replace(['\\', '_'], DS, $class) . '.php';
     }
 
     /**
@@ -60,7 +62,7 @@ class ClassLoader
     public static function register()
     {
         if (!static::$registered) {
-            static::$registered = spl_autoload_register(array('ForeverPHP\Core\ClassLoader', 'load'));
+            static::$registered = spl_autoload_register(['ForeverPHP\Core\ClassLoader', 'load']);
         }
     }
 
@@ -83,8 +85,8 @@ class ClassLoader
      */
     public static function removeDirectories($directories = null)
     {
-        if (is_null($directories)) {
-            static::$directories = array();
+        if ($directories === null) {
+            static::$directories = [];
         } else {
             static::$directories = array_diff(static::$directories, (array) $directories);
         }

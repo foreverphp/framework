@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Auth;
+<?php
+
+namespace ForeverPHP\Auth;
 
 /**
  * Autentificacion basica HTTP.
@@ -8,14 +10,14 @@
  */
 class BasicAuth
 {
-    private static $_username = null;
-    private static $_password = null;
+    private static $username = null;
+    private static $password = null;
 
-    public static function send_header($realm, $message)
+    public static function sendHeader($realm, $message)
     {
-        header('WWW-Authenticate: Basic realm="' . $message . '"');
+        header("WWW-Authenticate: Basic realm=\"$message\"");
         header('HTTP/1.0 401 Unauthorized');
-        echo $message . "\n";
+        echo "$message\n";
         exit;
     }
 
@@ -33,11 +35,11 @@ class BasicAuth
 
     public static function username()
     {
-        return self::$_username;
+        return self::$username;
     }
 
     public static function password()
     {
-        return self::$_password;
+        return self::$password;
     }
 }

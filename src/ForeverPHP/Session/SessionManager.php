@@ -29,7 +29,7 @@ class SessionManager
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static();
         }
 
@@ -145,7 +145,7 @@ class SessionManager
 
         if ($this->isSessionStarted()) {
             // Destruir todas las variables de sesión
-            $_SESSION = array();
+            $_SESSION = [];
 
             /**
              * Si se desea destruir la sesión completamente, borre también la cookie de sesión.

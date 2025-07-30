@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Http;
+<?php
+
+namespace ForeverPHP\Http;
 
 /**
  * Contiene información de un archivo enviado por el request.
@@ -7,7 +9,6 @@
  */
 class RequestFile
 {
-
     private $filename = '';
 
     private $name = '';
@@ -99,7 +100,7 @@ class RequestFile
         }
 
         // Retorno TRUE si se movio el archivo, de lo contrario FALSE
-        $result = move_uploaded_file($this->realPath, $path . $newFilename);
+        $result = move_uploaded_file($this->realPath, "$path$newFilename");
 
         return $result;
     }

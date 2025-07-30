@@ -6,6 +6,7 @@ use ForeverPHP\Core\Facades\App;
 use ForeverPHP\Core\Facades\Storage;
 use ForeverPHP\Core\Settings;
 use ForeverPHP\Http\TemplateEngines\TemplateInterface;
+use ForeverPHP\Http\TemplateEngines\TemplateVarNotFound;
 use ForeverPHP\Security\CSRF;
 
 /**
@@ -13,10 +14,6 @@ use ForeverPHP\Security\CSRF;
  *
  * @since   Version 0.1.0
  */
-class TemplateVarNotFound extends \Exception
-{
-}
-
 class Chameleon implements TemplateInterface
 {
     private $templatesDir = "";
@@ -110,7 +107,7 @@ class Chameleon implements TemplateInterface
                             ".html";
                     }
                 } else {
-                    $templateFile = $this->templatesDir . $include[2] . ".html";
+                    $templateFile = "{$this->templatesDir}$include[2].html";
                 }
 
                 if (Storage::exists($templateFile)) {
@@ -146,11 +143,7 @@ class Chameleon implements TemplateInterface
         if (count($results) > 0) {
             foreach ($results as $block) {
                 $regexReplace =
-                    "#\{\% block " .
-                    $block[1] .
-                    $block[2] .
-                    $block[3] .
-                    " \%\}\{\% endblock \%\}#";
+                    "#\\{\\% block $block[1]$block[2]$block[3] \\%\\}\\{\\% endblock \\%\\}#";
 
                 // Busco el bloque en el template base y lo reemplazo
                 $this->dataRenderBase = preg_replace(
@@ -181,9 +174,9 @@ class Chameleon implements TemplateInterface
             //$url_base = (URL_BASE === '/') ? '' : URL_BASE;
 
             foreach ($results as $static) {
-                $regexReplace = "#\{\% static '" . $static[1] . "' \%\}#";
+                $regexReplace = "#\\{\\% static '$static[1]' \\%\\}#";
                 //$static_file = $url_base . $this->static_dir . $static[1];
-                $staticFile = $this->staticDir . $static[1];
+                $staticFile = "{$this->staticDir}$static[1]";
 
                 $this->dataRender = preg_replace(
                     $regexReplace,
@@ -211,7 +204,7 @@ class Chameleon implements TemplateInterface
             //$url_base = (URL_BASE === '/') ? '' : URL_BASE;
 
             foreach ($results as $static) {
-                $regexReplace = "#\{\% url '" . $static[1] . "' \%\}#";
+                $regexReplace = "#\\{\\% url '$static[1]' \\%\\}#";
                 //$static_file = $url_base . $this->static_dir . $static[1];
                 //$static_file = URL_BASE . $static[1];
                 $staticFile = $static[1];
@@ -416,11 +409,7 @@ class Chameleon implements TemplateInterface
         } else {
             if (Settings::getInstance()->inDebug()) {
                 throw new TemplateVarNotFound(
-                    'The variable \'' .
-                    $varNotFound .
-                    '\' is not defined for template \'' .
-                    $this->template .
-                    '\'.'
+                    "The variable '$varNotFound' is not defined for template '{$this->template}'."
                 );
             } else {
                 $this->dataRender = str_replace(
@@ -579,7 +568,7 @@ class Chameleon implements TemplateInterface
 
         $this->dataRender = preg_replace(
             $regex,
-            "/" . "static/",
+            "/static/",
             $this->dataRender
         );
     }
@@ -596,9 +585,7 @@ class Chameleon implements TemplateInterface
         if (count($results) > 0) {
             $token = CSRF::generateToken();
             $inputTag =
-                '<input type="hidden" name="csrfToken" value="' .
-                $token .
-                '" />';
+                "<input type=\"hidden\" name=\"csrfToken\" value=\"$token\" />";
 
             $this->dataRender = preg_replace(
                 $regex,

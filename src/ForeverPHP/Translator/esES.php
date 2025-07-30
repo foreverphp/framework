@@ -1,4 +1,7 @@
 <?php
+
+namespace ForeverPHP\Translator;
+
 class EsEsLang extends Context
 {
     // VER COMO IMPLEMENTARLOS

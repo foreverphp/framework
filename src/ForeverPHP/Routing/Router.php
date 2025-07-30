@@ -23,8 +23,8 @@ use ForeverPHP\View\Context;
 class Router
 {
     private $uriBase = '/';
-    private $routes = array();
-    private $complexRoutes = array();
+    private $routes = [];
+    private $complexRoutes = [];
     private $nameForRoute = null;
 
     /**
@@ -45,7 +45,7 @@ class Router
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static();
         }
 
@@ -56,13 +56,15 @@ class Router
     {
         $url = $route;
 
-        if (strlen($url) == 0) {
-            $url = '/';
-        } else {
-            // Busca el ultimo slash si no esta se agrega
-            if ($url[strlen($url) - 1] != '/') {
-                $url .= '/';
-            }
+        switch (strlen($url)) {
+            case 0:
+                $url = '/';
+                break;
+            default:
+                if ($url[strlen($url) - 1] != '/') {
+                    $url .= '/';
+                }
+                break;
         }
 
         return $url;
@@ -87,7 +89,7 @@ class Router
     private function parseRoute($route, &$paramsUrl)
     {
         $newRoute = $route;
-        $matches = array();
+        $matches = [];
 
         // Patrones de busqueda
         $regexFindParam = "/{([0-9A-Za-z\-_]*)([?])?}/";
@@ -137,7 +139,9 @@ class Router
         // Se valida si es una vista a ejecutar o una funcion anonima
         if (is_string($view)) {
             if (!strpos($view, '@')) {
-                throw new RouterException("Revise la ruta ($route) al parecer la ruta a la vista no esta correctamente escrita.");
+                throw new RouterException(
+                    "Revise la ruta ($route) al parecer la ruta a la vista no esta correctamente escrita."
+                );
             }
 
             // Dividir la vista en app, vista y funcion si es que esta definida
@@ -181,24 +185,27 @@ class Router
         }
 
         // Se valida si la ruta trae parametros por ruta
-        $paramsUrl = array();
+        $paramsUrl = [];
         $route = $this->parseRoute($route, $paramsUrl);
 
         // Matriz con el contenido de la ruta
-        $routeContent = array(
+        $routeContent = [
             'app' => $app,
             'view' => $v,
             'method' => $method,
             'paramsUrl' => $paramsUrl,
             'name' => $this->nameForRoute,
             'middlewares' => $middlewares,
-        );
+        ];
 
         // Valida si es ruta normal o compleja
-        if (count($paramsUrl) == 0) {
-            $this->routes[$route] = $routeContent;
-        } else {
-            $this->complexRoutes[$route] = $routeContent;
+        switch (count($paramsUrl)) {
+            case 0:
+                $this->routes[$route] = $routeContent;
+                break;
+            default:
+                $this->complexRoutes[$route] = $routeContent;
+                break;
         }
     }
 
@@ -246,13 +253,13 @@ class Router
 
         if (count($this->complexRoutes) > 0) {
             foreach ($this->complexRoutes as $complexRoute => $_routeContent) {
-                $regex = '#^' . $complexRoute . '$#m';
+                $regex = "#^$complexRoute\$#m";
 
                 // Busca los parametreos dentro de la ruta
                 preg_match_all($regex, $route, $matches, PREG_SET_ORDER);
 
                 if (count($matches) > 0) {
-                    $paramsUrl = array();
+                    $paramsUrl = [];
                     $i = 0; // Indice del parametro
 
                     // Se saca el primer elemento de las coincidencia ya que no se usara
@@ -273,11 +280,7 @@ class Router
                         Request::register($paramsUrl);
                     }
 
-                    if ($_routeContent['app'] != null) {
-                        $routeContent = $_routeContent;
-                    } else {
-                        $routeContent = $_routeContent['function'];
-                    }
+                    $routeContent = ($_routeContent['app'] != null) ? $_routeContent : $_routeContent['function'];
 
                     /**
                      * Devuelvo la ruta compleja para obtener su nombre y
@@ -343,16 +346,19 @@ class Router
             $redirectPath = SessionManager::getInstance()->get('redirectPath', 'redirect');
             $requestURI = $_SERVER['REQUEST_URI'];
 
-            if ($redirectPath == $requestURI) {
-                $headers = SessionManager::getInstance()->get('headersInRedirect', 'redirect');
+            switch ($redirectPath) {
+                case $requestURI:
+                    $headers = SessionManager::getInstance()->get('headersInRedirect', 'redirect');
 
-                if ($headers != false) {
-                    foreach ($headers as $key => $value) {
-                        header($key . ': ' . $value);
+                    if ($headers != false) {
+                        foreach ($headers as $key => $value) {
+                            header("$key: $value");
+                        }
                     }
-                }
-            } else {
-                SessionManager::getInstance()->set('headersInRedirect', false, 'redirect');
+                    break;
+                default:
+                    SessionManager::getInstance()->set('headersInRedirect', false, 'redirect');
+                    break;
             }
         }
     }
@@ -429,7 +435,7 @@ class Router
                 // Ejecuta los decoradores de la ruta si es que hay
                 $middlewares = $routeContent['middlewares'];
 
-                if (!is_null($middlewares)) {
+                if ($middlewares !== null) {
                     foreach ($middlewares as $middleware) {
                         $returnValue = $app->getMiddleware($middleware);
 
@@ -442,7 +448,9 @@ class Router
 
                 $app->run($routeContent);
             } else {
-                throw new AppException("La aplicación ($appName) a la que pertenece la vista no esta cargada en settings.php.");
+                throw new AppException(
+                    "La aplicación ($appName) a la que pertenece la vista no esta cargada en settings.php."
+                );
             }
         } elseif (is_callable($routeContent)) {
             $this->runFunction($routeContent);

@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Database\KeyValueEngines;
+<?php
+
+namespace ForeverPHP\Database\KeyValueEngines;
 
 /**
  * Motor Redis, permite trabajar con este motor de base de datos, tipo

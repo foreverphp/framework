@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Http;
+<?php
+
+namespace ForeverPHP\Http;
 
 /**
  * Interface base para los objetos que devuelven la respuesta

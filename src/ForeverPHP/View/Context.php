@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\View;
+<?php
+
+namespace ForeverPHP\View;
 
 /**
  * Permite administrar de forma mas amigable la variables a trabajar
@@ -39,8 +41,8 @@ class Context
 
     private function __construct()
     {
-        $this->contexts = array();
-        $this->globalContexts = array();
+        $this->contexts = [];
+        $this->globalContexts = [];
         $this->useGlobalContexts = true;
     }
 
@@ -51,7 +53,7 @@ class Context
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
+        if (static::$instance === null) {
             static::$instance = new static();
         }
 
@@ -119,11 +121,7 @@ class Context
         $value = null;
 
         if ($this->exists($name)) {
-            if ($global) {
-                $value = $this->globalContexts[$name];
-            } else {
-                $value = $this->contexts[$name];
-            }
+            $value = $global ? $this->globalContexts[$name] : $this->contexts[$name];
         }
 
         return $value;
@@ -154,6 +152,6 @@ class Context
 
     public function removeAll()
     {
-        $this->contexts = array();
+        $this->contexts = [];
     }
 }

@@ -22,13 +22,13 @@ class FieldType
 
 class BigIntegerField extends FieldType
 {
-    private $_default_attributes = array(
+    private $default_attributes = [
         'autoincrement' => false,
         'null' => true,
         'unique' => false,
         'primary_key' => false,
         'default' => null,
-    );
+    ];
 
     public function __construct($attributes)
     {

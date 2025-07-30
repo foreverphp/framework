@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Http;
+<?php
+
+namespace ForeverPHP\Http;
 
 use ForeverPHP\Core\Facades\Context;
 use ForeverPHP\Http\ResponseInterface;
@@ -25,6 +27,13 @@ class JsonResponse implements ResponseInterface
      */
     private $statusCode;
 
+    /**
+     * Charset de la respuesta
+     *
+     * @var
+     */
+    private $charset;
+
     public function __construct($content, $statusCode = 200, $charset = 'utf-8')
     {
         $this->content = $content;
@@ -34,19 +43,14 @@ class JsonResponse implements ResponseInterface
 
     public function make()
     {
-        $data = array();
+        $data = [];
 
-        if (is_array($this->content)) {
-            $data = $this->content;
-        } else {
-            // Obtiene los datos del contexto
-            $data = Context::all();
-        }
+        $data = (is_array($this->content)) ? $this->content : Context::all();
 
         header('HTTP/1.0 ' . $this->statusCode . ' ' .
             Response::getResponseStatus($this->statusCode), true, $this->statusCode);
-        header('Content-type: application/json; charset: ' . $this->charset);
-        header('Accept-Charset: ' . $this->charset);
+        header("Content-type: application/json; charset: {$this->charset}");
+        header("Accept-Charset: {$this->charset}");
 
         // Comienza la captura del buffer de salida
         ob_start();

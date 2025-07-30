@@ -283,7 +283,7 @@ class ExceptionManager
                 $errorsList .= '<strong>Message:</strong> ' . htmlspecialchars($error['message']) . '<br>';
                 $errorsList .= '<strong>File:</strong> ' . $error['file'] . '<br>';
                 $errorsList .= '<strong>Line:</strong> ' . $error['line'] . '<br>';
-                $errorsList .= '<strong>Timestamp:</strong> ' . date('Y-m-d H:i:s', $error['timestamp']) . '<br>';
+                $errorsList .= '<strong>Timestamp:</strong> ' . date('Y-m-d H:i:s', (int)$error['timestamp']) . '<br>';
                 $errorsList .= '</div>';
             }
 

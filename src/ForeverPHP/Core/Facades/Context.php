@@ -3,7 +3,15 @@
 namespace ForeverPHP\Core\Facades;
 
 /**
- * @method static void import(string $type, string $toImport)
+ * @method static bool exists(string $name)
+ * @method static void set(string $name, string $value, bool $global = false)
+ * @method static void setArray(array $values, bool $global)
+ * @method static mixed get(string $name, bool $global = false)
+ * @method static void useGlobal(string $value)
+ * @method static array all()
+ * @method static void remove(string $name, bool $global = false)
+ * @method static void removeAll()
+ *
  * @see \ForeverPHP\View\Context
  */
 class Context extends Facade

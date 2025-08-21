@@ -2,10 +2,11 @@
 
 namespace ForeverPHP\Routing;
 
-use ForeverPHP\Core\Facades\Context;
-use ForeverPHP\Core\Facades\Settings;
+use ForeverPHP\Core\Helpers\GlobalHelpers;
+use ForeverPHP\Core\Settings;
 use ForeverPHP\Http\RedirectResponse;
 use ForeverPHP\Http\Response;
+use ForeverPHP\View\Context;
 
 /**
  * Permite la redireccion con multiples opciones.
@@ -24,7 +25,7 @@ class Redirect
      * @param  array   $headers
      * @return \ForeverPHP\Http\RedirectResponse
      */
-    public function to($path, $status = 301, $headers = array())
+    public function to($path, $status = 301, $headers = [])
     {
         return $this->makeRedirect($path, $status, $headers);
     }
@@ -56,10 +57,17 @@ class Redirect
          * Retorna un Response para mostrar el mensaje de que algo salio mal
          * este solo se muestra cuando esta en produccion.
          */
-        if (!Settings::inDebug()) {
-            Settings::set('ForeverPHPTemplate', true);
-            Context::set('errno', $errno);
-            Context::set('message', 'Oops, al parecer algo salió mal.');
+        if (!Settings::getInstance()->inDebug()) {
+            // Templates de error disponibles
+            $availableErrors = [400, 401, 403, 404, 429, 500, 502, 503];
+
+            Settings::getInstance()->set('ForeverPHPTemplate', true);
+
+            Context::getInstance()->set('errno', $errno);
+            //Context::set('message', 'Oops, al parecer algo salió mal.');
+            Context::getInstance()->set('errorTitle', GlobalHelpers::lang("errors.errorTitle$errno"));
+            Context::getInstance()->set('errorMessage', GlobalHelpers::lang("errors.errorMessage$errno"));
+
             $response->render('error')->make();
         }
     }

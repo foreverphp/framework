@@ -1,6 +1,6 @@
 <?php
 
-namespace ForeverPHP\Translator;
+namespace ForeverPHP\Lang;
 
 class EnUSLang extends Context
 {

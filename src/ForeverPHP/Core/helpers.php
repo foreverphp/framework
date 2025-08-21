@@ -17,6 +17,7 @@ use ForeverPHP\Core\Helpers\ArrayHelpers;
 use ForeverPHP\Core\Helpers\RouteHelpers;
 use ForeverPHP\Core\Helpers\StringHelpers;
 
+// Carga las variables de entorno desde el archivo .env
 if (Storage::exists(ROOT_PATH . DS . '.env')) {
     $dotenv = \Dotenv\Dotenv::createUnsafeImmutable(ROOT_PATH);
     $dotenv->load();

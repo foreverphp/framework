@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core;
+<?php
+
+namespace ForeverPHP\Core;
 
 use ForeverPHP\Core\Facades\Context;
 use ForeverPHP\Core\Facades\Redirect;
@@ -18,7 +20,7 @@ class ExceptionManager
      *
      * @var string
      */
-    private static $errors = array();
+    private static $errors = [];
 
     /**
      * Permite mostrar un excepción propia.
@@ -30,7 +32,7 @@ class ExceptionManager
     private static function viewException($type, $message)
     {
         $template = 'exception';
-        $title = 'Excepción';
+        $title = 'Exception';
 
         // 1 es Error
         if ($type === 1) {
@@ -78,26 +80,26 @@ class ExceptionManager
     /**
      * Manipulador de excepciones.
      *
-     * @param  Exception $exception
+     * @param \Throwable $e
      * @return void
      */
-    public static function exceptionHandler($exception)
+    public static function exceptionHandler(\Throwable $e)
     {
-        $message = 'Tipo de excepción no valida.';
+        $message = 'Invalid exception type.';
 
         /**
          * Primero se valida si viene el parametro $exception y que sea
          * de tipo Exception o herede de este.
          */
-        if ($exception != null) {
-            if ($exception instanceof \Exception) {
+        if ($e != null) {
+            if ($e instanceof \Throwable) {
                 // Crear un mensaje mas detallado
-                $message = 'Message: ' . $exception->getMessage() . '<br />';
-                $message .= 'Previus: ' . $exception->getPrevious() . '<br />';
-                $message .= 'Code: ' . $exception->getCode() . '<br />';
-                $message .= 'File: ' . $exception->getFile() . '<br />';
-                $message .= 'Line: ' . $exception->getLine() . '<br />';
-                $message .= 'Trace: ' . $exception->getTraceAsString() . '<br />';
+                $message = 'Message: ' . $e->getMessage() . '<br />';
+                $message .= 'Previus: ' . $e->getPrevious() . '<br />';
+                $message .= 'Code: ' . $e->getCode() . '<br />';
+                $message .= 'File: ' . $e->getFile() . '<br />';
+                $message .= 'Line: ' . $e->getLine() . '<br />';
+                $message .= 'Trace: ' . $e->getTraceAsString() . '<br />';
             }
         }
 
@@ -126,60 +128,30 @@ class ExceptionManager
             }
         }
 
-        switch ($errno) {
-            case E_ERROR: // 1
-                $type = 'E_ERROR';
-                break;
-            case E_WARNING: // 2
-                $type = 'E_WARNING';
-                break;
-            case E_PARSE: // 4
-                $type = 'E_PARSE';
-                break;
-            case E_NOTICE: // 8
-                $type = 'E_NOTICE';
-                break;
-            case E_CORE_ERROR: // 16
-                $type = 'E_CORE_ERROR';
-                break;
-            case E_CORE_WARNING: // 32
-                $type = 'E_CORE_WARNING';
-                break;
-            case E_COMPILE_ERROR: // 64
-                $type = 'E_COMPILE_ERROR';
-                break;
-            case E_CORE_WARNING: // 128
-                $type = 'E_COMPILE_WARNING';
-                break;
-            case E_USER_ERROR: // 256
-                $type = 'E_USER_ERROR';
-                break;
-            case E_USER_WARNING: // 512
-                $type = 'E_USER_WARNING';
-                break;
-            case E_USER_NOTICE: // 1024
-                $type = 'E_USER_NOTICE';
-                break;
-            case E_STRICT: // 2048
-                $type = 'E_STRICT';
-                break;
-            case E_RECOVERABLE_ERROR: // 4096
-                $type = 'E_RECOVERABLE_ERROR';
-                break;
-            case E_DEPRECATED: // 8192
-                $type = 'E_DEPRECATED';
-                break;
-            case E_USER_DEPRECATED: // 16384
-                $type = 'E_USER_DEPRECATED';
-                break;
-        }
+        $type = match ($errno) {
+            E_ERROR => 'E_ERROR',
+            E_WARNING => 'E_WARNING',
+            E_PARSE => 'E_PARSE',
+            E_NOTICE => 'E_NOTICE',
+            E_CORE_ERROR => 'E_CORE_ERROR',
+            E_CORE_WARNING => 'E_CORE_WARNING',
+            E_COMPILE_ERROR => 'E_COMPILE_ERROR',
+            E_COMPILE_WARNING => 'E_COMPILE_WARNING',
+            E_USER_ERROR => 'E_USER_ERROR',
+            E_USER_WARNING => 'E_USER_WARNING',
+            E_USER_NOTICE => 'E_USER_NOTICE',
+            E_STRICT => 'E_STRICT',
+            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+            E_DEPRECATED => 'E_DEPRECATED',
+            E_USER_DEPRECATED => 'E_USER_DEPRECATED',
+        };
 
-        array_push(static::$errors, array(
+        array_push(static::$errors, [
             'type' => $type,
             'message' => $errstr,
             'file' => $errfile,
-            'line' => $errline,
-        ));
+            'line' => $errline
+        ]);
     }
 
     /**
@@ -213,15 +185,19 @@ class ExceptionManager
         if (count(static::$errors) == 0) {
             $error = error_get_last();
 
-            if ($error != null) {
-                ob_start();
+            if ($error !== null) {
+                $isFatal = in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE]);
 
-                static::errorHandler($error['type'], $error['message'], $error['file'], $error['line']);
+                if ($isFatal) {
+                    ob_start();
+
+                    static::errorHandler($error['type'], $error['message'], $error['file'], $error['line']);
+                }
             }
+        } else {
+            // Muestra los errores
+            static::showErrors();
         }
-
-        // Muestra los errores
-        static::showErrors();
 
         /**
          * Como ultima funcion en ejecutarse, es aca donde se termina el flujo

@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core\Helpers;
+<?php
+
+namespace ForeverPHP\Core\Helpers;
 
 /**
  * Funciones auxiliares para rutas.
@@ -10,6 +12,5 @@ class RouteHelpers
 {
     public static function basePath()
     {
-        //
     }
 }

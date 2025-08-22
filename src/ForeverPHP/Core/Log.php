@@ -1,12 +1,13 @@
-<?php namespace ForeverPHP\Core;
+<?php
+
+namespace ForeverPHP\Core;
 
 /**
  *
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @since       Version 1.0.0
+ * @since       Version 0.3.0
  */
 class Log
 {
-
 }

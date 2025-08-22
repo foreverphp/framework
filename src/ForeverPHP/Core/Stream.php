@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core;
+<?php
+
+namespace ForeverPHP\Core;
 
 /**
  * Permite controlar todo el flujo de salida canalizandolo por una tuberia,
@@ -6,7 +8,7 @@
  * cliente con una salida mas limpia.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @since       Version 0.5.0
+ * @since       Version 0.4.0
  */
 class Stream
 {
@@ -117,7 +119,6 @@ class Stream
      */
     public function remove($index)
     {
-        //
     }
 
     /**

@@ -1,16 +1,18 @@
-<?php namespace ForeverPHP\View;
+<?php
 
-use ForeverPHP\Core\App;
+namespace ForeverPHP\View;
+
+use ForeverPHP\Core\Module;
 use ForeverPHP\Core\Exceptions\ViewException;
 use ForeverPHP\Core\Setup;
 
 /**
- * Todas las vistas deben heredar de este archivo, para ser tratadas
- * como tal.
+ * Todas las vistas deben heredar de esta clase, para ser tratadas como tal.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
  */
+
 class View
 {
     // Si se sobre escribe con valor true la vista se adaptara para trabajar con RESTful
@@ -18,7 +20,6 @@ class View
 
     public function __construct()
     {
-        //
     }
 
     /**
@@ -47,14 +48,14 @@ class View
         $pathToImport = '';
         $import = '';
 
-        // Valida si se esta importando de la misma App o de otra
+        // Valida si se esta importando en el mismo Module o de otra
         if (!strstr($toImport, '.')) {
-            $pathToImport = App::getInstance()->getAppName();
+            $pathToImport = Module::getInstance()->getModuleName();
         } else {
             $importSegments = explode('.', $toImport);
 
             // Valida que la aplicación este cargada.
-            if (App::getInstance()->exists($importSegments[0])) {
+            if (Module::getInstance()->exists($importSegments[0])) {
                 $pathToImport = $importSegments[0];
                 $import = $importSegments[1];
             } else {
@@ -88,7 +89,8 @@ $data = array();
 if (DEBUG) {
 if (Settings::exists('csrf_token')) {
 if (!CSRF::validate_token()) {
-throw new SecurityException('Acceso denegado, token inválido. Es imposible procesar tu solicitud vuelve al inicio o cierra esta página.');
+throw new SecurityException('Acceso denegado, token inválido. Es imposible procesar tu solicitud vuelve al inicio o
+cierra esta página.');
 //return;
 }
 }

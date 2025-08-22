@@ -1,28 +1,48 @@
 <?php
+
 /**
  * funciones helpers ejemplos
  *
  * snake_case
  * camel_case
  *
+ * sacar algunas ideas de laravel
+ *
  * Nota este archivo se debe cargar al iniciar el framework
  */
 
+use ForeverPHP\Core\Facades\Storage;
+use ForeverPHP\Core\Helpers\GlobalHelpers;
 use ForeverPHP\Core\Helpers\ArrayHelpers;
+use ForeverPHP\Core\Helpers\RouteHelpers;
 use ForeverPHP\Core\Helpers\StringHelpers;
 
-if (!function_exists('array_add')) {
+if (Storage::exists(ROOT_PATH . DS . '.env')) {
+    $dotenv = \Dotenv\Dotenv::createUnsafeImmutable(ROOT_PATH);
+    $dotenv->load();
+}
+
+if (!function_exists('is_multi_array')) {
     /**
-     * [array_add description]
-     *
-     * @param  [type] $array [description]
-     * @param  [type] $key   [description]
-     * @param  [type] $value [description]
-     * @return [type]        [description]
+     * Valida si el array dado es multidimensional.
+     * @param array $array
+     * @return bool
      */
-    function array_add($array, $key, $value)
+    function is_multi_array(array $array)
     {
-        return ArrayHelpers::arrayAdd($array, $key, $value);
+        return ArrayHelpers::isMultiArray($array);
+    }
+}
+
+if (!function_exists('array_convert_to_string')) {
+    /**
+     * Convierte los elementos de un array a cadena de texto.
+     * @param array $array
+     * @return array
+     */
+    function array_convert_to_string(array $array)
+    {
+        return ArrayHelpers::convertToString($array);
     }
 }
 
@@ -30,6 +50,13 @@ if (!function_exists('camel_case')) {
     function camel_case()
     {
         //
+    }
+}
+
+if (!function_exists('env')) {
+    function env($nombre, $valor = null)
+    {
+        return GlobalHelpers::env($nombre, $valor);
     }
 }
 

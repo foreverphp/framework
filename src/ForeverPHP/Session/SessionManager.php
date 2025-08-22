@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Session;
+<?php
+
+namespace ForeverPHP\Session;
 
 use ForeverPHP\Core\Settings;
 
@@ -18,7 +20,6 @@ class SessionManager
 
     private function __construct()
     {
-        //
     }
 
     /**

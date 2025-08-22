@@ -1,29 +1,39 @@
 {
-	"name": "foreverphp/framework",
-	"description": "ForeverPHP Framework.",
-	"keywords": ["framework", "foreverphp"],
-	"license": "MIT",
+    "name": "foreverphp/framework",
+    "description": "ForeverPHP Framework.",
+    "keywords": ["framework", "foreverphp"],
+    "license": "MIT",
+    "homepage": "https://emarva.com",
+    "support": {
+        "issues": "https://github.com/foreverphp/framework/issues",
+        "source": "https://github.com/foreverphp/framework"
+    },
     "authors": [
         {
             "name": "Daniel Nuñez S.",
-            "email": "dnunezse@gmail.com"
+            "email": "dnunez@emarva.com"
         }
     ],
     "require": {
-        "php": ">=7.4",
-        "vlucas/phpdotenv": "5.4.*",
-        "phpmailer/phpmailer": "6.5.*",
-        "phpoffice/phpspreadsheet": "1.20.*",
-        "phpoffice/phpword": "0.18.*",
-        "dompdf/dompdf": "1.1.*"
+        "php": "^8.1",
+        "vlucas/phpdotenv": "^5.4.1",
+        "phpmailer/phpmailer": "^6.6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0.7"
     },
     "autoload": {
         "files": [
-            "src/Core/helpers.php"
+            "src/ForeverPHP/Core/helpers.php",
+            "src/ForeverPHP/View/helpers.php"
         ],
         "psr-4": {
             "ForeverPHP\\": "src/ForeverPHP/"
         }
     },
-    "minimum-stability": "dev"
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": false
 }

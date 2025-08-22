@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Mail;
+<?php
+
+namespace ForeverPHP\Mail;
 
 use ForeverPHP\Core\Settings;
 use PHPMailer;
@@ -19,7 +21,6 @@ class Mailer
 
     public function __construct()
     {
-        //
     }
 
     /**
@@ -80,6 +81,9 @@ class Mailer
         }
 
         $this->mail->isHTML(true);
+
+        // Activo condificacción utf-8
+        $this->mail->CharSet = 'UTF-8';
 
         $this->mail->Subject = $this->subject;
         $this->mail->Body = $this->message;

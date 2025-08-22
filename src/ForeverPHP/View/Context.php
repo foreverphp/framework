@@ -1,11 +1,13 @@
-<?php namespace ForeverPHP\View;
+<?php
+
+namespace ForeverPHP\View;
 
 /**
- * Permite administrar de forma mas amigable la variables a trabajar
- * en el template.
+ * Permite administrar de forma amigable la variables que se le asignaran al template.
  *
  * @since       Version 0.2.0
  */
+
 class Context
 {
     /**
@@ -39,8 +41,8 @@ class Context
 
     private function __construct()
     {
-        $this->contexts = array();
-        $this->globalContexts = array();
+        $this->contexts = [];
+        $this->globalContexts = [];
         $this->useGlobalContexts = true;
     }
 
@@ -58,7 +60,7 @@ class Context
         return static::$instance;
     }
 
-    public function exists($name)
+    public function has($name)
     {
         if (array_key_exists($name, $this->contexts)) {
             return true;
@@ -118,7 +120,7 @@ class Context
     {
         $value = null;
 
-        if ($this->exists($name)) {
+        if ($this->has($name)) {
             if ($global) {
                 $value = $this->globalContexts[$name];
             } else {
@@ -147,13 +149,13 @@ class Context
 
     public function remove($name, $global = false)
     {
-        if ($this->exists($name)) {
+        if ($this->has($name)) {
             unset($this->contexts[$name]);
         }
     }
 
-    public function removeAll()
+    public function clear()
     {
-        $this->contexts = array();
+        $this->contexts = [];
     }
 }

@@ -1,16 +1,17 @@
-<?php namespace ForeverPHP\Routing;
+<?php
 
+namespace ForeverPHP\Routing;
+
+use ForeverPHP\Core\Facades\Context;
 use ForeverPHP\Core\Facades\Settings;
-
-use ForeverPHP\Http\RedirectResponse;
-use ForeverPHP\Http\Response;
-use ForeverPHP\View\Context;
+use ForeverPHP\View\Http\RedirectResponse;
+use ForeverPHP\View\Http\Response;
 
 /**
  * Permite la redireccion con multiples opciones.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @since 1.0.0
+ * @since 0.2.0
  */
 class Redirect
 {
@@ -23,7 +24,7 @@ class Redirect
      * @param  array   $headers
      * @return \ForeverPHP\Http\RedirectResponse
      */
-    public function to(string $path, int $status = 301, array $headers = array())
+    public function to($path, $status = 301, $headers = array())
     {
         return $this->makeRedirect($path, $status, $headers);
     }
@@ -34,7 +35,7 @@ class Redirect
      * @param  string $name
      * @return \ForeverPHP\Http\RedirectResponse
      */
-    public function route(string $name)
+    public function route($name)
     {
         // Debe construir una ruta segun el nombre de la ruta
     }
@@ -45,7 +46,7 @@ class Redirect
      * @param  integer $errno
      * @return void
      */
-    public function error(int $errno)
+    public function error($errno)
     {
         $response = new Response();
 
@@ -53,15 +54,17 @@ class Redirect
 
         /**
          * Retorna un Response para mostrar el mensaje de que algo salio mal
-         * este solo se muestra cuando esta en produccion.         *
+         * este solo se muestra cuando esta en produccion.
          */
         if (!Settings::inDebug()) {
             Settings::set('ForeverPHPTemplate', true);
-            $response->render('error', new Context(array('message' => 'Oops, al parecer algo salió mal.')))->make();
+            Context::set('errno', $errno);
+            Context::set('message', 'Oops, al parecer algo salió mal.');
+            $response->render('error')->make();
         }
     }
 
-    public function makeRedirect(string $path, int $status, array $headers)
+    public function makeRedirect($path, $status, $headers)
     {
         $redirect = new RedirectResponse($path, $status, $headers);
 

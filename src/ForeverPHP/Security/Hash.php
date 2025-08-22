@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Security;
+<?php
+
+namespace ForeverPHP\Security;
 
 use ForeverPHP\Core\Exceptions\SecurityException;
 
@@ -19,7 +21,6 @@ class Hash
 
     public function __construct()
     {
-        //
     }
 
     /**
@@ -43,7 +44,6 @@ class Hash
 
     private function makeSHA1($value)
     {
-        //
     }
 
     public function make($values, $type = 'md5')

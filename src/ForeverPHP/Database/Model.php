@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Database;
+<?php
+
+namespace ForeverPHP\Database;
 
 /**
  * ORM: para bases de datos relacionales.
@@ -8,7 +10,7 @@
  * bases de datos relacionales.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @since       Version 1.0.0
+ * @since       Version 0.4.0
  */
 class Model extends QuerySet
 {
@@ -27,7 +29,6 @@ class Model extends QuerySet
 
     public function create()
     {
-        //
     }
 
     public function __set($name, $value)
@@ -37,12 +38,10 @@ class Model extends QuerySet
 
     public function __get($name)
     {
-        //
     }
 
     public function save()
     {
-        //
     }
 
     public function find($limit = 1)
@@ -52,21 +51,17 @@ class Model extends QuerySet
 
     public function all()
     {
-        //
     }
 
     public function delete()
     {
-        //
     }
 
     public function orderBy()
     {
-        //
     }
 
     public function where()
     {
-        //
     }
 }

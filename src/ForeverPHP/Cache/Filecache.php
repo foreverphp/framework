@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Cache;
+<?php
+
+namespace ForeverPHP\Cache;
 
 use ForeverPHP\Cache\CacheInterface;
 

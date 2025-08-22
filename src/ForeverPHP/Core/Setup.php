@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core;
+<?php
+
+namespace ForeverPHP\Core;
 
 use ForeverPHP\Core\Exceptions\SetupException;
 
@@ -6,7 +8,7 @@ use ForeverPHP\Core\Exceptions\SetupException;
  * Importa objetos y configuraciones del framework y Apps.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
- * @since       Version 1.0.0
+ * @since       Version 0.1.0
  */
 class Setup
 {

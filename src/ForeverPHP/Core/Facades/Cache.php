@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core\Facades;
+<?php
+
+namespace ForeverPHP\Core\Facades;
 
 /**
  * @see \ForeverPHP\Cache\Cache

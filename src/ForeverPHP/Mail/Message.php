@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Mail;
+<?php
+
+namespace ForeverPHP\Mail;
 
 /**
  *

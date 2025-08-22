@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core\Facades;
+<?php
+
+namespace ForeverPHP\Core\Facades;
 
 /**
  * @see \ForeverPHP\Filesystem\Filesystem
@@ -12,6 +14,6 @@ class Storage extends Facade
      */
     protected static function getComponent()
     {
-        return new \ForeverPHP\Filesystem\Filesystem;
+        return new \ForeverPHP\Filesystem\Filesystem();
     }
 }

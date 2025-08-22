@@ -1,11 +1,15 @@
-﻿<?php namespace ForeverPHP\Security;
+﻿<?php
+
+namespace ForeverPHP\Security;
 
 /**
  * Controla y evita los ataques de tipo Cross Site Request Forgery.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.1.0
- *
+ */
+
+/**
  * IMPORTANTE: La clase CSRF, se debe usar siempre que se este manipulando datos
  *             del usuario o de la base de datos para evitar ataques.
  */

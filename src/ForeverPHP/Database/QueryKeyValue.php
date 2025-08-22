@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Database;
+<?php
+
+namespace ForeverPHP\Database;
 
 /**
  * Permite la ejecucion de consultas a motores NoSQL de tipo
@@ -9,9 +11,13 @@
 class QueryKeyValue
 {
     private $dbSetting = 'default';
+
     private $database = false;
+
     private $dbInstance = null;
+
     private $hasError = false;
+
     private $error = '';
 
     /**
@@ -23,7 +29,6 @@ class QueryKeyValue
 
     public function __construct()
     {
-        //
     }
 
     /**
@@ -46,24 +51,20 @@ class QueryKeyValue
         $this->database = false;
     }
 
-    public function exists($key)
+    public function hay($key)
     {
-        //
     }
 
     public function get($key)
     {
-        //
     }
 
     public function set($key, $value)
     {
-        //
     }
 
-    public function remove($key)
+    public function delete($key)
     {
-        //
     }
 
     public function hasError()

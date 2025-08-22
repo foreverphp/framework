@@ -1,4 +1,8 @@
-<?php namespace ForeverPHP\Filesystem;
+<?php
+
+namespace ForeverPHP\Filesystem;
+
+use ForeverPHP\Filesystem\FileNotFoundException;
 
 /**
  * Permite administrar el sistema de archivos.
@@ -6,10 +10,8 @@
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.3.0
  */
-class FileNotFoundException extends \Exception
-{}
 
-/*
+/**
  * Se debe poder trabajar con diferentes sistemas de archivos.
  * Como: local, google drive, amazon s3, dropbox
  */

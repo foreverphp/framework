@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Database;
+<?php
+
+namespace ForeverPHP\Database;
 
 /**
  * foreverPHP - Framework MVT (Model - View - Template)
@@ -20,26 +22,21 @@ class QueryBuilder
 {
     private static function buildCreate()
     {
-        //
     }
 
     private static function buildRead()
     {
-        //
     }
 
     private static function buildUpdate()
     {
-        //
     }
 
     private static function buildDelete()
     {
-        //
     }
 
     public static function build()
     {
-        //Å
     }
 }

@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Database;
+<?php
+
+namespace ForeverPHP\Database;
 
 /**
  * foreverPHP - Framework MVT (Model - View - Template)
@@ -14,7 +16,7 @@
  * @copyright   Copyright (c) 2014, Emarva.
  * @license     http://www.opensource.org/licenses/mit-license.php MIT License
  * @link        http://www.emarva.com/foreverphp
- * @since       Version 1.0.0
+ * @since       Version 0.5.0
  */
 
 /**

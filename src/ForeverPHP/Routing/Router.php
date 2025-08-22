@@ -1,35 +1,32 @@
-<?php namespace ForeverPHP\Routing;
+<?php
 
-use ForeverPHP\Core\App;
-use ForeverPHP\Core\Exceptions\AppException;
+namespace ForeverPHP\Routing;
+
+use ForeverPHP\Core\Module;
+use ForeverPHP\Core\Exceptions\ModuleException;
 use ForeverPHP\Core\Exceptions\RouterException;
-
 use ForeverPHP\Core\Facades\Redirect;
 use ForeverPHP\Core\Facades\Request;
-
 use ForeverPHP\Core\Facades\Storage;
 use ForeverPHP\Core\Settings;
-use ForeverPHP\Http\Response;
+use ForeverPHP\View\Http\Response;
 use ForeverPHP\Session\SessionManager;
-
 use ForeverPHP\View\Context;
 
 /**
  * Almacena todas las rutas en una matriz para luego ejecutar la ruta
  * solicitada.
  *
- * @author      Daniel Nuñez S. <dnunez@pointers.cl>
- * @since       Version 1.0.0
+ * @author      Daniel Nuñez S. <dnunez@emarva.com>
+ * @since       Version 0.1.0
  */
+
 class Router
 {
     private $uriBase = '/';
-    private $routes = array();
-    private $complexRoutes = array();
+    private $routes = [];
+    private $complexRoutes = [];
     private $nameForRoute = null;
-
-    private $gets = array();
-    private $posts = array();
 
     /**
      * Contiene la instancia singleton de Router.
@@ -40,7 +37,6 @@ class Router
 
     public function __construct()
     {
-        //
     }
 
     /**
@@ -57,7 +53,7 @@ class Router
         return static::$instance;
     }
 
-    private function addSlash(string $route)
+    private function addSlash($route)
     {
         $url = $route;
 
@@ -73,7 +69,7 @@ class Router
         return $url;
     }
 
-    private function removeSlash(string $route)
+    private function removeSlash($route)
     {
         $url = $route;
 
@@ -89,10 +85,10 @@ class Router
         $this->uriBase = str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
     }
 
-    private function parseRoute(string $route, array &$paramsUrl)
+    private function parseRoute($route, &$paramsUrl)
     {
         $newRoute = $route;
-        $matches = array();
+        $matches = [];
 
         // Patrones de busqueda
         $regexFindParam = "/{([0-9A-Za-z\-_]*)([?])?}/";
@@ -124,36 +120,18 @@ class Router
     }
 
     /**
-     * ABSOLETA: Se eliminara esta version ya que ahora habra un directorio con rutas.
-     */
-    /**
-     * Carga las rutas propias de una aplicación.
+     * Carga las rutas propias de un modulo.
      *
-     * @param  string $appName
+     * @param  string $moduleName
      */
-    public function fromApp(string $appName)
+    /*public function fromModule($moduleName)
     {
-        require_once APPS_ROOT . DS . $appName . DS . 'approutes.php';
-    }
+        require_once MODULES_ROOT . DS . $moduleName . DS . 'approutes.php';
+    }*/
 
-    public function get()
+    public function add($route, $view, $middlewares = null)
     {
-        //
-    }
-
-    public function post()
-    {
-        //
-    }
-
-    /**
-     * ESTA FUNCION QUEDARA OBSOLETA SIENDO REEMPLAZADA POR get, post, ENTRE OTRAS, ESTA FUNCIONA AUN NO SE ELIMINARA
-     * POR TEMAS DE COMPATIBILIDAD PERO SE MODIFICARA, Y ESTA SEGUN EL METODO DE LLAMADA DE LA RUTA LLAMARA A LA FUNCION
-     * get, post, etc SEGUN SEA NECESARIO
-     */
-    public function add(string $route, string $view, $middlewares = null)
-    {
-        $app = null; // Aplicacion donde esta la vista
+        $module = null; // Aplicacion donde esta la vista
         $v = null; // Vista a buscar
         $method = 'run'; // Metodo por defecto a ejecutar
 
@@ -167,7 +145,7 @@ class Router
 
             // Dividir la vista en app, vista y funcion si es que esta definida
             $view = explode('@', $view);
-            $app = $view[0];
+            $module = $view[0];
             $v = $view[1];
 
             // Valida si la vista trae un metodo a ejecutar
@@ -211,7 +189,7 @@ class Router
 
         // Matriz con el contenido de la ruta
         $routeContent = array(
-            'app' => $app,
+            'module' => $module,
             'view' => $v,
             'method' => $method,
             'paramsUrl' => $paramsUrl,
@@ -232,7 +210,7 @@ class Router
      *
      * @return string
      */
-    public function getRoute(): string
+    public function getRoute()
     {
         $uri = $_SERVER['REQUEST_URI'];
 
@@ -260,12 +238,12 @@ class Router
      *
      * @return string
      */
-    public function getRouteName(): string
+    public function getRouteName()
     {
         return $this->nameForRoute;
     }
 
-    private function loadParamsRoute(string &$route, string &$routeContent)
+    private function loadParamsRoute(&$route, &$routeContent)
     {
         $noMatch = true; // Indica si hay o no coincidencias de ruta
 
@@ -298,7 +276,7 @@ class Router
                         Request::register($paramsUrl);
                     }
 
-                    if ($_routeContent['app'] != null) {
+                    if ($_routeContent['module'] != null) {
                         $routeContent = $_routeContent;
                     } else {
                         $routeContent = $_routeContent['function'];
@@ -395,13 +373,13 @@ class Router
 
         // Valida que tipo de ruta se solicito
         $routeContent = null;
-        $appName = null;
+        $moduleName = null;
 
         if (array_key_exists($route, $this->routes)) {
             $route = $this->routes[$route];
 
-            if ($route['app'] != null) {
-                $appName = $route['app'];
+            if ($route['module'] != null) {
+                $moduleName = $route['module'];
                 $routeContent = $route;
             } else {
                 $routeContent = $route['function'];
@@ -434,19 +412,18 @@ class Router
          * NOTA: Los decoradores solo pueden ser utilizados en rutas con vistas
          *       no en rutas con funciones anonimas.
          */
-
         if (is_array($routeContent)) {
-            if ($appName == null) {
-                $appName = $routeContent['app'];
+            if ($moduleName == null) {
+                $moduleName = $routeContent['module'];
             }
 
-            // Primero se verifica que la aplicacion este agregada en la configuracion
-            $app = App::getInstance();
-            if ($app->exists($appName)) {
-                $app->load($appName);
+            // Primero se verifica que el modulo esta agregado en la configuracion
+            $module = Module::getInstance();
+            if ($module->exists($moduleName)) {
+                $module->load($moduleName);
 
                 // Cargo el autoload.php, archivo opcional
-                $autoloadPath = APPS_ROOT . DS . 'autoload.php';
+                $autoloadPath = MODULES_ROOT . DS . 'autoload.php';
 
                 if (Storage::exists($autoloadPath)) {
                     include_once $autoloadPath;
@@ -457,19 +434,20 @@ class Router
 
                 if (!is_null($middlewares)) {
                     foreach ($middlewares as $middleware) {
-                        $returnValue = $app->getMiddleware($middleware);
+                        $returnValue = $module->getMiddleware($middleware);
 
                         // Valida si el decorador retorna un Response
-                        if ($returnValue instanceof \ForeverPHP\Http\ResponseInterface) {
-                            $app->run($returnValue);
+                        if ($returnValue instanceof \ForeverPHP\View\Http\ResponseInterface) {
+                            $module->run($returnValue);
                         }
                     }
                 }
 
-                $app->run($routeContent);
+                $module->run($routeContent);
             } else {
-                throw new AppException("La aplicación ($appName) a la que pertenece la vista no esta " .
-                    "cargada en settings.php.");
+                throw new ModuleException(
+                    "El modulon ($moduleName) al que pertenece la vista no esta cargado en Settings."
+                );
             }
         } elseif (is_callable($routeContent)) {
             $this->runFunction($routeContent);

@@ -1,24 +1,36 @@
-<?php namespace ForeverPHP\Database;
+<?php
+
+namespace ForeverPHP\Database;
 
 use ForeverPHP\Core\Settings;
 
 /**
  * Permite la ejecucion de consultas en bruto a la base de datos.
  *
- * @since       Version 0.1.0
+ * @since       Version 0.4.0
  */
 class QuerySQL
 {
     private $dbSetting = 'default';
+
     private $database = false;
+
     private $dbInstance = null;
+
     private $hasError = false;
-    private $errno = 0;
+
+    private $errno = '';
+
     private $error = '';
-    private $parameters = array();
+
+    private $parameters = [];
+
     private $query = null;
+
     private $queryType = 'select';
+
     private $queryReturn = 'num';
+
     private $autocommit = false;
 
     /**
@@ -58,10 +70,9 @@ class QuerySQL
         $this->database = $database;
     }
 
-    public function autocommit($value = false)
-    {
-        $this->autocommit = $value;
-    }
+    /*public function autocommit($value = false) {
+    $this->autocommit = $value;
+    }*/
 
     public function query($query, $fetch = 'num')
     {
@@ -101,7 +112,29 @@ class QuerySQL
     {
         $count = count($this->parameters);
 
-        $this->parameters[$count] = array('type' => $type, 'value' => $value);
+        $this->parameters[$count] = ['type' => $type, 'value' => $value];
+    }
+
+    private function createInstance()
+    {
+        // Obtengo la configuracion de la base de datos a utilizar
+        $selectDb = Settings::getInstance()->get('dbs');
+        $selectDb[$this->dbSetting];
+        $dbEngine = $selectDb[$this->dbSetting]['engine'];
+
+        if ($dbEngine == 'mariadb') {
+            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MariaDBEngine($this->dbSetting);
+        } elseif ($dbEngine == 'mssql') {
+            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MSSQLEngine($this->dbSetting);
+        } elseif ($dbEngine == 'pgsql') {
+            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PgSQLEngine($this->dbSetting);
+        } elseif ($dbEngine == 'sqlsrv') {
+            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\SQLSRVEngine($this->dbSetting);
+        } elseif ($dbEngine == 'pdo') {
+            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PDOEngine($this->dbSetting);
+        } else {
+            $this->error = 'Database engine not found.';
+        }
     }
 
     public function execute($returnType = 'array')
@@ -112,22 +145,7 @@ class QuerySQL
         $this->error = '';
         $return = false;
 
-        // Obtengo la configuracion de la base de datos a utilizar
-        $selectDb = Settings::getInstance()->get('dbs');
-        $selectDb[$this->dbSetting];
-        $dbEngine = $selectDb[$this->dbSetting]['engine'];
-
-        if ($dbEngine == 'mariadb') {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MariaDBEngine($this->dbSetting);
-        } elseif ($dbEngine == 'mssql') {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\MSSQLEngine($this->dbSetting);
-        } elseif ($dbEngine == 'postgresql') {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\PostgreSQLEngine($this->dbSetting);
-        } elseif ($dbEngine == 'sqlsrv') {
-            $this->dbInstance = new \ForeverPHP\Database\SQLEngines\SQLSRVEngine($this->dbSetting);
-        } else {
-            $this->error = 'Database engine not found.';
-        }
+        $this->createInstance();
 
         if ($this->dbInstance != null) {
             if ($this->database != false) {
@@ -174,17 +192,59 @@ class QuerySQL
 
         // Se limpian las variables
         $this->dbInstance = null;
-        $this->parameters = array();
+        $this->parameters = [];
         $this->query = '';
         $this->queryType = 'select';
         $this->queryReturn = 'num';
 
+        // Agrego este control de error para lanzar una excepción para no tener que usar siempre QuerySQL::hasError
+        if (!empty($this->error) && $this->error != null) {
+            throw new \Exception($this->error, is_string($this->errno) ? 0 : $this->errno);
+        }
+
         return $return;
+    }
+
+    public function executeInsertBulk(string $query, array $bulkData)
+    {
+        $return = false;
+        $this->dbInstance = null;
+
+        $this->createInstance();
+
+        if ($this->dbInstance != null) {
+            if ($this->dbInstance->connect()) {
+                $this->dbInstance->executeInsertBulk($query, $bulkData);
+            }
+        }
+
+        // Agrego este control de error para lanzar una excepción para no tener que usar siempre QuerySQL::hasError
+        if (!empty($this->dbInstance->getError()) && $this->dbInstance->getError() != null) {
+            throw new \Exception(
+                $this->dbInstance->getError(),
+                is_string($this->dbInstance->getErrorNumber()) ? 0 : $this->dbInstance->getErrorNumber()
+            );
+        }
+
+        // Me desconecto
+        $this->dbInstance->disconnect();
+
+        return $return == null ? false : $return;
+    }
+
+    public function startTransaction()
+    {
+        $this->dbInstance->startTransaction();
     }
 
     public function commit()
     {
-        //
+        $this->dbInstance->commit();
+    }
+
+    public function rollback()
+    {
+        $this->dbInstance->rollback();
     }
 
     public function hasError()

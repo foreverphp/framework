@@ -1,4 +1,6 @@
-<?php namespace ForeverPHP\Core\Facades;
+<?php
+
+namespace ForeverPHP\Core\Facades;
 
 /**
  * @see \ForeverPHP\Http\Response
@@ -12,6 +14,6 @@ class Response extends Facade
      */
     protected static function getComponent()
     {
-        return new \ForeverPHP\Http\Response;
+        return new \ForeverPHP\Http\Response();
     }
 }

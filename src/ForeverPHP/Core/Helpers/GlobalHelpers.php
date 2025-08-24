@@ -56,7 +56,7 @@ class GlobalHelpers
 
             if (file_exists($filePath)) {
                 $langVars = require $filePath;
-                return getNestedValue($translations, $parts) ?? $key;
+                //return getNestedValue($translations, $parts) ?? $key;
             }
 
             return $key;

@@ -36,10 +36,10 @@ class Redirect
      * @param  string $name
      * @return \ForeverPHP\Http\RedirectResponse
      */
-    public function route($name)
-    {
-        // Debe construir una ruta segun el nombre de la ruta
-    }
+    //public function route($name)
+    //{
+    //    // Debe construir una ruta segun el nombre de la ruta
+    //}
 
     /**
      * Redirecciona a un error, ejemplo un 404.
@@ -53,23 +53,30 @@ class Redirect
 
         header("HTTP/1.0 $errno " . $response->getResponseStatus($errno), true, $errno);
 
+        // Temporal para mostrar el error mientras implemento idiomas
+        Settings::getInstance()->set('ForeverPHPTemplate', true);
+
+        Context::getInstance()->set('errno', $errno);
+        Context::getInstance()->set('message', 'Oops, al parecer algo salió mal.');
+
+        $response->render('error')->make();
+
         /**
          * Retorna un Response para mostrar el mensaje de que algo salio mal
          * este solo se muestra cuando esta en produccion.
          */
-        if (!Settings::getInstance()->inDebug()) {
+        /*if (!Settings::getInstance()->inDebug()) {
             // Templates de error disponibles
             $availableErrors = [400, 401, 403, 404, 429, 500, 502, 503];
 
             Settings::getInstance()->set('ForeverPHPTemplate', true);
 
             Context::getInstance()->set('errno', $errno);
-            //Context::set('message', 'Oops, al parecer algo salió mal.');
             Context::getInstance()->set('errorTitle', GlobalHelpers::lang("errors.errorTitle$errno"));
             Context::getInstance()->set('errorMessage', GlobalHelpers::lang("errors.errorMessage$errno"));
 
             $response->render('error')->make();
-        }
+        }*/
     }
 
     public function makeRedirect($path, $status, $headers)

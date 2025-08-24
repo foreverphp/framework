@@ -2,6 +2,8 @@
 
 namespace ForeverPHP\Lang;
 
+use ForeverPHP\View\Context;
+
 class EsEsLang extends Context
 {
     // Errors pages

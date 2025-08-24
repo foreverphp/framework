@@ -2,8 +2,8 @@
 
 namespace ForeverPHP\Mail;
 
-use ForeverPHP\Core\Settings;
-use PHPMailer;
+//use ForeverPHP\Core\Settings;
+//use PHPMailer;
 
 /**
  * Permite enviar correos ya sea en formato texto como HTML.
@@ -19,14 +19,16 @@ class Mailer
      */
     private static $instance;
 
+    private static $error = '';
+
     public function __construct()
     {
     }
 
     /**
-     * Obtiene o crea la instancia singleton de App.
+     * Obtiene o crea la instancia singleton de Mailer.
      *
-     * @return \ForeverPHP\Core\App
+     * @return \ForeverPHP\Mail\Mailer
      */
     public static function getInstance()
     {
@@ -39,7 +41,7 @@ class Mailer
 
     public function send($to, $subject, $message, $from, $attachmentPath = null, $attachmentName = null)
     {
-        $this->to = $to;
+        /*$this->to = $to;
         $this->subject = $subject;
         $this->message = $message;
         $this->from = $from;
@@ -92,7 +94,7 @@ class Mailer
         if (!$this->mail->send()) {
             $this->error = $this->mail->ErrorInfo;
             return false;
-        }
+        }*/
 
         return true;
     }

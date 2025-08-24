@@ -82,13 +82,14 @@ class Settings
      * @param mixed  $value Valor a asignar al item
      * @return boolean
      */
-    public function set($name, $value = null)
+    public function set($name, $value = null): bool
     {
         if ($value == null) {
             return false;
         }
 
         $this->settings[$name] = $value;
+        return true;
     }
 
     /**

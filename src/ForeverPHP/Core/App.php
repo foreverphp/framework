@@ -198,7 +198,10 @@ class App
 
         // Verifico que la vista hereda de View
         if ($view instanceof \ForeverPHP\View\View) {
-            throw new ViewException("La vista ($view) no hereda de View.");
+            throw new ViewException(sprintf(
+                "La vista (%s) no hereda de View.",
+                method_exists($view, '__toString') ? (string) $view : get_class($view)
+            ));
         }
 
         // Creo la vista y la ejecuto y le asigno el request a la vista para manipulacion interna

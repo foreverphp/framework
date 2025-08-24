@@ -15,7 +15,8 @@ use ForeverPHP\Core\Settings;
  * @since       Version 0.4.0
  */
 
-class Model extends QuerySet
+//class Model extends QuerySet
+class Model
 {
     protected $data = []; // Almacena el contenido que se va a trabajar en el modelo
 

@@ -121,7 +121,8 @@ class Cookie
     }
 
     // Implementar en versiones futuras
-    /*public static function set_array($name, $array, $expire = 0, $path = null, $domain = null, $secure = false, $httponly = false) {
+    /*public static function set_array($name, $array, $expire = 0,
+    $path = null, $domain = null, $secure = false, $httponly = false) {
     if (is_array($array)) {
     // Recorro la matriz y genero tantas cookies como elementos tenga la matriz
     foreach ($array as $key => $value) {

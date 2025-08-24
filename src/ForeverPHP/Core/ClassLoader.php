@@ -9,7 +9,7 @@ class ClassLoader
      *
      * @var array
      */
-    private static $directories = array();
+    private static $directories = [];
 
     /**
      * Indica si ClassLoader esta correctamente registrado.

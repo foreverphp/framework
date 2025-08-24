@@ -9,6 +9,8 @@ namespace ForeverPHP\Database\KeyValueEngines;
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.4.0
  */
-class RedisEngine extends KeyValueEngine implements KeyValueEngineInterface
+
+//class RedisEngine extends KeyValueEngine implements KeyValueEngineInterface
+class RedisEngine
 {
 }

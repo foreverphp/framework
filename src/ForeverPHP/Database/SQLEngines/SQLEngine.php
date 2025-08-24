@@ -21,6 +21,7 @@ class SQLEngine
     protected $errno;
     protected $error;
     protected $numRows;
+    protected $bulkData = null;
 
     protected static $instance;
 

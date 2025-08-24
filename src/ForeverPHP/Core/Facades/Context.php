@@ -4,7 +4,7 @@ namespace ForeverPHP\Core\Facades;
 
 /**
  * @method static bool exists(string $name)
- * @method static void set(string $name, string $value, bool $global = false)
+ * @method static void set(string $name, mixed $value, bool $global = false)
  * @method static void setArray(array $values, bool $global)
  * @method static mixed get(string $name, bool $global = false)
  * @method static void useGlobal(string $value)

@@ -4,7 +4,7 @@ namespace ForeverPHP\Core\Facades;
 
 /**
  * @method static void fromApp(string $appName)
- * @method static mixed add(string $route, string $view, array $middlewares = null)
+ * @method static mixed add(string $route, mixed $view, array $middlewares = null)
  * @method static string getRoute()
  * @method static string getRouteName()
  * @method static void run()

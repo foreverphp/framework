@@ -3,7 +3,7 @@
 namespace ForeverPHP\Core\Facades;
 
 /**
- * @method static void using(array $dbSetting)
+ * @method static void using(string $dbSetting)
  * @method static void selectDatabase(string $database)
  * @method static \ForeverPHP\Database\QuerySQL query(string $query, string $fetch = 'num')
  * @method static void addParameter(string $key, mixed $value)

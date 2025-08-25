@@ -3,8 +3,8 @@
 namespace ForeverPHP\Core\Facades;
 
 /**
- * @method static void send(string $to, string $subject, string $message, string $from, string $attachmentPath = null, string $attachmentName = null)
- * @method static void error()
+ * @method static bool send(string $to, string $subject, string $message, string $from, string $attachmentPath = null, string $attachmentName = null)
+ * @method static string error()
  * @see \ForeverPHP\Mail\Mailer
  */
 class Mail extends Facade

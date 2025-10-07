@@ -44,33 +44,45 @@ class Redirect
     /**
      * Redirecciona a un error, ejemplo un 404.
      *
-     * @param  integer $errno
+     * @param  int $errno
      * @return void
      */
-    public function error($errno)
+    public function error(int $errno)
     {
         $response = new Response();
 
-        header("HTTP/1.0 $errno " . $response->getResponseStatus($errno), true, $errno);
+        if (!$response::existsResponseStatus($errno)) {
+            $errno = 500;
+        }
+
+        $responseStatus = $response::getResponseStatus($errno);
+
+        header("HTTP/1.0 $errno $responseStatus", true, $errno);
 
         // Temporal para mostrar el error mientras implemento idiomas
         Settings::getInstance()->set('ForeverPHPTemplate', true);
 
-        Context::getInstance()->set('errno', $errno);
-        Context::getInstance()->set('message', 'Oops, al parecer algo salió mal.');
+        $lang = GlobalHelpers::getLanguage();
+        Context::getInstance()->set('lang', $lang);
 
-        $response->render('error')->make();
+        // Templates de error disponibles
+        $availableErrors = [400, 401, 403, 404, 429, 500, 502, 503];
+
+        Context::getInstance()->set('errno', $errno);
+        Context::getInstance()->set('responseStatus', $responseStatus);
+
+        // Si el error no esta disponible se cambia a 0, para usar el template genérico de error
+        if (!in_array($errno, $availableErrors)) {
+            $errno = 0;
+        }
+
+        $response->render("error-pages.$lang.$errno")->make();
 
         /**
          * Retorna un Response para mostrar el mensaje de que algo salio mal
          * este solo se muestra cuando esta en produccion.
          */
         /*if (!Settings::getInstance()->inDebug()) {
-            // Templates de error disponibles
-            $availableErrors = [400, 401, 403, 404, 429, 500, 502, 503];
-
-            Settings::getInstance()->set('ForeverPHPTemplate', true);
-
             Context::getInstance()->set('errno', $errno);
             Context::getInstance()->set('errorTitle', GlobalHelpers::lang("errors.errorTitle$errno"));
             Context::getInstance()->set('errorMessage', GlobalHelpers::lang("errors.errorMessage$errno"));

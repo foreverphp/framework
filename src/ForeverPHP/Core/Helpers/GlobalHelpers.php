@@ -32,11 +32,11 @@ class GlobalHelpers
     }
 
     /**
-     * Obtiene el texto de un archivo de traducciones, por el momento solo disponible para ForeverPHP.
-     * @param string $key
+     * Obtiene el lenguaje de la configuración.
+     *
      * @return string
      */
-    public static function lang(string $key): string
+    public static function getLanguage(): string
     {
         $availablesLangs = ['en', 'es'];
         $langFromSettings = Settings::getInstance()->exists('language')
@@ -48,20 +48,6 @@ class GlobalHelpers
             $langFromSettings = 'en';
         }
 
-        if (Settings::getInstance()->get('ForeverPHPTemplate')) {
-            $parts = explode('.', $key);
-            $file = array_shift($parts);
-
-            $filePath = ROOT_PATH . "/vendor/foreverphp/framework/src/ForeverPHP/Lang/$langFromSettings/$file.php";
-
-            if (file_exists($filePath)) {
-                $langVars = require $filePath;
-                //return getNestedValue($translations, $parts) ?? $key;
-            }
-
-            return $key;
-        }
-
-        return "";
+        return $langFromSettings;
     }
 }

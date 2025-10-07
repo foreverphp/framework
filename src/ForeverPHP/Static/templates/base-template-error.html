@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="{{lang}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{{errno}} {{responseStatus}}</title>
+    <link rel="shortcut icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAAAAAAnonbAJ6J7wCeie8AnonvAJ6J7wCeie8AnonvAJ6J7wCeie8AnonvAJ6J7wCeie8AnonvAJ6J7wCeie8AnonbAJ6J7wCeif8Anon/AJ6J/wCeif8Anon/AJ6J/wCeif8Anon/AJ6J/wCeif8Anon/AJ6J/wCeif8Anon/AJ6J7wCeie8Anon/AJ6J/wCeif8UpZH/ruDZ/67g2f+X187/AJ6J/wCeif8Anon/AJ6J/wCeif8Anon/AJ6J/wCeie8AnonvAJ6J/wCeif8Anon/HaiW//7+/v/+/v7/3PHu/wCeif8Anon/AJ6J/wCeif8Anon/AJ6J/wCeif8AnonvAJ6J7wCeif8Anon/AJ6J/x2olv/+/v7//v7+/9zx7v8Anon/AJ6J/wCeif8Anon/AJ6J/wCeif8Anon/AJ6J7wCeie8Anon/AJ6J/wCeif8dqJb//v7+//7+/v/c8e7/AJ6J/wCeif8Anon/AJ6J/wCeif8Anon/AJ6J/wCeie8AnonvAJ6J/wCeif8Anon/HaiW//7+/v/+/v7/7/j3/5DUy/+Q1Mv/kNTL/x6plv8Anon/AJ6J/wCeif8AnonvAJ+K7wCeif8Anon/AJ6J/x2olv/+/v7//v7+//7+/v/+/v7//v7+//7+/v82saH/AJ6J/wCeif8Anon/AJ+K7wDPsO8A0LH/ANCx/wDQsf8d1bn//v7+//7+/v/5/fz/3vj0/9749P/e+PT/L9i+/wDQsf8A0LH/ANCx/wDPsO8A0LHvANCx/wDQsf8A0LH/HdW5//7+/v/+/v7/3Pfz/wDQsf8A0LH/ANCx/wDQsf8A0LH/ANCx/wDQsf8A0LHvANCx7wDQsf8A0LH/ANCx/x3Vuf/+/v7//v7+/9z38/8A0LH/ANCx/wDQsf8A0LH/ANCx/wDQsf8A0LH/ANCx7wDQse8A0LH/ANCx/wDQsf8d1bn//v7+//7+/v/+/v7//v7+//7+/v/+/v7/fObW/wDQsf8A0LH/ANCx/wDQse8A0LHvANCx/wDQsf8A0LH/HdW5//7+/v/+/v7//v7+//7+/v/+/v7//v7+/3zm1v8A0LH/ANCx/wDQsf8A0LHvANCx7wDQsf8A0LH/ANCx/wzStP9v5NL/b+TS/2/k0v9v5NL/b+TS/2/k0v822cH/ANCx/wDQsf8A0LH/ANCx7wDQse8A0LH/ANCx/wDQsf8A0LH/ANCx/wDQsf8A0LH/ANCx/wDQsf8A0LH/ANCx/wDQsf8A0LH/ANCx/wDQse8A0LHaANCx7wDQse8A0LHvANCx7wDQse8A0LHvANCx7wDQse8A0LHvANCx7wDQse8A0LHvANCx7wDQse8A0LHaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==" />
+
+    <!-- Google font -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:500"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Titillium+Web:700,900"
+      rel="stylesheet"
+    />
+
+    <!-- Custom stlylesheet -->
+    <style>
+      * {
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+
+      body {
+        padding: 0;
+        margin: 0;
+        background-color: #afb878;
+      }
+
+      #error {
+        position: relative;
+        height: 100vh;
+      }
+
+      #error .error {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+      }
+
+      .error {
+        max-width: 767px;
+        width: 100%;
+        line-height: 1.4;
+        padding: 0px 15px;
+      }
+
+      .error .error-number {
+        position: relative;
+        height: 150px;
+        line-height: 150px;
+        margin-bottom: 25px;
+      }
+
+      .error .error-number h1 {
+        font-family: "Titillium Web", sans-serif;
+        font-size: 186px;
+        font-weight: 900;
+        margin: 0px;
+        text-transform: uppercase;
+        background-color: #252525;;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .error h2 {
+        font-family: "Titillium Web", sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .error p {
+        font-family: "Montserrat", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 0px;
+        text-transform: uppercase;
+      }
+
+      .error a {
+        font-family: "Titillium Web", sans-serif;
+        display: inline-block;
+        text-transform: uppercase;
+        color: #fff;
+        text-decoration: none;
+        border: none;
+        background: #747e14;
+        padding: 10px 40px;
+        font-size: 14px;
+        font-weight: 700;
+        border-radius: 1px;
+        margin-top: 15px;
+        -webkit-transition: 0.2s all;
+        transition: 0.2s all;
+      }
+
+      .error a:hover {
+        opacity: 0.8;
+      }
+
+      @media only screen and (max-width: 767px) {
+        .error .error-number {
+          height: 110px;
+          line-height: 110px;
+        }
+        .error .error-number h1 {
+          font-size: 120px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="error">
+      <div class="error">
+        <div class="error-number">
+          <h1>{{errno}}</h1>
+        </div>
+        <h2>Oops! {{responseStatus}}</h2>
+        {% block 'errorContent' %}{% endblock %}
+      </div>
+    </div>
+  </body>
+</html>

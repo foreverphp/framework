@@ -19,7 +19,7 @@ class Response
      *
      * @var array
      */
-    private static $responseStatus = array(
+    private static $responseStatus = [
         100 => 'Continue',
         101 => 'Switching Protocol',
         102 => 'Processing (WebDAV)',
@@ -81,7 +81,7 @@ class Response
         508 => 'Loop Detected (WebDAV)',
         510 => 'Not Extended',
         511 => 'Network Authentication Required'
-    );
+    ];
 
     /**
      * Devuelve una respuesta del rendereo de un template.
@@ -120,8 +120,31 @@ class Response
         //
     }
 
-    public static function getResponseStatus($status)
+    /**
+     * Devuelve el texto del estado de la respuesta.
+     *
+     * @param int $status
+     * @return string|bool
+     */
+    public static function getResponseStatus(int $status): string|bool
     {
+        // Si el status no esta en el array de estados devuelve 500
+        if (!isset(static::$responseStatus[$status])) {
+            $status = 500;
+        }
+
         return static::$responseStatus[$status];
+    }
+
+    /**
+     * Verifica si el status de la respuesta existe.
+     *
+     * @param int $status
+     * @return bool
+     */
+    public static function existsResponseStatus(int $status): bool
+    {
+        // Si el status no esta en el array de estados devuelve 500
+        return isset(static::$responseStatus[$status]);
     }
 }

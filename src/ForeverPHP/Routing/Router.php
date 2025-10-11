@@ -307,14 +307,13 @@ class Router
     private function notView()
     {
         if (Settings::getInstance()->inDebug()) {
-            Context::getInstance()->set('exception', 'Framework MVT');
-            Context::getInstance()->set('details', 'Hurra ForeverPHP esta corriendo, ahora genera una vista.');
+            Context::getInstance()->set('title', 'Hurray ForeverPHP is running');
 
             // Le indico a la vista que haga render usando los templates del framework
             Settings::getInstance()->set('ForeverPHPTemplate', true);
 
             $response = new Response();
-            $response->render('exception')->make();
+            $response->render('noview-exception')->make();
         } else {
             // Si esta en produccion muestra un error 404
             //(new Redirect)->error(404);

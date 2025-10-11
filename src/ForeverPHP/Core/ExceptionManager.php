@@ -34,14 +34,70 @@ class ExceptionManager
      */
     private static $handling;
 
+    private static function getErrorTypeAsString(int $type): string
+    {
+        return match ($type) {
+            E_ERROR => 'E_ERROR',
+            E_WARNING => 'E_WARNING',
+            E_PARSE => 'E_PARSE',
+            E_NOTICE => 'E_NOTICE',
+            E_CORE_ERROR => 'E_CORE_ERROR',
+            E_CORE_WARNING => 'E_CORE_WARNING',
+            E_COMPILE_ERROR => 'E_COMPILE_ERROR',
+            E_COMPILE_WARNING => 'E_COMPILE_WARNING',
+            E_USER_ERROR => 'E_USER_ERROR',
+            E_USER_WARNING => 'E_USER_WARNING',
+            E_USER_NOTICE => 'E_USER_NOTICE',
+            //E_STRICT => 'E_STRICT',
+            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+            E_DEPRECATED => 'E_DEPRECATED',
+            E_USER_DEPRECATED => 'E_USER_DEPRECATED',
+            default => 'E_UNKNOWN',
+        };
+    }
+
+    private static function getErrorClass(int $type): string
+    {
+        $errorClass = 'error-exception';
+
+        // Determinar el tipo y clase CSS según el código de error
+        switch ($type) {
+            case E_ERROR:
+            case E_CORE_ERROR:
+            case E_COMPILE_ERROR:
+            case E_USER_ERROR:
+                $errorClass = 'error-fatal';
+                break;
+            case E_WARNING:
+            case E_CORE_WARNING:
+            case E_COMPILE_WARNING:
+            case E_USER_WARNING:
+                $errorClass = 'error-warning';
+                break;
+            case E_NOTICE:
+            case E_USER_NOTICE:
+                $errorClass = 'error-notice';
+                break;
+            case E_DEPRECATED:
+            case E_USER_DEPRECATED:
+                $errorClass = 'error-deprecated';
+                break;
+            default:
+                $errorClass = 'error-exception';
+                break;
+        }
+
+        return $errorClass;
+    }
+
     /**
      * Permite mostrar un excepción propia.
      *
-     * @param  string $type
-     * @param  string $message
+     * @param int $type
+     * @param array $errorsList
      * @return void
      */
-    private static function viewException($type, $message)
+    private static function viewException(array $errorsList)
     {
         if (static::$handling) {
             return;
@@ -49,13 +105,7 @@ class ExceptionManager
 
         static::$handling = true;
 
-        $template = 'exception';
-        $title = 'Exception';
-
-        // 1 es Error
-        if ($type === 1) {
-            $title = 'Error';
-        }
+        $template = 'new-exception';
 
         if (Settings::getInstance()->inDebug()) {
             $contentBuffer = json_decode(ob_get_contents());
@@ -65,9 +115,56 @@ class ExceptionManager
                 ob_clean();
             }
 
+            // Contenido de la excepción
+            $contentException = '';
+
+            foreach ($errorsList as $error) {
+                $contentException .= '<div class="error ' . static::getErrorClass($error['errno']) . '">';
+                $contentException .= '    <div class="error-line">';
+                $contentException .= '        <span class="label">Type:</span>';
+                $contentException .= '        <span class="value type">' . $error['type'] . '</span>';
+                $contentException .= '    </div>';
+
+                if (!empty($error['code'])) {
+                    $contentException .= '    <div class="error-line">';
+                    $contentException .= '        <span class="label">Code:</span>';
+                    $contentException .= '        <span class="value">' . $error['code'] . '</span>';
+                    $contentException .= '    </div>';
+                }
+
+                $contentException .= '    <div class="error-line">';
+                $contentException .= '        <span class="label">Message:</span>';
+                $contentException .= '        <span class="value">' . $error['message'] . '</span>';
+                $contentException .= '    </div>';
+                $contentException .= '    <div class="error-line">';
+                $contentException .= '        <span class="label">File:</span>';
+                $contentException .= '        <span class="value file">' . $error['file'] . '</span>';
+                $contentException .= '    </div>';
+                $contentException .= '    <div class="error-line">';
+                $contentException .= '        <span class="label">Line:</span>';
+                $contentException .= '        <span class="value line">' . $error['line'] . '</span>';
+                $contentException .= '    </div>';
+                $contentException .= '    <div class="error-line">';
+                $contentException .= '        <span class="label">Timestamp:</span>';
+                $contentException .= '        <span class="value timestamp">' . $error['timestamp'] . '</span>';
+                $contentException .= '    </div>';
+
+                if (!empty($error['trace'])) {
+                    $contentException .= '<div class="error-line">';
+                    $contentException .= '    <span class="label">Stack Trace:</span>';
+                    $contentException .= '    <div class="value">';
+                    $contentException .=
+                        '        <pre class="stack-trace">' . htmlspecialchars($error['trace']) . '</pre>';
+                    $contentException .= '    </div>';
+                    $contentException .= '</div>';
+                }
+
+                $contentException .= '</div>';
+            }
+
             Context::useGlobal(false);
-            Context::set('exception', $title);
-            Context::set('details', $message);
+            Context::set('title', 'Error Log');
+            Context::set('contentException', $contentException);
 
             $response = new Response();
 
@@ -134,7 +231,16 @@ class ExceptionManager
      */
     public static function exceptionHandler(\Throwable $e)
     {
-        $message = 'Invalid exception type.';
+        $contentException = [
+            'errno' => E_ERROR,
+            'type' => 'E_ERROR',
+            'code' => '',
+            'message' => 'Invalid exception type.',
+            'file' => '',
+            'line' => '',
+            'timestamp' => date('Y-m-d H:i:s', (int)microtime(true)),
+            'trace' => ''
+        ];
 
         /**
          * Primero se valida si viene el parametro $exception y que sea
@@ -156,18 +262,17 @@ class ExceptionManager
             }
 
             // Crear un mensaje más detallado
-            $message = 'Message: ' . $e->getMessage() . '<br />';
-            $message .= 'Previous: ' . ($e->getPrevious() ? $e->getPrevious()->getMessage() : 'None') . '<br />';
-            $message .= 'Code: ' . $e->getCode() . '<br />';
-            $message .= 'File: ' . $e->getFile() . '<br />';
-            $message .= 'Line: ' . $e->getLine() . '<br />';
-            $message .= 'Trace: <pre>' . $e->getTraceAsString() . '</pre><br />';
+            $contentException['code'] = $e->getCode();
+            $contentException['message'] = $e->getMessage();
+            $contentException['file'] = $e->getFile();
+            $contentException['line'] = $e->getLine();
+            $contentException['trace'] = $e->getTraceAsString();
 
             // Marcar el error como manejado ANTES de procesarlo
             static::markErrorAsHandled($errorDetails);
         }
 
-        static::viewException(0, $message);
+        static::viewException([$contentException]);
     }
 
     /**
@@ -199,27 +304,10 @@ class ExceptionManager
             }
         }
 
-        $type = match ($errno) {
-            E_ERROR => 'E_ERROR',
-            E_WARNING => 'E_WARNING',
-            E_PARSE => 'E_PARSE',
-            E_NOTICE => 'E_NOTICE',
-            E_CORE_ERROR => 'E_CORE_ERROR',
-            E_CORE_WARNING => 'E_CORE_WARNING',
-            E_COMPILE_ERROR => 'E_COMPILE_ERROR',
-            E_COMPILE_WARNING => 'E_COMPILE_WARNING',
-            E_USER_ERROR => 'E_USER_ERROR',
-            E_USER_WARNING => 'E_USER_WARNING',
-            E_USER_NOTICE => 'E_USER_NOTICE',
-            E_STRICT => 'E_STRICT',
-            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
-            E_DEPRECATED => 'E_DEPRECATED',
-            E_USER_DEPRECATED => 'E_USER_DEPRECATED',
-        };
-
         // Agregar el error al array ANTES de marcarlo como manejado
         static::$errors[] = [
-            'type' => $type,
+            'type' => static::getErrorTypeAsString($errno),
+            'code' => '',
             'message' => $errstr,
             'file' => $errfile,
             'line' => $errline,
@@ -275,19 +363,21 @@ class ExceptionManager
         $unhandledErrors = static::getUnhandledErrors();
 
         if (count($unhandledErrors) > 0) {
-            $errorsList = '<h3>Unhandled Errors:</h3>';
+            $errorsList = [];
 
             foreach ($unhandledErrors as $error) {
-                $errorsList .= '<div style="margin-bottom: 15px; padding: 10px; border-left: 3px solid #ff0000;">';
-                $errorsList .= '<strong>Type:</strong> ' . $error['type'] . '<br>';
-                $errorsList .= '<strong>Message:</strong> ' . htmlspecialchars($error['message']) . '<br>';
-                $errorsList .= '<strong>File:</strong> ' . $error['file'] . '<br>';
-                $errorsList .= '<strong>Line:</strong> ' . $error['line'] . '<br>';
-                $errorsList .= '<strong>Timestamp:</strong> ' . date('Y-m-d H:i:s', (int)$error['timestamp']) . '<br>';
-                $errorsList .= '</div>';
+                $errorsList[] = [
+                    'errno' => $error['errno'], // Ejemplo 2 = E_WARNING
+                    'type' => $error['type'], // Ejemplo E_WARNING como string
+                    'message' => htmlspecialchars($error['message']),
+                    'file' => $error['file'],
+                    'line' => $error['line'],
+                    'timestamp' => date('Y-m-d H:i:s', (int)$error['timestamp']),
+                    'trace' => ''
+                ];
             }
 
-            static::viewException(1, $errorsList);
+            static::viewException($errorsList);
         }
     }
 

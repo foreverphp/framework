@@ -107,15 +107,15 @@ class ExceptionManager
         if (Settings::getInstance()->inDebug()) {
             $response = new Response();
 
-            // Verifico si la petición es de tipo JSON y si lo es devuelvo los errores como JSON
-            if (isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] == 'application/json') {
-                $response->json($errorsList)->make();
-                return;
-            }
-
             // Limpio el buffer de salida previo
             if (ob_get_length()) {
                 ob_clean();
+            }
+
+            // Verifico si la petición es de tipo JSON y si lo es devuelvo los errores como JSON
+            if (isset($_SERVER['CONTENT_TYPE']) && str_starts_with($_SERVER['CONTENT_TYPE'], 'application/json')) {
+                $response->json($errorsList)->make();
+                return;
             }
 
             // Contenido de la excepción

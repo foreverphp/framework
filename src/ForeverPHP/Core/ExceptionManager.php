@@ -93,7 +93,6 @@ class ExceptionManager
     /**
      * Permite mostrar un excepción propia.
      *
-     * @param int $type
      * @param array $errorsList
      * @return void
      */
@@ -105,10 +104,14 @@ class ExceptionManager
 
         static::$handling = true;
 
-        $template = 'new-exception';
-
         if (Settings::getInstance()->inDebug()) {
-            $contentBuffer = json_decode(ob_get_contents());
+            $response = new Response();
+
+            // Verifico si la petición es de tipo JSON y si lo es devuelvo los errores como JSON
+            if (isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] == 'application/json') {
+                $response->json($errorsList)->make();
+                return;
+            }
 
             // Limpio el buffer de salida previo
             if (ob_get_length()) {
@@ -166,22 +169,10 @@ class ExceptionManager
             Context::set('title', 'Error Log');
             Context::set('contentException', $contentException);
 
-            $response = new Response();
+            // Le indico a la vista que haga render usando los templates del framework
+            Settings::getInstance()->set('ForeverPHPTemplate', true);
 
-            if (is_array($contentBuffer)) {
-                $contentBuffer['ForeverPHPException'] = Context::all();
-                $response->json($contentBuffer)->make();
-            } else {
-                // Si hay buffer de salida previo cambio el template
-                if (ob_get_level() > 0 && ob_get_length() > 0) {
-                    $template = 'exception-block';
-                }
-
-                // Le indico a la vista que haga render usando los templates del framework
-                Settings::getInstance()->set('ForeverPHPTemplate', true);
-
-                $response->render($template)->make();
-            }
+            $response->render('new-exception')->make();
         } else {
             // Termino el buffer de salida y lo limpio de forma segura
             while (ob_get_level() > 0) {

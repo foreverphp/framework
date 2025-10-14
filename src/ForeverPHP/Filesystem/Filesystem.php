@@ -2,6 +2,7 @@
 
 namespace ForeverPHP\Filesystem;
 
+use ForeverPHP\Core\Facades\Redirect;
 use ForeverPHP\Filesystem\FileNotFoundException;
 
 /**
@@ -203,5 +204,123 @@ class Filesystem
         }
 
         return true;
+    }
+
+    private function sanitizeFilename(string $filename): string
+    {
+        // Remover caracteres peligrosos
+        $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
+
+        // Evitar nombres vacíos
+        return $filename ?: 'download';
+    }
+
+    private function readfileChunked(string $filepath, int $chunkSize = 8192): void
+    {
+        $handle = fopen($filepath, 'rb');
+
+        if ($handle === false) {
+            return;
+        }
+
+        while (!feof($handle)) {
+            $buffer = fread($handle, $chunkSize);
+            echo $buffer;
+            flush(); // Forzar envío al navegador
+        }
+
+        fclose($handle);
+    }
+
+    /**
+     * Envía un archivo al cliente para su descarga de forma segura.
+     *
+     * Este método valida la existencia, permisos y ubicación del archivo dentro
+     * del directorio permitido antes de enviarlo. Permite además asignar un nombre
+     * alternativo para el archivo descargado sin alterar el archivo físico.
+     *
+     * El envío se realiza en chunks para optimizar el uso de memoria y soportar
+     * archivos grandes. Se envían cabeceras HTTP seguras y se limpian los buffers
+     * de salida previos.
+     *
+     * @param string      $filePath     Ruta completa del archivo a descargar.
+     * @param string|null $newFilename  (Opcional) Nombre con el que se ofrecerá
+     *                                  el archivo al usuario durante la descarga.
+     *                                  Si se omite, se usa el nombre real del archivo.
+     *
+     * @return bool  Devuelve `true` si la descarga comienza correctamente,
+     *               o `false` si ocurre un error (por ejemplo, archivo no encontrado
+     *               o sin permisos).
+     *
+     * @throws void  No lanza excepciones, pero puede finalizar la ejecución con `exit`
+     *               después de enviar los encabezados y el contenido del archivo.
+     *
+     * @uses sanitizeFilename()  Para limpiar el nombre del archivo de salida.
+     * @uses readfileChunked()   Para enviar el archivo en bloques (chunks).
+     *
+     * @note Esta función envía cabeceras HTTP y termina la ejecución del script.
+     *       No debe llamarse después de haber enviado salida al navegador.
+     *       Se recomienda que cualquier manejo de errores previos se realice antes.
+     *
+     * @example
+     * ```php
+     * // Descarga normal
+     * $this->download('/var/www/storage/reports/invoice.pdf');
+     *
+     * // Descarga con nombre alternativo
+     * $this->download('/var/www/storage/reports/invoice.pdf', 'invoice_2025.pdf');
+     * ```
+     */
+    public function download(string $filePath, ?string $newFilename = null): bool
+    {
+        // Validar que el archivo existe
+        if (!$this->exists($filePath)) {
+            Redirect::error(404);
+            return false;
+        }
+
+        // Obtener ruta absoluta y validar que esté en directorio permitido
+        $realPath = realpath($filePath);
+        $allowedDir = realpath(ROOT_PATH);
+
+        if ($realPath === false || strpos($realPath, $allowedDir) !== 0) {
+            Redirect::error(403);
+            return false;
+        }
+
+        // Verificar permisos de lectura
+        if (!is_readable($realPath)) {
+            Redirect::error(403);
+            return false;
+        }
+
+        // Obtener información del archivo
+        $filesize = filesize($realPath);
+        $filenameSafe = $this->sanitizeFilename(basename($newFilename ?? $realPath));
+
+        // Limpiar buffers de salida
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        // Enviar headers seguros
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header("Content-Disposition: attachment; filename=\"$filenameSafe\"");
+        header(
+            "Content-Disposition: attachment; filename=\"$filenameSafe\"; filename*=UTF-8''" .
+            rawurlencode($filenameSafe)
+        );
+        header('Content-Transfer-Encoding: binary');
+        header("Content-Length: $filesize");
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        header('Expires: 0');
+        header('X-Content-Type-Options: nosniff');
+
+        // Enviar archivo en chunks para archivos grandes
+        $this->readfileChunked($realPath);
+
+        exit;
     }
 }

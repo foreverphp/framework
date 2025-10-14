@@ -18,6 +18,7 @@ namespace ForeverPHP\Core\Facades;
  * @method static bool isWritable(string $path)
  * @method static bool isFile(string $path)
  * @method static bool makeDirectory(string $path, int $mode = 0755, bool $recursive = false)
+ * @method static bool download(string $filePath, ?string $newFilename = null)
  * @see \ForeverPHP\Filesystem\Filesystem
  */
 class Storage extends Facade

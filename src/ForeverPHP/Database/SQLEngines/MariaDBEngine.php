@@ -14,6 +14,7 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
 {
     private $useTransaction = false;
     private $stmt = null;
+    private $unbuffered = false;
 
     public function connect()
     {
@@ -45,13 +46,21 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
         return true;
     }
 
+    /**
+     * Habilita modo unbuffered
+     */
+    public function setUnbuffered(bool $value)
+    {
+        $this->unbuffered = $value;
+    }
+
     private function returnDataGenerator()
     {
         $fields = null; // Almacena los nombres de campos afectados en la consulta
         $rows = null; // Almacenas las filas obtenidas de la consulta
         $return = [];
 
-        if ($this->numRows > 0) {
+        if ($this->numRows > 0 || $this->unbuffered) {
             // Se obtienen los metadatos del resultado para obtener los campos
             $metadata = $this->stmt->result_metadata();
             $mdFields = $metadata->fetch_fields();
@@ -222,8 +231,13 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
             // Se procede con la ejecucion de la consulta
             if ($this->queryType == 'other') {
                 if ($this->stmt->execute() === true) {
-                    $this->stmt->store_result();
-                    $this->numRows = $this->stmt->num_rows();
+                    // Solo store_result si NO es unbuffered
+                    if (!$this->unbuffered) {
+                        $this->stmt->store_result();
+                        $this->numRows = $this->stmt->num_rows();
+                    } else {
+                        $this->numRows = -1; // Desconocido en modo unbuffered
+                    }
 
                     // Genera los datos de retorno
                     $return = $this->returnDataGenerator();
@@ -244,8 +258,13 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
                         $return = true;
                     } else {
                         // Se obtiene el numero de filas obtenidas de los metadatos de la consulta
-                        $this->stmt->store_result();
-                        $this->numRows = $this->stmt->num_rows();
+                        // Solo store_result si NO es unbuffered
+                        if (!$this->unbuffered) {
+                            $this->stmt->store_result();
+                            $this->numRows = $this->stmt->num_rows();
+                        } else {
+                            $this->numRows = -1; // Desconocido en modo unbuffered
+                        }
 
                         // Genera los datos de retorno
                         $return = $this->returnDataGenerator();

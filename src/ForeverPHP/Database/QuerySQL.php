@@ -36,6 +36,7 @@ class QuerySQL
     private $autocommit = false;
 
     private $useTransaction = false;
+    private $unbuffered = false;
 
     /**
      * Contiene la instancia singleton de QuerySQL.
@@ -112,6 +113,17 @@ class QuerySQL
         $this->parameters[$count] = ["type" => $type, "value" => $value];
     }
 
+    /**
+     * Habilita modo unbuffered para grandes conjuntos de datos
+     *
+     * @return $this
+     */
+    public function unbuffered()
+    {
+        $this->unbuffered = true;
+        return $this;
+    }
+
     private function createInstance()
     {
         if (!$this->useTransaction) {
@@ -150,6 +162,11 @@ class QuerySQL
 
             if ($this->dbInstance->connect()) {
                 $this->connected = true;
+            }
+
+            // Pasa el modo unbuffered al engine
+            if ($this->unbuffered) {
+                $this->dbInstance->setUnbuffered(true);
             }
         }
     }
@@ -220,6 +237,7 @@ class QuerySQL
         $this->query = "";
         $this->queryType = "select";
         $this->queryReturn = "num";
+        $this->unbuffered = false;
 
         // Agrego este control de error para lanzar una excepción para no tener que usar siempre QuerySQL::hasError
         if (!empty($this->error) && $this->error != null) {

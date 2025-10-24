@@ -14,6 +14,7 @@ class PgSQLEngine extends SQLEngine implements SQLEngineInterface
 {
     private $useTransaction = false;
     private $stmt = null;
+    private $unbuffered = false;
 
     public function connect()
     {
@@ -37,6 +38,14 @@ class PgSQLEngine extends SQLEngine implements SQLEngineInterface
         }
 
         return true;
+    }
+
+    /**
+     * Habilita modo unbuffered
+     */
+    public function setUnbuffered(bool $value)
+    {
+        $this->unbuffered = $value;
     }
 
     private function returnDataGenerator($resultQuery)

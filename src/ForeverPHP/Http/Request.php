@@ -173,14 +173,14 @@ class Request
         return isset($this->params[$name]);
     }
 
-     /**
+    /**
      * Obtiene el valor de un parámetro del request.
      *
      * @param string $name
-     * @param mixed|null $default
+     * @param string|int|array|null $default
      * @return mixed
      */
-    public function get(string $name, mixed $default = null): mixed
+    public function get(string $name, string|int|array|null $default = null): mixed
     {
         return $this->params[$name] ?? $default;
     }

@@ -74,7 +74,7 @@ class RedirectResponse implements ResponseInterface
      *
      * @return void
      */
-    public function make(): void
+    public function make()
     {
         // Guarda headers y path en sesión para uso posterior
         if (!empty($this->headers)) {

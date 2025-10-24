@@ -10,5 +10,5 @@ namespace ForeverPHP\Http;
  */
 interface ResponseInterface
 {
-    public function make(): void;
+    public function make();
 }

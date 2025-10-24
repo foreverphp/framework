@@ -46,7 +46,7 @@ class JsonResponse implements ResponseInterface
      *
      * @return void
      */
-    public function make(): void
+    public function make()
     {
         // Determinar los datos a codificar
         $data = is_array($this->content)

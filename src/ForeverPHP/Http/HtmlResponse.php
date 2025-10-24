@@ -51,7 +51,12 @@ class HtmlResponse implements ResponseInterface
         $this->usingCache = $usingCache;
     }
 
-    public function make($returnRender = false): void
+    /**
+     * Genera HTML y lo envía al cliente.
+     *
+     * @return void
+     */
+    public function make($returnRender = false)
     {
         $this->validateCsrf();
 

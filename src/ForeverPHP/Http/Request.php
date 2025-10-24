@@ -6,26 +6,26 @@ use ForeverPHP\Core\Settings;
 use ForeverPHP\Http\RequestFile;
 
 /**
- * Contiene parametros he informacion del request.
+ * Contiene parámetros e información del request HTTP.
  *
- * @since       Version 0.1.0
+ * @since Version 0.4.0
  */
 class Request
 {
-    private $registered = false;
+    /** @var bool Indica si el request ya fue registrado */
+    private bool $registered = false;
 
-    private $files = null;
+    /** @var array Archivos subidos */
+    private array $files = [];
 
-    private $method = 'get';
+    /** @var string Método HTTP del request */
+    private string $method = 'get';
 
-    private $params = null;
+    /** @var array Parámetros del request */
+    private array $params = [];
 
-    /**
-     * Contiene la instancia singleton de Request.
-     *
-     * @var \ForeverPHP\Http\Request
-     */
-    private static $instance;
+    /** @var \ForeverPHP\Http\Request Instancia singleton */
+    private static ?Request $instance = null;
 
     public function __construct()
     {
@@ -36,7 +36,7 @@ class Request
      *
      * @return \ForeverPHP\Http\Request
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (static::$instance === null) {
             static::$instance = new static();
@@ -45,22 +45,33 @@ class Request
         return static::$instance;
     }
 
-    private function loadRequest()
+    /**
+     * Carga los parámetros y archivos del request.
+     *
+     * @return void
+     */
+    private function loadRequest(): void
     {
-        $requestParams = null;
+        if ($this->registered) {
+            return;
+        }
 
-        if ($this->params == null) {
-            $requestMethod = $_SERVER['REQUEST_METHOD'];
-            $this->files = [];
-            $this->params = [];
+        $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $requestParams = [];
 
-            if ($requestMethod == 'GET') {
-                $this->method = 'get';
+        $this->method = strtolower($requestMethod);
+
+        switch ($requestMethod) {
+            case 'GET':
                 $requestParams = $_GET;
-            } elseif ($requestMethod == 'POST') {
-                $this->method = 'post';
+                break;
+
+            case 'POST':
                 $requestParams = $_POST;
-            } elseif ($requestMethod == 'PUT' || $requestMethod == 'DELETE') {
+                break;
+
+            case 'PUT':
+            case 'DELETE':
                 /**
                  * PHP no tiene un método propiamente dicho para leer una petición PUT o DELETE,
                  * por lo que se usa un "truco".
@@ -70,165 +81,184 @@ class Request
                  * (variable1=dato1&variable2=data2...) que evidentemente tendremos que
                  * transformarla a un array asociativo.
                  */
-                $requestContent = file_get_contents("php://input");
-                parse_str($requestContent, $requestParams);
+                $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+                $input = file_get_contents("php://input");
 
-                $this->method = ($requestMethod == 'PUT') ? 'put' : 'delete';
-            }
-
-            // Verifica si hay archivos enviados
-            if (count($_FILES) != 0) {
-                foreach ($_FILES as $name => $value) {
-                    $this->files[$name] = new RequestFile($value);
+                if (str_contains($contentType, 'application/json')) {
+                    $requestParams = json_decode($input, true) ?: [];
+                } else {
+                    parse_str($input, $requestParams);
                 }
-            }
-
-            foreach ($requestParams as $name => $value) {
-                switch ($name) {
-                    case 'csrfToken':
-                        Settings::getInstance()->set($name, $value);
-                        break;
-                    default:
-                        $this->params[$name] = $value;
-                        break;
-                }
-            }
-        }
-    }
-
-    public function register($params = null)
-    {
-        if (!$this->registered) {
-            switch ($params) {
-                case null:
-                    $this->loadRequest();
-                    break;
-                default:
-                    $this->params = $params;
-                    break;
-            }
-
-            $this->registered = true;
-        }
-    }
-
-    public function path()
-    {
-        // retorna la uri
-    }
-
-    public function url()
-    {
-        // retorna la url del request
-    }
-
-    public function segment($number)
-    {
-        // devuelve el segmento de url indicado
-    }
-
-    public function is($path)
-    {
-        // valida si se esta en el path
-    }
-
-    public function header($name)
-    {
-        // devuelve el elemento del header ejemplo 'Content-Type'
-    }
-
-    public function server($var)
-    {
-        // retorna valores de $_SERVER
-    }
-
-    public function host()
-    {
-        return Host::getInstance();
-    }
-
-    public function method()
-    {
-        return self::$method;
-    }
-
-    public function isMethod($method)
-    {
-        if (strtolower($method) === $this->method) {
-            return true;
+                break;
         }
 
-        return false;
+        // Archivos subidos
+        foreach ($_FILES as $name => $value) {
+            $this->files[$name] = new RequestFile($value);
+        }
+
+        // Asignación de parámetros y keys especiales (como csrfToken)
+        $specialKeys = ['csrfToken'];
+        foreach ($requestParams as $name => $value) {
+            if (in_array($name, $specialKeys)) {
+                Settings::getInstance()->set($name, $value);
+            } else {
+                $this->params[$name] = $value;
+            }
+        }
+
+        $this->registered = true;
     }
 
-    public function secure()
-    {
-        // devuelve si esta en https o no
-    }
-
-    public function ajax()
-    {
-        // devuelve si esta en ajax o no
-    }
-
-    public function isJson()
-    {
-        // devuelve si el request content-type es de tipo json
-    }
-
-    public function wantsJson()
-    {
-        // devuelve si la solicitud esta pidiendo json o no
-    }
-
-    public function format($format)
-    {
-        /*
-    Comprobación del formato de respuesta de la petición de
-
-    El método Request :: format devuelve el formato de respuesta solicitada basándose en la cabecera HTTP Accept header:
+    /**
+     * Registra el request manualmente.
+     *
+     * @param array|null $params Parámetros a registrar
+     * @return void
      */
-    }
-
-    public function exists($name)
+    public function register(?array $params = null): void
     {
-        if ($this->params !== null) {
-            if (array_key_exists($name, $this->params)) {
-                return true;
-            }
+        if ($this->registered) {
+            return;
         }
 
-        return false;
-    }
-
-    public function get($name)
-    {
-        if ($this->exists($name)) {
-            return $this->params[$name];
+        if ($params !== null) {
+            $this->params = $params;
+        } else {
+            $this->loadRequest();
         }
 
-        return false;
+        $this->registered = true;
     }
 
-    public function all()
+    /**
+     * Obtiene la instancia de Host.
+     *
+     * @return \ForeverPHP\Http\Host
+     */
+    public function host(): Host
+    {
+         return Host::getInstance();
+    }
+
+    /**
+     * Retorna el método HTTP del request.
+     *
+     * @return string
+     */
+    public function method(): string
+    {
+        return $this->method;
+    }
+
+    /**
+     * Valida si el request es del método indicado.
+     *
+     * @param string $method
+     * @return bool
+     */
+    public function isMethod(string $method): bool
+    {
+        return strtolower($method) === $this->method;
+    }
+
+    /**
+     * Verifica si existe un parámetro en el request.
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function exists(string $name): bool
+    {
+        return isset($this->params[$name]);
+    }
+
+     /**
+     * Obtiene el valor de un parámetro del request.
+     *
+     * @param string $name
+     * @param mixed|null $default
+     * @return mixed
+     */
+    public function get(string $name, mixed $default = null): mixed
+    {
+        return $this->params[$name] ?? $default;
+    }
+
+    /**
+     * Retorna todos los parámetros del request.
+     *
+     * @return array
+     */
+    public function all(): array
     {
         return $this->params;
     }
 
-    public function hasFile($name)
+    /**
+     * Verifica si existe un archivo subido.
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function hasFile(string $name): bool
     {
-        // indica si el parametro pasado por nombre es de tipo file
+        return isset($this->files[$name]);
     }
 
-    public function file($name)
+    /**
+     * Obtiene un archivo subido.
+     *
+     * @param string $name
+     * @return RequestFile|false
+     */
+    public function file(string $name): RequestFile|false
     {
-        $return = false;
+        return $this->files[$name] ?? false;
+    }
 
-        if (isset($this->files[$name])) {
-            $return = $this->files[$name];
-        }
+    /**
+     * Retorna todos los archivos subidos.
+     *
+     * @return array
+     */
+    public function allFiles(): array
+    {
+        return $this->files;
+    }
 
-        return $return; //$this->files[$name];
-        //return $this->files[$name];
+    // Métodos pendientes de implementación
+    public function path()
+    {
+    }
+    public function url()
+    {
+    }
+    public function segment(int $number)
+    {
+    }
+    public function is(string $path)
+    {
+    }
+    public function header(string $name)
+    {
+    }
+    public function server(string $var)
+    {
+    }
+    public function secure()
+    {
+    }
+    public function ajax()
+    {
+    }
+    public function isJson()
+    {
+    }
+    public function wantsJson()
+    {
+    }
+    public function format(string $format)
+    {
     }
 }

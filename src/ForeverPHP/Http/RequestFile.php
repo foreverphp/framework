@@ -3,105 +3,197 @@
 namespace ForeverPHP\Http;
 
 /**
- * Contiene información de un archivo enviado por el request.
+ * Contiene información y operaciones de un archivo enviado en el request.
  *
- * @since       Version 0.4.0
+ * Proporciona métodos para acceder a nombre, extensión, MIME type, tamaño,
+ * estado de error y mover el archivo a un directorio específico.
+ *
+ * @since Version 0.4.0
  */
 class RequestFile
 {
-    private $filename = '';
+    /**
+     * Nombre completo del archivo tal como se subió.
+     *
+     * @var string
+     */
+    private string $filename = '';
 
-    private $name = '';
+    /**
+     * Nombre del archivo sin extensión.
+     *
+     * @var string
+     */
+    private string $name = '';
 
-    private $extension = '';
+    /**
+     * Extensión del archivo (sin el punto).
+     *
+     * @var string
+     */
+    private string $extension = '';
 
-    private $mimetype = '';
+    /**
+     * MIME type del archivo.
+     *
+     * @var string
+     */
+    private string $mimetype = '';
 
-    private $realPath = '';
+    /**
+     * Ruta temporal donde PHP almacena el archivo subido.
+     *
+     * @var string
+     */
+    private string $realPath = '';
 
-    private $error = null;
+    /**
+     * Código de error de la subida, según las constantes UPLOAD_ERR_* de PHP.
+     *
+     * @var int
+     */
+    private int $error = 0;
 
-    private $size = 0;
+    /**
+     * Tamaño del archivo en bytes.
+     *
+     * @var int
+     */
+    private int $size = 0;
 
-    public function __construct($fileInfo)
+    /**
+     * Constructor.
+     *
+     * Inicializa la instancia con los datos del array $_FILES.
+     *
+     * @param array $fileInfo Array con información del archivo (ej. $_FILES['field'])
+     */
+    public function __construct(array $fileInfo)
     {
-        $this->filename = $fileInfo['name'];
+        $this->filename = is_array($fileInfo['name']) ? $fileInfo['name'][0] : $fileInfo['name'];
 
-        // Valida si el nombre del archivo viene en array
-        if (is_array($this->filename)) {
-            $this->filename = $this->filename[0];
-        }
+        $this->setNameAndExtension($this->filename);
 
-        // Obtengo el nombre y la extención del archivo
-        $nameAndExtension = explode('.', $this->filename);
-        $this->name = $nameAndExtension[0];
-        $this->extension = $nameAndExtension[1];
-
-        $this->mimetype = $fileInfo['type'];
-        $this->realPath = $fileInfo['tmp_name'];
-        $this->error = $fileInfo['error'];
-        $this->size = $fileInfo['size'];
+        $this->mimetype = $fileInfo['type'] ?? '';
+        $this->realPath = $fileInfo['tmp_name'] ?? '';
+        $this->error = $fileInfo['error'] ?? UPLOAD_ERR_OK;
+        $this->size = $fileInfo['size'] ?? 0;
     }
 
-    public function getFilename()
+    /**
+     * Separa el nombre y la extensión del archivo, incluso si tiene múltiples puntos.
+     *
+     * @param string $filename
+     * @return void
+     */
+    private function setNameAndExtension(string $filename): void
+    {
+        $pathInfo = pathinfo($filename);
+        $this->name = $pathInfo['filename'] ?? '';
+        $this->extension = $pathInfo['extension'] ?? '';
+    }
+
+    /**
+     * Obtiene el nombre completo del archivo.
+     *
+     * @return string
+     */
+    public function getFilename(): string
     {
         return $this->filename;
     }
 
-    public function getName()
+    /**
+     * Obtiene el nombre del archivo sin extensión.
+     *
+     * @return string
+     */
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function getExtension()
+    /**
+     * Obtiene la extensión del archivo.
+     *
+     * @return string
+     */
+    public function getExtension(): string
     {
         return $this->extension;
     }
 
-    public function getMimeType()
+    /**
+     * Obtiene el MIME type del archivo.
+     *
+     * @return string
+     */
+    public function getMimeType(): string
     {
         return $this->mimetype;
     }
 
-    public function getRealPath()
+    /**
+     * Obtiene la ruta temporal donde PHP almacena el archivo.
+     *
+     * @return string
+     */
+    public function getRealPath(): string
     {
         return $this->realPath;
     }
 
-    public function hasError()
+    /**
+     * Indica si el archivo tiene algún error de subida.
+     *
+     * @return bool
+     */
+    public function hasError(): bool
     {
-        if ($this->error != 0) {
-            return true;
-        }
-
-        return false;
+        return $this->error !== UPLOAD_ERR_OK;
     }
 
-    public function getSize()
+     /**
+     * Obtiene el código de error de la subida.
+     *
+     * @return int
+     */
+    public function getError(): int
+    {
+        return $this->error;
+    }
+
+    /**
+     * Obtiene el código de error de la subida.
+     *
+     * @return int
+     */
+    public function getSize(): int
     {
         return $this->size;
     }
 
     /**
-     * Mueve el archivo a la ruta entregada.
+     * Mueve el archivo a la ruta especificada.
      *
-     * @param  string $path
-     * @return boolean
+     * Crea el directorio si no existe y asegura que la ruta termine con un slash.
+     *
+     * @param string $path Directorio destino
+     * @param string|null $filename Nombre opcional del archivo
+     * @return bool Retorna true si se movió correctamente, false en caso contrario
      */
-    public function move($path, $filename = null)
+    public function move(string $path, ?string $filename = null): bool
     {
-        $newFilename = ($filename != null) ? $filename : $this->filename;
+        $newFilename = $filename ?? $this->filename;
 
-        // Valida si la ruta termina con slash
-        $lastSlash = substr($path, strlen($path), 1);
+        // Asegura que la ruta termina con '/'
+        $path = rtrim($path, '/\\') . '/';
 
-        if ($lastSlash !== '/') {
-            $path .= '/';
+        // Crea el directorio si no existe
+        if (!is_dir($path)) {
+            mkdir($path, 0755, true);
         }
 
-        // Retorno TRUE si se movio el archivo, de lo contrario FALSE
-        $result = move_uploaded_file($this->realPath, "$path$newFilename");
-
-        return $result;
+        return move_uploaded_file($this->realPath, "$path$newFilename");
     }
 }

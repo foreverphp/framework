@@ -5,19 +5,25 @@ namespace ForeverPHP\Session;
 use ForeverPHP\Core\Settings;
 
 /**
- * Controla y gestiona las sessiones en el framework.
+ * Gestiona las sesiones en el framework ForeverPHP.
  *
- * @since       Version 0.1.0
+ * Esta clase implementa el patrón Singleton para asegurar
+ * que solo exista una instancia del manejador de sesiones.
+ *
+ * @since 0.4.0
  */
 class SessionManager
 {
     /**
-     * Contiene la instancia singleton de SessionManager.
+     * Instancia única de la clase SessionManager.
      *
      * @var \ForeverPHP\Session\SessionManager
      */
-    private static $instance;
+    private static ?self $instance = null;
 
+    /**
+     * Constructor privado para evitar instanciación directa.
+     */
     private function __construct()
     {
     }
@@ -27,7 +33,7 @@ class SessionManager
      *
      * @return \ForeverPHP\Session\SessionManager
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (static::$instance === null) {
             static::$instance = new static();
@@ -36,20 +42,29 @@ class SessionManager
         return static::$instance;
     }
 
-    private function isSessionStarted()
+    /**
+     * Verifica si la sesión está iniciada.
+     *
+     * @return bool
+     */
+    private function isSessionStarted(): bool
     {
-        if (php_sapi_name() !== 'cli') {
-            if (version_compare(phpversion(), '5.4.0', '>=')) {
-                return session_status() === PHP_SESSION_ACTIVE ? true : false;
-            } else {
-                return session_id() === '' ? false : true;
-            }
+        if (php_sapi_name() === 'cli') {
+            return false;
         }
 
-        return false;
+        if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+            return session_status() === PHP_SESSION_ACTIVE;
+        }
+        return session_id() !== '';
     }
 
-    private function sessionStart()
+    /**
+     * Inicia la sesión si aún no está activa.
+     *
+     * @return void
+     */
+    private function sessionStart(): void
     {
         if (!$this->isSessionStarted()) {
             session_name(Settings::getInstance()->get('sessionName'));
@@ -57,105 +72,166 @@ class SessionManager
         }
     }
 
-    public function exists($key, $section = 'main')
+    /**
+     * Asegura que la sesión esté iniciada y retorna el estado.
+     *
+     * @return bool True si la sesión está activa tras el intento de inicio.
+     */
+    private function ensureStarted(): bool
     {
         $this->sessionStart();
+        return $this->isSessionStarted();
+    }
 
-        if ($this->isSessionStarted()) {
-            if (isset($_SESSION[$section][$key])) {
-                return true;
+    /**
+     * Verifica si existe una clave dentro de una sección de sesión.
+     *
+     * @param string $key      Clave de sesión.
+     * @param string $section  Sección de la sesión (por defecto 'main').
+     * @return bool
+     */
+    public function exists(string $key, string $section = 'main'): bool
+    {
+        return $this->ensureStarted() && isset($_SESSION[$section][$key]);
+    }
+
+    /**
+     * Valida si todas las claves especificadas existen en un mismo namespace de sesión.
+     *
+     * @param array $keys Lista de claves a validar.
+     * @param string $section Namespace de sesión (por defecto 'main').
+     * @return bool Devuelve true si todas existen, false si alguna no existe.
+     */
+    public function existsAll(array $keys, string $section = 'main'): bool
+    {
+        if (!$this->ensureStarted()) {
+            return false;
+        }
+
+        foreach ($keys as $key) {
+            if (!isset($_SESSION[$section][$key])) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
-    public function existsSection($section)
+    /**
+     * Verifica si existe una sección de sesión.
+     *
+     * @param string $section Nombre de la sección.
+     * @return bool
+     */
+    public function existsSection(string $section): bool
     {
-        $this->sessionStart();
+        return $this->ensureStarted() && isset($_SESSION[$section]);
+    }
 
-        if ($this->isSessionStarted()) {
-            if (isset($_SESSION[$section])) {
-                return true;
+    /**
+     * Almacena un valor en la sesión.
+     *
+     * @param string $key      Clave de la variable.
+     * @param mixed  $value    Valor a almacenar.
+     * @param string $section  Sección de la sesión (por defecto 'main').
+     * @return void
+     */
+    public function set(string $key, mixed $value, string $section = 'main'): void
+    {
+        if ($this->ensureStarted()) {
+            if (!isset($_SESSION[$section]) || !is_array($_SESSION[$section])) {
+                $_SESSION[$section] = [];
             }
-        }
-
-        return false;
-    }
-
-    public function set($key, $value, $section = 'main')
-    {
-        $this->sessionStart();
-
-        if ($this->isSessionStarted()) {
-            // Agrego la llave a la sesion
             $_SESSION[$section][$key] = $value;
         }
     }
 
-    public function get($key, $section = 'main')
+    /**
+     * Obtiene un valor de la sesión.
+     *
+     * @param string $key      Clave de la variable.
+     * @param string $section  Sección de la sesión (por defecto 'main').
+     * @return mixed|null
+     */
+    public function get(string $key, string $section = 'main'): mixed
     {
-        $this->sessionStart();
-
-        if ($this->isSessionStarted()) {
-            if ($this->exists($key, $section)) {
-                // Retorna el valor de la llave
-                return $_SESSION[$section][$key];
-            }
+        if ($this->ensureStarted() && isset($_SESSION[$section][$key])) {
+            return $_SESSION[$section][$key];
         }
 
         return null;
     }
 
-    public function remove($key, $section = 'main')
+    /**
+     * Elimina una variable de la sesión.
+     *
+     * @param string $key     Clave a eliminar.
+     * @param string $section Sección donde se encuentra (por defecto 'main').
+     * @return void
+     */
+    public function remove(string $key, string $section = 'main'): void
     {
-        $this->sessionStart();
-
-        if ($this->isSessionStarted()) {
-            if ($this->exists($key, $section)) {
-                unset($_SESSION[$section][$key]);
-            }
+        if ($this->ensureStarted() && isset($_SESSION[$section][$key])) {
+            unset($_SESSION[$section][$key]);
         }
     }
 
-    public function removeSection($section)
+    /**
+     * Elimina una sección completa de la sesión.
+     *
+     * @param string $section Nombre de la sección.
+     * @return void
+     */
+    public function removeSection(string $section): void
     {
-        $this->sessionStart();
-
-        if ($this->isSessionStarted()) {
-            if ($this->existsSection($section)) {
-                unset($_SESSION[$section]);
-            }
+        if ($this->ensureStarted() && isset($_SESSION[$section])) {
+            unset($_SESSION[$section]);
         }
     }
 
-    public function regenerate($deleteOldSession = false)
+    /**
+     * Regenera el ID de sesión.
+     *
+     * @param bool $deleteOldSession Si se debe eliminar la sesión anterior (por defecto false).
+     * @return void
+     */
+    public function regenerate(bool $deleteOldSession = false): void
     {
-        $this->sessionStart();
-
-        if ($this->isSessionStarted()) {
+        if ($this->ensureStarted()) {
             session_regenerate_id($deleteOldSession);
-            //self::$id = session_id();
         }
     }
 
-    public function destroy()
+    /**
+     * Destruye completamente la sesión.
+     *
+     * Limpia todas las variables, elimina la cookie de sesión
+     * y destruye la sesión activa.
+     *
+     * @return void
+     */
+    public function destroy(): void
     {
-        $this->sessionStart();
-
-        if ($this->isSessionStarted()) {
-            // Destruir todas las variables de sesión
-            $_SESSION = [];
-
-            /**
-             * Si se desea destruir la sesión completamente, borre también la cookie de sesión.
-             * Nota: ¡Esto destruirá la sesión, y no la información de la sesión!
-             */
-            $paramsCookie = session_get_cookie_params();
-            setcookie(session_name(), 0, 1, $paramsCookie['path']);
-
-            // Finalmente, destruir la sesión
-            session_destroy();
+        if (!$this->ensureStarted()) {
+            return;
         }
+
+        // Vaciar variables de sesión
+        $_SESSION = [];
+
+        // Eliminar cookie de sesión correctamente
+        $params = session_get_cookie_params();
+        setcookie(
+            session_name(),
+            '',
+            time() - 42000,
+            $params['path'] ?? '/',
+            $params['domain'] ?? '',
+            $params['secure'] ?? false,
+            $params['httponly'] ?? false
+        );
+
+        // Destruir sesión
+        session_destroy();
     }
 }

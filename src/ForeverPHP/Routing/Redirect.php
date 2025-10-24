@@ -36,10 +36,10 @@ class Redirect
      * @param  string $name
      * @return \ForeverPHP\Http\RedirectResponse
      */
-    //public function route($name)
-    //{
-    //    // Debe construir una ruta segun el nombre de la ruta
-    //}
+    /*public function route($name)
+    {
+        // Debe construir una ruta segun el nombre de la ruta
+    }*/
 
     /**
      * Redirecciona a un error, ejemplo un 404.

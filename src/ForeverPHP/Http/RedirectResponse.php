@@ -16,30 +16,30 @@ class RedirectResponse implements ResponseInterface
      *
      * @var string
      */
-    private $path;
+    private string $path;
 
     /**
      * Codigo de estado.
      *
      * @var integer
      */
-    private $status;
+    private int $status;
 
     /**
      * Encabezados a incluir en la redireccion.
      *
      * @var array
      */
-    private $headers;
+    private array $headers;
 
     /**
      * Almacena la instancia unica del administrador de sesiones.
      *
      * @var \ForeverPHP\Session\SessionManager
      */
-    private $session;
+    private SessionManager $session;
 
-    public function __construct($path, $status, $headers)
+    public function __construct(string $path, int $status = 302, array $headers = [])
     {
         $this->path = $path;
         $this->status = $status;
@@ -49,14 +49,19 @@ class RedirectResponse implements ResponseInterface
         $this->session = SessionManager::getInstance();
     }
 
-    public function with($key, $value = null)
+    /**
+     * Añade datos que estarán disponibles después de la redirección.
+     */
+    public function with($key, $value = null): self
     {
+        if ($key instanceof \ForeverPHP\View\Context) {
+            return $this->with($key->all());
+        }
+
         if (is_array($key)) {
-            foreach ($key as $k => $value) {
-                $this->with($k, $value);
+            foreach ($key as $k => $v) {
+                $this->session->set($k, $v, 'redirect');
             }
-        } elseif ($key instanceof \ForeverPHP\View\Context) {
-            $this->with($key->all());
         } else {
             $this->session->set($key, $value, 'redirect');
         }
@@ -65,27 +70,27 @@ class RedirectResponse implements ResponseInterface
     }
 
     /**
-     * Construye la redireccion
+     * Ejecuta la redirección HTTP.
      *
      * @return void
      */
-    public function make()
+    public function make(): void
     {
-        /**
-         * Se guardan los headers si es que hay en la configuracion
-         * para luego utilizarlos al construir la redireccion
-         */
-        if (count($this->headers) > 0) {
-            if (
-                !$this->session->exists('headersInRedirect', 'redirect') ||
-                !$this->session->get('headersInRedirect', 'redirect')
-            ) {
+        // Guarda headers y path en sesión para uso posterior
+        if (!empty($this->headers)) {
+            if (!$this->session->existsAll(['redirectPath', 'headersInRedirect'], 'redirect')) {
                 $this->session->set('redirectPath', $this->path, 'redirect');
                 $this->session->set('headersInRedirect', $this->headers, 'redirect');
             }
         }
 
-        header("Location: $this->path");
+        // Envía headers personalizados antes de redirección
+        foreach ($this->headers as $name => $value) {
+            header("$name: $value");
+        }
+
+        // Redirección HTTP con código especificado
+        header("Location: {$this->path}", true, $this->status);
         exit();
     }
 }

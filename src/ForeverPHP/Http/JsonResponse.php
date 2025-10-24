@@ -9,7 +9,7 @@ use ForeverPHP\Http\ResponseInterface;
  * Genera respuestas en formato JSON al cliente.
  *
  * @author  Daniel Nuñez S. <dnunez@emarva.com>
- * @since   Version 0.2.0
+ * @since   Version 0.4.0
  */
 class JsonResponse implements ResponseInterface
 {
@@ -41,21 +41,35 @@ class JsonResponse implements ResponseInterface
         $this->charset = $charset;
     }
 
-    public function make()
+    /**
+     * Genera y envía la respuesta JSON al cliente.
+     *
+     * @return void
+     */
+    public function make(): void
     {
-        $data = [];
+        // Determinar los datos a codificar
+        $data = is_array($this->content)
+            ? $this->content
+            : [];
 
-        $data = (is_array($this->content)) ? $this->content : Context::all();
+        // Establecer código de estado HTTP
+        http_response_code($this->statusCode);
 
-        header('HTTP/1.0 ' . $this->statusCode . ' ' .
-            Response::getResponseStatus($this->statusCode), true, $this->statusCode);
-        header("Content-type: application/json; charset: {$this->charset}");
-        header("Accept-Charset: {$this->charset}");
+        // Establecer encabezados
+        header("Content-Type: application/json; charset={$this->charset}");
 
-        // Comienza la captura del buffer de salida
-        ob_start();
+        // Codificar JSON con opciones modernas
+        $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-        // Retorna los datos en formato JSON
-        echo json_encode($data);
+        // Manejo de errores en codificación
+        if ($json === false) {
+            $error = json_last_error_msg();
+            http_response_code(500);
+            $json = json_encode(['error' => "Error encoding JSON: {$error}"], JSON_UNESCAPED_UNICODE);
+        }
+
+        // Enviar el cuerpo de la respuesta
+        echo $json;
     }
 }

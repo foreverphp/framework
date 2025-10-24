@@ -18,9 +18,12 @@ use ForeverPHP\Core\Helpers\RouteHelpers;
 use ForeverPHP\Core\Helpers\StringHelpers;
 
 // Carga las variables de entorno desde el archivo .env
+// TODO: Mover a bootstrap.php
 if (Storage::exists(ROOT_PATH . DS . '.env')) {
-    $dotenv = \Dotenv\Dotenv::createUnsafeImmutable(ROOT_PATH);
-    $dotenv->load();
+    if (class_exists(\Dotenv\Dotenv::class)) {
+        $dotenv = \Dotenv\Dotenv::createUnsafeImmutable(ROOT_PATH);
+        $dotenv->load();
+    }
 }
 
 if (!function_exists('is_multi_array')) {
@@ -86,5 +89,19 @@ if (!function_exists('upper')) {
     function upper($string)
     {
         return StringHelpers::upper($string);
+    }
+}
+
+/**
+ * Valida si una constante esta definida
+ *
+ * @param string $name
+ * @param mixed $default
+ * @return mixed
+ */
+if (!function_exists('safe_const')) {
+    function safe_const(string $name, mixed $default = null): mixed
+    {
+        return defined($name) ? constant($name) : $default;
     }
 }

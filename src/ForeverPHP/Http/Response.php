@@ -2,22 +2,22 @@
 
 namespace ForeverPHP\Http;
 
-use ForeverPHP\Http\HtmlResponse;
-use ForeverPHP\Http\JsonResponse;
+use ForeverPHP\View\Context;
 
 /**
  * Se encarga de devolver la respuesta adecuada al cliente.
- * solicitada.
  *
- * @since       Version 0.2.0
+ * Proporciona métodos para renderizar HTML, devolver JSON, manejar descargas
+ * y obtener textos de códigos de estado HTTP.
+ *
+ * @since Version 0.4.0
  */
 class Response
 {
     /**
-     * Contiene los textos de estados los cuales se recuperar con su
-     * respectivo codigo.
+     * Textos de estados HTTP mapeados por código.
      *
-     * @var array
+     * @var array<int,string>
      */
     private static $responseStatus = [
         100 => 'Continue',
@@ -84,12 +84,13 @@ class Response
     ];
 
     /**
-     * Devuelve una respuesta del rendereo de un template.
+     * Renderiza un template HTML.
      *
-     * @param  string $template
-     * @return \ForeverPHP\Http\HtmlResponse
+     * @param string $template Nombre del template
+     * @param int $statusCode Código de estado HTTP
+     * @return HtmlResponse
      */
-    public function render($template, $statusCode = 200)
+    public function render(string $template, int $statusCode = 200): HtmlResponse
     {
         return new HtmlResponse($template, $statusCode);
     }
@@ -97,49 +98,66 @@ class Response
     /**
      * Devuelve una respuesta en formato JSON.
      *
-     * @param  \ForeverPHP\View\Context|array $context
-     * @return mixed
+     * @param Context|array $content Contenido a devolver
+     * @param int $statusCode Código de estado HTTP
+     * @return JsonResponse
+     *
+     * @throws \InvalidArgumentException Si $content es null
      */
-    public function json($content, $statusCode = 200): JsonResponse | bool
+    public function json(Context|array $content, int $statusCode = 200): JsonResponse
     {
-        if ($content !== null) {
-            return new JsonResponse($content, $statusCode);
+        if ($content === null) {
+            throw new \InvalidArgumentException('JSON content cannot be null.');
         }
 
-        return false;
+        return new JsonResponse($content, $statusCode);
     }
 
     /**
-     * Devuelve una descarga de archivo.
+     * Inicia la descarga de un archivo.
      *
-     * @param  string $url
-     * @return mixed
+     * @param string $filePath Ruta del archivo
+     * @param string|null $filename Nombre opcional del archivo para descargar
+     * @return void
      */
-    public function download($url)
+    public function download(string $filePath, ?string $filename = null): void
     {
-        //
+        if (!file_exists($filePath)) {
+            http_response_code(404);
+            echo "File not found.";
+            exit();
+        }
+
+        $filename ??= basename($filePath);
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($filePath));
+
+        readfile($filePath);
+        exit();
     }
 
     /**
-     * Devuelve el texto del estado de la respuesta.
+     * Obtiene el texto asociado a un código de estado HTTP.
      *
-     * @param int $status
-     * @return string|bool
+     * @param int $status Código de estado
+     * @return string Texto del estado
      */
-    public static function getResponseStatus(int $status): string|bool
+    public static function getResponseStatus(int $status): string
     {
         // Si el status no esta en el array de estados devuelve 500
-        if (!isset(static::$responseStatus[$status])) {
-            $status = 500;
-        }
-
-        return static::$responseStatus[$status];
+        return static::$responseStatus[$status] ?? static::$responseStatus[500];
     }
 
     /**
-     * Verifica si el status de la respuesta existe.
+     * Verifica si un código de estado HTTP existe.
      *
-     * @param int $status
+     * @param int $status Código de estado
      * @return bool
      */
     public static function existsResponseStatus(int $status): bool

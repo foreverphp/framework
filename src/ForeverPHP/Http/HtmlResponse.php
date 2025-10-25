@@ -53,8 +53,6 @@ class HtmlResponse implements ResponseInterface
 
     /**
      * Genera HTML y lo envía al cliente.
-     *
-     * @return void
      */
     public function make($returnRender = false)
     {
@@ -125,27 +123,28 @@ class HtmlResponse implements ResponseInterface
     private function resolveTemplatePath(): array
     {
         $settings = Settings::getInstance();
+        $ds = safe_const('DS');
 
         $baseTemplatesDir = $settings->get('ForeverPHPTemplate')
             ? safe_const('FOREVERPHP_TEMPLATES_PATH', safe_const('TEMPLATES_PATH'))
             : safe_const('TEMPLATES_PATH');
 
         $staticDir = $settings->get('ForeverPHPTemplate')
-            ? str_replace(DS, '/', safe_const('FOREVERPHP_STATIC_PATH', safe_const('STATIC_PATH')))
-            : str_replace(DS, '/', safe_const('STATIC_PATH'));
+            ? str_replace($ds, '/', safe_const('FOREVERPHP_STATIC_PATH', safe_const('STATIC_PATH')))
+            : str_replace($ds, '/', safe_const('STATIC_PATH'));
 
         $templateName = $this->template;
 
         // Si tiene formato "app@template.subdir.file"
         if (str_contains($templateName, '@')) {
             [$app, $templateName] = explode('@', $templateName, 2);
-            $baseTemplatesDir = APPS_ROOT . DS . $app . DS . 'Templates' . DS;
+            $baseTemplatesDir = safe_const('APPS_ROOT') . $ds . $app . $ds . 'Templates' . $ds;
         }
 
         $segments = explode('.', $templateName);
         $file = array_pop($segments);
-        $dir = implode(DS, $segments);
-        $templatePath = rtrim($baseTemplatesDir . DS . $dir . DS . $file, DS);
+        $dir = implode($ds, $segments);
+        $templatePath = rtrim($baseTemplatesDir . $ds . $dir . $ds . $file, $ds);
 
         return [$baseTemplatesDir, $staticDir, $templatePath];
     }

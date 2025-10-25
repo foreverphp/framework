@@ -43,8 +43,6 @@ class JsonResponse implements ResponseInterface
 
     /**
      * Genera y envía la respuesta JSON al cliente.
-     *
-     * @return void
      */
     public function make()
     {

@@ -71,8 +71,6 @@ class RedirectResponse implements ResponseInterface
 
     /**
      * Ejecuta la redirección HTTP.
-     *
-     * @return void
      */
     public function make()
     {

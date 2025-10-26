@@ -106,18 +106,16 @@ if (!function_exists('secret')) {
     {
         static $cache = null;
 
+        $keyFile = safe_const('ROOT_PATH') . safe_const('DS') . '.secrets' . safe_const('DS') . 'master-password.key';
+        $secretsFile = safe_const('ROOT_PATH') . safe_const('DS') . '.secrets' . safe_const('DS') . 'secrets.json';
+
+        if (!file_exists($keyFile) || !file_exists($secretsFile)) {
+            return '';
+        }
+
         if ($cache === null) {
-            $key = base64_decode(
-                file_get_contents(
-                    safe_const('ROOT_PATH') . safe_const('DS') . '.secrets' . safe_const('DS') . 'master-password.key'
-                )
-            );
-            $data = json_decode(
-                file_get_contents(
-                    safe_const('ROOT_PATH') . safe_const('DS') . '.secrets' . safe_const('DS') . 'secrets.json'
-                ),
-                true
-            );
+            $key = base64_decode(file_get_contents($keyFile));
+            $data = json_decode(file_get_contents($secretsFile), true);
 
             $cache = [];
             foreach ($data as $k => $v) {

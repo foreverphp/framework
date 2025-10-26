@@ -11,20 +11,9 @@
  * Nota este archivo se debe cargar al iniciar el framework
  */
 
-use ForeverPHP\Core\Facades\Storage;
 use ForeverPHP\Core\Helpers\GlobalHelpers;
 use ForeverPHP\Core\Helpers\ArrayHelpers;
-use ForeverPHP\Core\Helpers\RouteHelpers;
 use ForeverPHP\Core\Helpers\StringHelpers;
-
-// Carga las variables de entorno desde el archivo .env
-// TODO: Mover a bootstrap.php
-if (Storage::exists(ROOT_PATH . DS . '.env')) {
-    if (class_exists(\Dotenv\Dotenv::class)) {
-        $dotenv = \Dotenv\Dotenv::createUnsafeImmutable(ROOT_PATH);
-        $dotenv->load();
-    }
-}
 
 if (!function_exists('is_multi_array')) {
     /**
@@ -103,5 +92,42 @@ if (!function_exists('safe_const')) {
     function safe_const(string $name, mixed $default = null): mixed
     {
         return defined($name) ? constant($name) : $default;
+    }
+}
+
+/**
+ * Obtiene un secret desde el archivo de secrets.
+ *
+ * @param string $name
+ * @return string
+ */
+if (!function_exists('secret')) {
+    function secret(string $name): ?string
+    {
+        static $cache = null;
+
+        if ($cache === null) {
+            $key = base64_decode(
+                file_get_contents(
+                    safe_const('ROOT_PATH') . safe_const('DS') . '.secrets' . safe_const('DS') . 'master-password.key'
+                )
+            );
+            $data = json_decode(
+                file_get_contents(
+                    safe_const('ROOT_PATH') . safe_const('DS') . '.secrets' . safe_const('DS') . 'secrets.json'
+                ),
+                true
+            );
+
+            $cache = [];
+            foreach ($data as $k => $v) {
+                $bin = base64_decode($v);
+                $nonce = substr($bin, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+                $cipher = substr($bin, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+                $cache[$k] = sodium_crypto_secretbox_open($cipher, $nonce, $key);
+            }
+        }
+
+        return $cache[$name] ?? null;
     }
 }

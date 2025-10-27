@@ -1,7 +1,16 @@
+# Editors
 .vscode/
-vendor/
-.DS_Store
 *.sublime-*
+
+# Composer
 composer.lock
 composer.phar
+
+# Directorios
+vendor/
+
+# Windows
 Thumbs.db
+
+# macOS
+.DS_Store

@@ -89,7 +89,7 @@ if (!function_exists('upper')) {
  * @return mixed
  */
 if (!function_exists('safe_const')) {
-    function safe_const(string $name, mixed $default = null): mixed
+    function safe_const(string $name, mixed $default = ''): mixed
     {
         return defined($name) ? constant($name) : $default;
     }

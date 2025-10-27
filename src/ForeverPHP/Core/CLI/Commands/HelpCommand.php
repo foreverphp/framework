@@ -17,8 +17,18 @@ class HelpCommand implements CommandInterface
         return 'Get help for a command.';
     }
 
+    public function showHelp(): void
+    {
+        echo "Get help for a command.\n";
+    }
+
     public function run(array $args): void
     {
-        echo Color::fg('green', 'Help') . " Coming soon\n";
+        if ($args['commandClass'] !== null) {
+            $args['commandClass']->showHelp();
+            exit(0);
+        }
+
+        echo Color::fg('red', 'Error:') . " Command not found: {$args['commandName']}\n";
     }
 }

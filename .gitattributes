@@ -1,1 +1,18 @@
-tests/ export-ignore
+# Enforce Unix newlines
+* text=auto eol=lf
+
+# Código fuente (diffs inteligentes)
+*.html diff=html
+*.json diff=json
+*.php diff=php
+
+# Documentación (manejo de formato)
+*.md diff=markdown
+
+# Excluir dependencies
+vendor/** -diff
+node_modules/** -diff
+
+# Excluir Logs y archivos generados
+*.log -diff
+*.cache -diff

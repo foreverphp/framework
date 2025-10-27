@@ -18,6 +18,13 @@ class VersionCommand implements CommandInterface
         return 'Show ForeverPHP version.';
     }
 
+    public function showHelp(): void
+    {
+        echo "Usage:\n";
+        echo "  " . Color::fg('green', 'forever') . " version, --version\n\n";
+        echo "Print the version numbers of ForeverPHP.\n";
+    }
+
     public function run(array $args): void
     {
         $version = InstalledVersions::getPrettyVersion('foreverphp/framework');

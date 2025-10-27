@@ -17,6 +17,12 @@ class CreateAppCommand implements CommandInterface
         return 'Create new App.';
     }
 
+    public function showHelp(): void
+    {
+        echo "Usage:\n";
+        echo "  " . Color::fg('green', 'forever') . " create-app [options]\n\n";
+    }
+
     public function run(array $args): void
     {
         echo Color::fg('Yellow', 'Coming soon') . "\n";

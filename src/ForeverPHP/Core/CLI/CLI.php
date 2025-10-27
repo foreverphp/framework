@@ -36,6 +36,15 @@ class CLI
             exit(1);
         }
 
+        // Si es help en sus args va la clase del commando a llamar su ayuda
+        if ($commandName === 'help') {
+            $this->commands[$commandName]->run([
+                'commandName' => $argv[1],
+                'commandClass' => $this->commands[$argv[1]] ?? null,
+            ]);
+            exit(0);
+        }
+
         array_shift($argv);
         $this->commands[$commandName]->run($argv);
     }
@@ -43,10 +52,10 @@ class CLI
     public function showHelp(): void
     {
         echo "Usage:\n";
-        echo "  " . Color::fg('blue', 'foreverphp') . " <command> [options]\n\n";
+        echo "  " . Color::fg('green', 'forever') . " <command> [options]\n\n";
         echo "Commands:\n";
         foreach ($this->commands as $cmd) {
-            echo "  " . str_pad(Color::fg('green', $cmd->getName()), 40, " ") . $cmd->getDescription() . "\n";
+            echo "  " . str_pad(Color::fg('yellow', $cmd->getName()), 40, " ") . $cmd->getDescription() . "\n";
         }
         echo "\n";
         echo "See \"forever help <command>\" for more information on a specific command.\n";

@@ -7,20 +7,24 @@ use ForeverPHP\Core\CLI\Color;
 
 class GenerateSecretsCommand implements CommandInterface
 {
-    /**
-     * @inheritDoc
-     */
     public function getName(): string
     {
         return 'generate-secrets';
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getDescription(): string
     {
         return 'Generates the application secrets.';
+    }
+
+    public function showHelp(): void
+    {
+        echo "Usage:\n";
+        echo "  " . Color::fg('green', 'forever') . " generate-secrets [options]\n\n";
+        echo "Generates the secrets file with the given passwords.\n\n";
+        echo "Options:\n";
+        echo "  " . str_pad("--no-regenerate", 20, " ") .
+            "Indicates that if the secrets file exists, passwords are not prompted again\n";
     }
 
     public function run(array $args): void

@@ -20,6 +20,16 @@ class RunServerCommand implements CommandInterface
         return 'Running development server.';
     }
 
+    public function showHelp(): void
+    {
+        echo "Usage:\n";
+        echo "  " . Color::fg('green', 'forever') . " run-server [options]\n\n";
+        echo "Runs a ForeverPHP instance in development mode.\n\n";
+        echo "Options:\n";
+        echo "  " . str_pad("--host", 20, " ") . "Sets the host, default value is 127.0.0.1\n";
+        echo "  " . str_pad("--port", 20, " ") . "Sets the port, default value is 8080\n";
+    }
+
     public function run(array $args): void
     {
         $keyHost = array_search('--host', $args);

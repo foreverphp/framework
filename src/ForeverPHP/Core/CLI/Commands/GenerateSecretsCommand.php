@@ -38,6 +38,18 @@ class GenerateSecretsCommand implements CommandInterface
             return;
         }
 
+        // Check if the secrets file already exists, for overwrite
+        if (file_exists($secretsFile)) {
+            echo "The secrets file already exists. Do you want to update the secrets? [y/N]:";
+            $response = trim(fgets(STDIN));
+
+            if (strtolower($response) !== 'y') {
+                return;
+            }
+
+            echo "Overwriting the secrets file...\n";
+        }
+
         $key = base64_decode(file_get_contents($keyFile));
         $secrets = [];
 

@@ -56,6 +56,10 @@ class Request
             return;
         }
 
+        // Determinar el tipo de contenido
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? 'application/json';
+
+        // Determinar el método
         $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $requestParams = [];
 
@@ -67,7 +71,9 @@ class Request
                 break;
 
             case 'POST':
-                $requestParams = $_POST;
+                $requestParams = (str_contains($contentType, 'application/json'))
+                    ? json_decode(file_get_contents('php://input'), true) ?: []
+                    : $_POST;
                 break;
 
             case 'PUT':
@@ -81,7 +87,6 @@ class Request
                  * (variable1=dato1&variable2=data2...) que evidentemente tendremos que
                  * transformarla a un array asociativo.
                  */
-                $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
                 $input = file_get_contents("php://input");
 
                 if (str_contains($contentType, 'application/json')) {

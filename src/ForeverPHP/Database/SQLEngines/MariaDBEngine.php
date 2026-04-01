@@ -95,78 +95,19 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
         return $rows;
     }
 
-    private function returnDataGenerator(\mysqli_stmt $stmt): array
+    private function returnDataGenerator(\mysqli_result $result): array
     {
-        $result = $stmt->get_result();
+        $data = match ($this->queryReturn) {
+            'assoc' => $result->fetch_all(MYSQLI_ASSOC),
+            'num' => $result->fetch_all(MYSQLI_NUM),
+            'both' => $result->fetch_all(MYSQLI_BOTH),
+            default => $result->fetch_all(MYSQLI_ASSOC),
+        };
 
-        if ($result instanceof \mysqli_result) {
-            return match ($this->queryReturn) {
-                'assoc' => $result->fetch_all(MYSQLI_ASSOC),
-                'num' => $result->fetch_all(MYSQLI_NUM),
-                'both' => $result->fetch_all(MYSQLI_BOTH),
-                default => $result->fetch_all(MYSQLI_ASSOC),
-            };
-        }
+        $result->free();
 
-        // Fallback (sin mysqlnd)
-        return $this->fetchWithBindResult($stmt);
+        return $data;
     }
-
-    /*private function returnDataGenerator(): array
-     * {
-     * $rows = [];
-     *
-     * if ($this->numRows > 0 || $this->unbuffered) {
-     * $metadata = $this->stmt->result_metadata();
-     *
-     * if (!$metadata) {
-     * return [];
-     * }
-     *
-     * $mdFields = $metadata->fetch_fields();
-     *
-     * if (empty($mdFields)) {
-     * return [];
-     * }
-     *
-     * $row = [];
-     * $fields = [];
-     *
-     * foreach ($mdFields as $field) {
-     * if ($this->queryReturn === 'assoc' || $this->queryReturn === 'both') {
-     * $fields[$field->name] = &$row[$field->name];
-     * } elseif ($this->queryReturn === 'num') {
-     * $fields[] = &$row[$field->name];
-     * }
-     * }
-     *
-     * call_user_func_array([$this->stmt, 'bind_result'], array_values($fields));
-     *
-     * while ($this->stmt->fetch()) {
-     * $rowData = [];
-     *
-     * foreach ($fields as $key => $value) {
-     * $rowData[$key] = $value;
-     * }
-     *
-     * $rows[] = $rowData;
-     * }
-     *
-     * if ($this->queryReturn === 'both') {
-     * $tempRows = [];
-     * $keyNums = array_keys(array_values($fields));
-     *
-     * foreach ($rows as $rowContent) {
-     * $rowInNums = array_combine($keyNums, array_values($rowContent));
-     * $tempRows[] = array_merge($rowInNums, $rowContent);
-     * }
-     *
-     * $rows = $tempRows;
-     * }
-     * }
-     *
-     * return $rows;
-     * }*/
 
     private function executeInternal(): array|bool|int
     {
@@ -213,18 +154,19 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
 
             if ($result instanceof \mysqli_result) {
                 $this->numRows = $result->num_rows;
+
+                return $this->returnDataGenerator($result);
             } else {
                 // fallback
                 if (!$this->unbuffered) {
                     $this->stmt->store_result();
                     $this->numRows = $this->stmt->num_rows;
+
+                    return $this->fetchWithBindResult($this->stmt);
                 } else {
-                    $this->numRows = -1;
+                    throw new \RuntimeException('Unbuffered queries not supported in this mode');
                 }
             }
-
-            $stmt = $this->stmt;
-            return $this->returnDataGenerator($stmt);
         } finally {
             $this->stmt?->close();
             $this->stmt = null;

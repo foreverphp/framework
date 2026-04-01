@@ -5,221 +5,174 @@ namespace ForeverPHP\Database\SQLEngines;
 use ForeverPHP\Core\Settings;
 
 /**
- * Motor SQLSRV(Para extención propietaria de Microsoft SQL Server solo
- * Windows) permite trabajar con este motor de base de datos.
+ * Motor SQLSRV (extensión propietaria de Microsoft SQL Server, solo Windows)
+ * permite trabajar con este motor de base de datos.
  *
  * @author      Daniel Nuñez S. <dnunez@emarva.com>
  * @since       Version 0.4.0
  */
 class SQLSRVEngine extends SQLEngine implements SQLEngineInterface
 {
-    private $useTransaction = false;
-    private $unbuffered = false;
+    private bool $useTransaction = false;
+    private mixed $stmt = null;
+    private bool $unbuffered = false;
 
-    public function connect()
+    private function setSQLSRVError(): void
     {
-        $db = Settings::getInstance()->get("dbs");
+        $errors = sqlsrv_errors();
+
+        if (!empty($errors)) {
+            $this->errno = $errors[0]['code'] ?? 0;
+            $this->errorCode = $errors[0]['SQLSTATE'] ?? '';
+            $this->error = $errors[0]['message'] ?? '';
+        }
+    }
+
+    public function connect(): bool
+    {
+        $db = Settings::getInstance()->get('dbs');
         $db = $db[$this->dbSetting];
 
-        // Las transacciones no estan activas
         $this->useTransaction = false;
 
-        $dbName = $this->database != false ? $this->database : $db["database"];
+        $dbName = $this->database ?: $db['database'];
 
-        $server = $db["server"];
-
-        if ($db["port"] != "") {
-            $server .= "," . $db["port"];
+        $server = $db['server'];
+        if ($db['port'] !== '') {
+            $server .= ',' . $db['port'];
         }
 
         $connectionInfo = [
-            "UID" => $db["user"],
-            "PWD" => $db["password"],
-            "Database" => $dbName,
-            "TrustServerCertificate" => $db["trustServerCertificate"],
+            'UID' => $db['user'],
+            'PWD' => $db['password'],
+            'Database' => $dbName,
+            'TrustServerCertificate' => $db['trustServerCertificate'],
         ];
 
-        // Me conecto a la base de datos
         $this->conn = sqlsrv_connect($server, $connectionInfo);
 
         if (!$this->conn) {
-            $this->error = sqlsrv_errors();
+            $this->setSQLSRVError();
             return false;
         }
 
         return true;
     }
 
-    /**
-     * Habilita modo unbuffered
-     */
-    public function setUnbuffered(bool $value)
+    public function setUnbuffered(bool $value): void
     {
         $this->unbuffered = $value;
     }
 
-    private function executeQuery()
+    private function returnDataGenerator(mixed $stmt): array
     {
-        $return = false;
-
-        if ($this->queryType == "other") {
-            if (sqlsrv_query($this->conn, $this->query) !== false) {
-                $return = true;
-
-                $this->error = sqlsrv_errors();
-            }
-        } else {
-            if ($stmt = sqlsrv_query($this->conn, $this->query)) {
-                // Conteo de registros
-                if (
-                    $this->queryType == "insert" ||
-                    $this->queryType == "update" ||
-                    $this->queryType == "delete"
-                ) {
-                    $this->numRows = sqlsrv_rows_affected($stmt);
-
-                    $return = true;
-                } else {
-                    $this->numRows = sqlsrv_num_rows($stmt);
-                    $fetchType = SQLSRV_FETCH_NUMERIC;
-
-                    $fetchType = match ($this->queryReturn) {
-                        "assoc" => SQLSRV_FETCH_ASSOC,
-                        "both" => SQLSRV_FETCH_BOTH,
-                    };
-
-                    $return = [];
-
-                    while ($row = sqlsrv_fetch_array($stmt, $fetchType)) {
-                        array_push($return, $row);
-                    }
-                }
-
-                $this->error = sqlsrv_errors();
-
-                sqlsrv_free_stmt($stmt);
-            } else {
-                $this->error = sqlsrv_errors();
-            }
+        if ($this->numRows <= 0) {
+            return [];
         }
 
-        return $return;
-    }
+        $fetchType = match ($this->queryReturn) {
+            'assoc' => SQLSRV_FETCH_ASSOC,
+            'both' => SQLSRV_FETCH_BOTH,
+            default => SQLSRV_FETCH_NUMERIC,
+        };
 
-    private function executeQueryWithParameters()
-    {
-        $return = false;
-
-        if (count($this->parameters) != 0) {
-            // Prepato los parametros
-            $params = [];
-
-            foreach ($this->parameters as $param => $paramContent) {
-                $params[] = &$paramContent["value"];
-            }
-
-            // Preparo la consulta
-            $stmt = sqlsrv_prepare($this->conn, $this->query, $params);
-
-            // Se procede con la ejecucion de la consulta
-            if ($this->queryType == "other") {
-                if (sqlsrv_execute($stmt) === true) {
-                    $return = true;
-
-                    $this->error = sqlsrv_errors();
-                }
-            } else {
-                if (sqlsrv_execute($stmt) === true) {
-                    // Conteo de registros
-                    if (
-                        $this->queryType == "insert" ||
-                        $this->queryType == "update" ||
-                        $this->queryType == "delete"
-                    ) {
-                        $this->numRows = sqlsrv_rows_affected($stmt);
-
-                        $return = true;
-                    } else {
-                        // Se obtiene el numero de filas obtenidas de los metadatos de la consulta
-                        $this->numRows = sqlsrv_num_rows($stmt);
-                        $fetchType = SQLSRV_FETCH_NUMERIC;
-
-                        $fetchType = match ($this->queryReturn) {
-                            "assoc" => SQLSRV_FETCH_ASSOC,
-                            "both" => SQLSRV_FETCH_BOTH,
-                        };
-
-                        $return = [];
-
-                        while ($row = sqlsrv_fetch_array($stmt, $fetchType)) {
-                            array_push($return, $row);
-                        }
-                    }
-
-                    $this->error = sqlsrv_errors();
-
-                    sqlsrv_free_stmt($stmt);
-                } else {
-                    $this->error = sqlsrv_errors();
-                }
-            }
+        $rows = [];
+        while ($row = sqlsrv_fetch_array($stmt, $fetchType)) {
+            $rows[] = $row;
         }
 
-        return $return;
+        return $rows;
     }
 
-    public function execute()
+    private function executeInternal(): array|bool|int
     {
-        if (count($this->parameters) == 0) {
-            return $this->executeQuery();
-        }
+        try {
+            $params = array_map(fn($p) => $p['value'], $this->parameters);
 
-        return $this->executeQueryWithParameters();
+            $options = [
+                'Scrollable' => $this->unbuffered ? SQLSRV_CURSOR_FORWARD : SQLSRV_CURSOR_STATIC,
+            ];
+
+            $this->stmt = sqlsrv_prepare($this->conn, $this->query, !empty($params) ? $params : [], $options);
+
+            if ($this->stmt === false) {
+                $this->setSQLSRVError();
+                return false;
+            }
+
+            if (sqlsrv_execute($this->stmt) === false) {
+                $this->setSQLSRVError();
+                return false;
+            }
+
+            if ($this->isWriteQuery()) {
+                $this->numRows = sqlsrv_rows_affected($this->stmt);
+                return $this->numRows;
+            }
+
+            $this->numRows = sqlsrv_num_rows($this->stmt);
+
+            $stmt = $this->stmt;
+            return $this->returnDataGenerator($stmt);
+        } finally {
+            if ($this->stmt !== null) {
+                sqlsrv_free_stmt($this->stmt);
+                $this->stmt = null;
+            }
+        }
     }
 
-    public function executeInsertBulk(string $query, array $bulkData)
+    public function execute(): array|bool|int
+    {
+        try {
+            $result = $this->executeInternal();
+            return $result;
+        } finally {
+            $this->reset();
+        }
+    }
+
+    public function executeInsertBulk(string $query, array $bulkData): int
     {
         // No implementada
+        return 0;
     }
 
-    public function disconnect()
+    public function disconnect(): bool
     {
-        if ($this->conn != null) {
-            // Cierro la conexion
+        if ($this->conn !== null) {
             if (!sqlsrv_close($this->conn)) {
-                $this->error = sqlsrv_errors();
+                $this->setSQLSRVError();
                 return false;
             }
 
             $this->conn = null;
         }
+
+        return true;
     }
 
-    public function beginTransaction()
+    public function beginTransaction(): void
     {
-        if ($this->conn != null) {
+        if ($this->conn !== null) {
             sqlsrv_begin_transaction($this->conn);
             $this->useTransaction = true;
         }
     }
 
-    public function commit()
+    public function commit(): void
     {
-        if ($this->conn != null) {
-            if ($this->useTransaction) {
-                sqlsrv_commit($this->conn);
-                $this->useTransaction = false;
-            }
+        if ($this->conn !== null && $this->useTransaction) {
+            sqlsrv_commit($this->conn);
+            $this->useTransaction = false;
         }
     }
 
-    public function rollback()
+    public function rollback(): void
     {
-        if ($this->conn != null) {
-            if ($this->useTransaction) {
-                sqlsrv_rollback($this->conn);
-                $this->useTransaction = false;
-            }
+        if ($this->conn !== null && $this->useTransaction) {
+            sqlsrv_rollback($this->conn);
+            $this->useTransaction = false;
         }
     }
 

@@ -12,23 +12,27 @@ use ForeverPHP\Core\Settings;
  */
 class PgSQLEngine extends SQLEngine implements SQLEngineInterface
 {
-    private $useTransaction = false;
-    private $stmt = null;
-    private $unbuffered = false;
+    private bool $useTransaction = false;
+    private bool $unbuffered = false;
 
-    public function connect()
+    private function setPgSQLError(): void
+    {
+        $this->errno = 1;
+        $this->errorCode = '';
+        $this->error = pg_last_error($this->conn);
+    }
+
+    public function connect(): bool
     {
         $db = Settings::getInstance()->get('dbs');
         $db = $db[$this->dbSetting];
 
-        // Las transacciones no estan activas
         $this->useTransaction = false;
 
-        $dbName = ($this->database != false) ? $this->database : $db['database'];
+        $dbName = $this->database ?: $db['database'];
 
-        // Me conecto a la base de datos
         $this->conn = pg_connect(
-            "host={$db['server']} port={$db['port']} dbname={$dbName} user={$db['user']} password={$db['password']}"
+            "host={$db['server']} port={$db['port']} dbname={$dbName} user={$db['user']} password={$db['password']}",
         );
 
         if (!$this->conn) {
@@ -40,191 +44,114 @@ class PgSQLEngine extends SQLEngine implements SQLEngineInterface
         return true;
     }
 
-    /**
-     * Habilita modo unbuffered
-     */
-    public function setUnbuffered(bool $value)
+    public function setUnbuffered(bool $value): void
     {
         $this->unbuffered = $value;
     }
 
-    private function returnDataGenerator($resultQuery)
+    private function returnDataGenerator(mixed $resultQuery): array
     {
-        $return = [];
-
-        if ($this->numRows > 0) {
-            $resultType = PGSQL_NUM;
-
-            $resultType = match ($this->queryReturn) {
-                'assoc' => PGSQL_ASSOC,
-                'both' => PGSQL_BOTH,
-            };
-
-            $return = pg_fetch_all($resultQuery, $resultType);
+        if ($this->numRows <= 0) {
+            return [];
         }
 
-        return $return;
+        $resultType = match ($this->queryReturn) {
+            'assoc' => PGSQL_ASSOC,
+            'both' => PGSQL_BOTH,
+            default => PGSQL_NUM,
+        };
+
+        return pg_fetch_all($resultQuery, $resultType) ?: [];
     }
 
-    private function executeQuery()
+    /**
+     * Reemplaza los "?" por "$1", "$2", ... que requiere PostgreSQL.
+     */
+    private function normalizeQueryParameters(): void
     {
-        $return = false;
-        $stmtName = md5(microtime());
-
-        // Preparar la consulta
-        $this->stmt = pg_prepare($this->conn, $stmtName, $this->query);
-
-        // Proceder con la ejecución de la consulta
-        if ($this->queryType == 'other') {
-            $result = pg_execute($this->conn, $stmtName, []);
-            if ($result !== false) {
-                $this->numRows = pg_num_rows($result);
-                $return = $this->returnDataGenerator($result);
-            } else {
-                $this->errno = 1;
-                $this->error = pg_last_error($this->conn);
-            }
-        } else {
-            $result = pg_execute($this->conn, $stmtName, []);
-            if ($result !== false) {
-                // Conteo de registros
-                if (
-                    $this->queryType == 'insert' ||
-                    $this->queryType == 'update' ||
-                    $this->queryType == 'delete'
-                ) {
-                    $this->numRows = pg_affected_rows($result);
-                    $return = true;
-                } else {
-                    // Obtener el número de filas obtenidas de los metadatos de la consulta
-                    $this->numRows = pg_num_rows($result);
-                    $return = $this->returnDataGenerator($result);
-                }
-
-                $this->errno = 1;
-                $this->error = pg_last_error($this->conn);
-            } else {
-                $this->errno = 1;
-                $this->error = pg_last_error($this->conn);
-            }
-        }
-
-        return $return;
-    }
-
-    private function normalizeQueryParameters()
-    {
-        // Contador para los marcadores de posición
         $count = 1;
 
-        // Reemplazar cada marcador de posición "?" por "$count"
-        $this->query = preg_replace_callback('/\?/', function () use (&$count) {
-            return '$' . $count++;
-        }, $this->query);
+        $this->query = preg_replace_callback('/\?/', fn() => '$' . $count++, $this->query);
     }
 
-    private function executeQueryWithParameters()
+    private function executeInternal(): array|bool|int
     {
-        $return = false;
-        $stmtName = md5(microtime());
-
-        if (count($this->parameters) != 0) {
+        if (!empty($this->parameters)) {
             $this->normalizeQueryParameters();
-
-            // Preparar la consulta
-            $this->stmt = pg_prepare($this->conn, $stmtName, $this->query);
-
-            // Asignar los parámetros a la consulta
-            $params = [];
-
-            foreach ($this->parameters as $keyParam => $paramContent) {
-                $params[] = $paramContent['value'];
-            }
-
-            // Ejecutar la consulta con los parámetros
-            $result = pg_execute($this->conn, $stmtName, $params);
-            if ($result !== false) {
-                // Conteo de registros
-                if (
-                    $this->queryType == 'insert' ||
-                    $this->queryType == 'update' ||
-                    $this->queryType == 'delete'
-                ) {
-                    $this->numRows = pg_affected_rows($result);
-                    $return = true;
-                } else {
-                    // Obtener el número de filas obtenidas de los metadatos de la consulta
-                    $this->numRows = pg_num_rows($result);
-                    $return = $this->returnDataGenerator($result);
-                }
-
-                $this->errno = 1;
-                $this->error = pg_last_error($this->conn);
-            } else {
-                $this->errno = 1;
-                $this->error = pg_last_error($this->conn);
-            }
         }
 
-        return $return;
+        $params = array_map(fn($p) => $p['value'], $this->parameters);
+
+        $result = !empty($params)
+            ? pg_query_params($this->conn, $this->query, $params)
+            : pg_query($this->conn, $this->query);
+
+        if ($result === false) {
+            $this->setPgSQLError();
+            return false;
+        }
+
+        if ($this->isWriteQuery()) {
+            $this->numRows = pg_affected_rows($result);
+            return $this->numRows;
+        }
+
+        $this->numRows = pg_num_rows($result);
+
+        return $this->returnDataGenerator($result);
     }
 
-    public function execute()
+    public function execute(): array|bool|int
     {
-        if (count($this->parameters) == 0) {
-            return $this->executeQuery();
+        try {
+            $result = $this->executeInternal();
+            return $result;
+        } finally {
+            $this->reset();
         }
-
-        return $this->executeQueryWithParameters();
     }
 
-    public function executeInsertBulk(string $query, array $bulkData)
+    public function executeInsertBulk(string $query, array $bulkData): int
     {
         // No implementada
+        return 0;
     }
 
-    public function disconnect()
+    public function disconnect(): bool
     {
-        if ($this->conn != null) {
-            // Cierro la conexion
-            /*if (!pg_close($this->conn)) {
-                $this->errno = 1;
-                $this->error = pg_last_error($this->conn);
+        if ($this->conn !== null) {
+            if (!pg_close($this->conn)) {
+                $this->setPgSQLError();
                 return false;
-            }*/
+            }
 
             $this->conn = null;
         }
+
+        return true;
     }
 
-    public function beginTransaction()
+    public function beginTransaction(): void
     {
-        if ($this->conn != null) {
-            $this->query = 'BEGIN';
-            $this->executeQuery();
+        if ($this->conn !== null) {
+            pg_query($this->conn, 'BEGIN');
             $this->useTransaction = true;
         }
     }
 
-    public function commit()
+    public function commit(): void
     {
-        if ($this->conn != null) {
-            if ($this->useTransaction) {
-                $this->query = 'COMMIT';
-                $this->executeQuery();
-                $this->useTransaction = false;
-            }
+        if ($this->conn !== null && $this->useTransaction) {
+            pg_query($this->conn, 'COMMIT');
+            $this->useTransaction = false;
         }
     }
 
-    public function rollback()
+    public function rollback(): void
     {
-        if ($this->conn != null) {
-            if ($this->useTransaction) {
-                $this->query = 'ROLLBACK';
-                $this->executeQuery();
-                $this->useTransaction = false;
-            }
+        if ($this->conn !== null && $this->useTransaction) {
+            pg_query($this->conn, 'ROLLBACK');
+            $this->useTransaction = false;
         }
     }
 

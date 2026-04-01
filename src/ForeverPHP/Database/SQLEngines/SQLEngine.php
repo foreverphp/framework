@@ -11,21 +11,27 @@ namespace ForeverPHP\Database\SQLEngines;
  */
 class SQLEngine
 {
-    protected $dbSetting;
-    protected $database;
-    protected $conn;
-    protected $query;
-    protected $queryType = 'other';
-    protected $queryReturn = 'num';
-    protected $parameters;
-    protected $errno;
-    protected $error;
-    protected $numRows;
-    protected $bulkData = null;
+    protected string $dbSetting;
+    protected ?string $database = null;
+    protected mixed $conn = null;
 
-    protected static $instance;
+    protected string $query = '';
+    protected string $queryType = 'other';
+    protected string $queryReturn = 'num';
 
-    public function __construct($dbSetting)
+    protected array $parameters = [];
+
+    protected int $errno = 0;
+    protected string $errorCode = '';
+    protected string $error = '';
+
+    protected int $numRows = 0;
+
+    protected ?array $bulkData = null;
+
+    protected static ?self $instance = null;
+
+    public function __construct(string $dbSetting)
     {
         $this->dbSetting = $dbSetting;
         $this->numRows = 0;
@@ -33,7 +39,7 @@ class SQLEngine
         $this->bulkData = null;
     }
 
-    public static function getInstance($dbSetting = 'default')
+    public static function getInstance(string $dbSetting = 'default'): static
     {
         if (static::$instance === null) {
             static::$instance = new static($dbSetting);
@@ -42,40 +48,61 @@ class SQLEngine
         return static::$instance;
     }
 
-    public function selectDatabase($database)
+    public function selectDatabase($database): void
     {
         $this->database = $database;
     }
 
-    public function query($query, $type = 'other', $return = 'num')
+    public function query(string $query, string $type = 'other', string $return = 'num'): void
     {
         $this->query = $query;
         $this->queryType = $type;
         $this->queryReturn = $return;
     }
 
-    public function setParameters($parameters)
+    public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
     }
 
-    public function getErrorNumber()
+    public function getErrorNumber(): int|string
     {
         return $this->errno;
     }
 
-    public function getError()
+    public function getErrorCode(): string
+    {
+        return $this->errorCode;
+    }
+
+    public function getError(): string
     {
         return $this->error;
     }
 
-    public function getNumRows()
+    public function getNumRows(): int
     {
         return $this->numRows;
     }
 
-    public function get()
+    /**
+     * Helper común para engines
+     */
+    protected function isWriteQuery(): bool
     {
-        echo $this->dbSetting;
+        return in_array($this->queryType, ['insert', 'update', 'delete'], true);
+    }
+
+    /**
+     * Limpia el estado de la consulta (opcional para reutilización segura)
+     */
+    protected function reset(): void
+    {
+        $this->query = '';
+        $this->queryType = 'other';
+        $this->queryReturn = 'num';
+        $this->parameters = [];
+        $this->numRows = 0;
+        $this->bulkData = null;
     }
 }

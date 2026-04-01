@@ -12,11 +12,22 @@ use ForeverPHP\Core\Settings;
  */
 class PDOEngine extends SQLEngine implements SQLEngineInterface
 {
-    private $useTransaction = false;
-    private $stmt = null;
-    private $unbuffered = false;
+    private bool $useTransaction = false;
+    private ?\PDOStatement $stmt = null;
+    private bool $unbuffered = false;
 
-    public function connect()
+    private function setPDOError(\PDOException $e): void
+    {
+        $this->error = $e->getMessage();
+
+        // SQLSTATE (string)
+        $this->errorCode = $e->errorInfo[0] ?? '';
+
+        // Driver error (int)
+        $this->errno = isset($e->errorInfo[1]) && is_numeric($e->errorInfo[1]) ? (int) $e->errorInfo[1] : 0;
+    }
+
+    public function connect(): bool
     {
         $db = Settings::getInstance()->get('dbs');
         $db = $db[$this->dbSetting];
@@ -29,13 +40,12 @@ class PDOEngine extends SQLEngine implements SQLEngineInterface
         try {
             $this->conn = new \PDO($dsn, $db['user'], $db['password']);
             $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+            return true;
         } catch (\PDOException $e) {
-            $this->errno = $e->getCode();
-            $this->error = $e->getMessage();
+            $this->setPDOError($e);
             return false;
         }
-
-        return true;
     }
 
     /**
@@ -46,132 +56,67 @@ class PDOEngine extends SQLEngine implements SQLEngineInterface
         $this->unbuffered = $value;
     }
 
-    private function returnDataGenerator()
+    private function returnDataGenerator(\PDOStatement $stmt): array
     {
-        $return = [];
-
-        if ($this->numRows > 0) {
-            $return = match ($this->queryReturn) {
-                'assoc' => $this->stmt->fetchAll(\PDO::FETCH_ASSOC),
-                'both' => $this->stmt->fetchAll(\PDO::FETCH_BOTH),
-                'num' => $this->stmt->fetchAll(\PDO::FETCH_NUM),
-            };
+        if ($this->numRows === 0) {
+            return [];
         }
 
-        return $return;
+        return match ($this->queryReturn) {
+            'assoc' => $stmt->fetchAll(\PDO::FETCH_ASSOC),
+            'both' => $stmt->fetchAll(\PDO::FETCH_BOTH),
+            'num' => $stmt->fetchAll(\PDO::FETCH_NUM),
+        };
     }
 
-    private function executeQuery()
+    private function executeInternal(): array|bool|int
     {
-        $return = false;
-
         try {
-            // Se procede con la ejecucion de la consulta
-            if ($this->queryType == 'other') {
-                $this->numRows = $this->conn->exec($this->query);
+            $this->stmt = $this->conn->prepare($this->query);
 
-                if ($this->numRows > 0) {
-                    $return = $this->returnDataGenerator();
+            // Ejecutar con o sin parámetros (PDO lo maneja solo)
+            if (!empty($this->parameters)) {
+                $params = [];
+
+                foreach ($this->parameters as $param) {
+                    $params[] = $param['value'];
                 }
+
+                $this->stmt->execute($params);
             } else {
-                $this->stmt = $this->conn->prepare($this->query);
                 $this->stmt->execute();
-
-                if (
-                    $this->queryType == 'insert' ||
-                    $this->queryType == 'update' ||
-                    $this->queryType == 'delete'
-                ) {
-                    $this->numRows = $this->stmt->rowCount();
-
-                    $return = true;
-                } else {
-                    // Se obtiene el numero de filas obtenidas de los metadatos de la consulta
-                    $this->numRows = $this->stmt->rowCount();
-
-                    // Genera los datos de retorno
-                    $return = $this->returnDataGenerator();
-                }
             }
 
-            $this->stmt->closeCursor();
-        } catch (\PDOException $e) {
-            $this->errno = $e->getCode();
-            $this->error = $e->getMessage();
-        }
+            // INSERT / UPDATE / DELETE
+            if ($this->isWriteQuery()) {
+                return $this->numRows = $this->stmt->rowCount();
+            }
 
-        return $return;
+            // SELECT / OTHER
+            $this->numRows = $this->stmt->rowCount();
+
+            $stmt = $this->stmt;
+            return $this->returnDataGenerator($stmt);
+        } catch (\PDOException $e) {
+            $this->setPDOError($e);
+            return false;
+        } finally {
+            $this->stmt?->closeCursor();
+            $this->stmt = null;
+        }
     }
 
-    private function executeQueryWithParameters()
+    public function execute(): array|bool|int
     {
-        $return = false;
-
         try {
-            if (count($this->parameters) > 0) {
-                // Preparo la consulta
-                $this->stmt = $this->conn->prepare($this->query);
-
-                // Preparo los parametros
-                foreach ($this->parameters as $paramKey => $param) {
-                    $paramType = match ($param['type']) {
-                        'i' => \PDO::PARAM_INT,
-                        'b' => \PDO::PARAM_BOOL,
-                        's' => \PDO::PARAM_STR,
-                        'd' => \PDO::PARAM_INT
-                    };
-
-                    $this->stmt->bindParam($paramKey + 1, $param['value'], $paramType);
-                }
-                //}
-
-                // Se procede con la ejecucion de la consulta
-                if ($this->queryType == 'other') {
-                    if ($this->stmt->execute()) {
-                        if ($this->numRows > 0) {
-                            $return = $this->returnDataGenerator();
-                        }
-                    }
-                } else {
-                    if ($this->stmt->execute()) {
-                        if (
-                            $this->queryType == 'insert' ||
-                            $this->queryType == 'update' ||
-                            $this->queryType == 'delete'
-                        ) {
-                            $this->numRows = $this->stmt->rowCount();
-
-                            $return = true;
-                        } else {
-                            // Se obtiene el numero de filas
-                            $this->numRows = $this->stmt->rowCount();
-
-                            // Genera los datos de retorno
-                            $return = $this->returnDataGenerator();
-                        }
-                    }
-                }
-
-                $this->stmt->closeCursor();
-            }
-        } catch (\PDOException $e) {
-            $this->errno = $e->getCode();
-            $this->error = $e->getMessage();
+            $result = $this->executeInternal();
+            return $result;
+        } finally {
+            $this->reset();
         }
-
-        return $return;
     }
 
-    public function execute()
-    {
-        if (count($this->parameters) == 0) {
-            return $this->executeQuery();
-        }
-
-        return $this->executeQueryWithParameters();
-    }
-
-    public function executeInsertBulk(string $query, array $bulkData)
+    public function executeInsertBulk(string $query, array $bulkData): int
     {
         try {
             if (is_multi_array($bulkData)) {
@@ -180,25 +125,28 @@ class PDOEngine extends SQLEngine implements SQLEngineInterface
 
             $this->stmt = $this->conn->prepare($query);
 
-            if ($this->stmt->execute($bulkData)) {
-                $this->numRows = $this->stmt->rowCount();
-            }
+            $this->stmt->execute($bulkData);
 
-            $this->stmt->closeCursor();
+            return $this->numRows = $this->stmt->rowCount();
         } catch (\PDOException $e) {
-            $this->errno = $e->getCode();
-            $this->error = $e->getMessage();
+            $this->setPDOError($e);
+            return 0;
+        } finally {
+            $this->stmt?->closeCursor();
+            $this->stmt = null;
         }
     }
 
-    public function disconnect()
+    public function disconnect(): bool
     {
         if ($this->conn != null) {
             $this->conn = null;
         }
+
+        return true;
     }
 
-    public function beginTransaction()
+    public function beginTransaction(): void
     {
         if ($this->conn != null) {
             $this->conn->beginTransaction();
@@ -206,23 +154,19 @@ class PDOEngine extends SQLEngine implements SQLEngineInterface
         }
     }
 
-    public function commit()
+    public function commit(): void
     {
-        if ($this->conn != null) {
-            if ($this->useTransaction) {
-                $this->conn->commit();
-                $this->useTransaction = false;
-            }
+        if ($this->conn != null && $this->useTransaction) {
+            $this->conn->commit();
+            $this->useTransaction = false;
         }
     }
 
-    public function rollback()
+    public function rollback(): void
     {
-        if ($this->conn != null) {
-            if ($this->useTransaction) {
-                $this->conn->rollBack();
-                $this->useTransaction = false;
-            }
+        if ($this->conn != null && $this->useTransaction) {
+            $this->conn->rollBack();
+            $this->useTransaction = false;
         }
     }
 

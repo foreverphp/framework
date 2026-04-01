@@ -11,16 +11,25 @@ namespace ForeverPHP\Database\SQLEngines;
  */
 interface SQLEngineInterface
 {
-    public function __construct($dbSetting);
-    public function selectDatabase($database);
-    public function connect();
-    public function query($query);
-    public function setParameters($parameters);
-    public function execute();
-    public function executeInsertBulk(string $query, array $bulkData);
-    public function disconnect();
-    public function beginTransaction();
-    public function commit();
-    public function rollback();
-    public function __destruct();
+    public function __construct(string $dbSetting);
+
+    public function selectDatabase(string $database): void;
+
+    public function connect(): bool;
+
+    public function query(string $query, string $type = 'other', string $return = 'num'): void;
+
+    public function setParameters(array $parameters): void;
+
+    public function execute(): array|bool|int;
+
+    public function executeInsertBulk(string $query, array $bulkData): int;
+
+    public function disconnect(): bool;
+
+    public function beginTransaction(): void;
+
+    public function commit(): void;
+
+    public function rollback(): void;
 }

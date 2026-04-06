@@ -2,12 +2,15 @@
 
 namespace ForeverPHP\Core\Facades;
 
+use ForeverPHP\Database\Enums\FetchMode;
+use ForeverPHP\Database\Enums\ParameterType;
+
 /**
- * @method static void using(string $dbSetting)
+ * @method static \ForeverPHP\Database\QuerySQL using(string $dbSetting)
  * @method static string getDbSetting()
  * @method static void selectDatabase(string $database)
- * @method static \ForeverPHP\Database\QuerySQL query(string $query, string $fetch = 'num')
- * @method static void addParameter(string $key, mixed $value)
+ * @method static \ForeverPHP\Database\QuerySQL query(string $query, FetchMode|string $fetch = FetchMode::NUM)
+ * @method static void addParameter(ParameterType|string $type, mixed $value)
  * @method static \ForeverPHP\Database\QuerySQL unbuffered()
  * @method static mixed execute(string $returnType = 'array')
  * @method static bool executeInsertBulk(string $query, array $bulkData)

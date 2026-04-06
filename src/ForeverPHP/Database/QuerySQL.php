@@ -3,6 +3,8 @@
 namespace ForeverPHP\Database;
 
 use ForeverPHP\Core\Settings;
+use ForeverPHP\Database\Enums\FetchMode;
+use ForeverPHP\Database\Enums\ParameterType;
 
 /**
  * Permite la ejecucion de consultas en bruto a la base de datos.
@@ -89,6 +91,25 @@ class QuerySQL
         $this->database = $database;
     }
 
+    private function normalizeFetchMode(FetchMode|string $mode): string
+    {
+        if ($mode instanceof FetchMode) {
+            return $mode->value;
+        }
+
+        // Compatibilidad legacy
+        $mode = strtolower($mode);
+
+        foreach (FetchMode::cases() as $case) {
+            if ($case->value === $mode) {
+                return $case->value;
+            }
+        }
+
+        // fallback seguro
+        return FetchMode::NUM->value;
+    }
+
     /**
      * Define la consulta SQL a ejecutar.
      *
@@ -99,33 +120,65 @@ class QuerySQL
      * @param string $fetch Tipo de retorno: "num", "assoc", "both", "object"
      * @return $this
      */
-    public function query(string $query, string $fetch = 'num'): self
+    /*public function query(string $query, string $fetch = 'num'): self
+     * {
+     * $this->query = $query;
+     *
+     * // Debe detectar que tipo de consulta se va a ejecutar
+     * $queryInLCase = strtolower($query);
+     *
+     * if (strpos($queryInLCase, 'insert') !== false) {
+     * $this->queryType = 'insert';
+     * } elseif (strpos($queryInLCase, 'select') !== false) {
+     * $this->queryType = 'select';
+     * } elseif (strpos($queryInLCase, 'update') !== false) {
+     * $this->queryType = 'update';
+     * } elseif (strpos($queryInLCase, 'delete') !== false) {
+     * $this->queryType = 'delete';
+     * } else {
+     * $this->queryType = 'other';
+     * }
+     *
+     * unset($queryInLCase);
+     *
+     * $this->queryReturn = match (strtolower($fetch)) {
+     * 'assoc' => 'assoc',
+     * 'both' => 'both',
+     * 'object' => 'object',
+     * default => 'num',
+     * };
+     *
+     * return $this;
+     * }*/
+
+    /**
+     * Define la consulta SQL a ejecutar.
+     *
+     * Detecta automáticamente el tipo de consulta (SELECT, INSERT, UPDATE, DELETE)
+     * y el formato de retorno de los resultados.
+     *
+     * @param string $query Consulta SQL
+     * @param FetchMode|string $fetch Tipo de retorno
+     * @return $this
+     */
+    public function query(string $query, FetchMode|string $fetch = FetchMode::NUM): self
     {
         $this->query = $query;
 
-        // Debe detectar que tipo de consulta se va a ejecutar
-        $queryInLCase = strtolower($query);
+        // Detectar tipo de query
+        $queryTrimmed = ltrim($query);
+        $firstWord = strtolower(strtok($queryTrimmed, " \n\t"));
 
-        if (strpos($queryInLCase, 'insert') !== false) {
-            $this->queryType = 'insert';
-        } elseif (strpos($queryInLCase, 'select') !== false) {
-            $this->queryType = 'select';
-        } elseif (strpos($queryInLCase, 'update') !== false) {
-            $this->queryType = 'update';
-        } elseif (strpos($queryInLCase, 'delete') !== false) {
-            $this->queryType = 'delete';
-        } else {
-            $this->queryType = 'other';
-        }
-
-        unset($queryInLCase);
-
-        $this->queryReturn = match (strtolower($fetch)) {
-            'assoc' => 'assoc',
-            'both' => 'both',
-            'object' => 'object',
-            default => 'num',
+        $this->queryType = match ($firstWord) {
+            'insert' => 'insert',
+            'select' => 'select',
+            'update' => 'update',
+            'delete' => 'delete',
+            default => 'other',
         };
+
+        // Normalizar fetch mode (enum + legacy string)
+        $this->queryReturn = $this->normalizeFetchMode($fetch);
 
         return $this;
     }
@@ -137,11 +190,102 @@ class QuerySQL
      * @param mixed $value Valor del parámetro
      * @return void
      */
-    public function addParameter(string $type, mixed $value): void
-    {
-        $count = count($this->parameters);
+    /*public function addParameter(string $type, mixed $value): void
+     * {
+     * $count = count($this->parameters);
+     *
+     * $this->parameters[$count] = ['type' => $type, 'value' => $value];
+     * }*/
 
-        $this->parameters[$count] = ['type' => $type, 'value' => $value];
+    /**
+     * Agrega un parámetro para consultas preparadas.
+     *
+     * Compatible con:
+     * - string legacy: "s", "i", "d", "b"
+     * - enum moderno: ParameterType
+     *
+     * @param ParameterType|string $type Tipo de dato
+     * @param mixed $value Valor del parámetro
+     * @return $this
+     */
+    public function addParameter(ParameterType|string $type, mixed $value): self
+    {
+        // Si viene como enum se convierte a string legacy
+        if ($type instanceof ParameterType) {
+            $type = match ($type) {
+                ParameterType::STRING => 's',
+                ParameterType::INT => 'i',
+                ParameterType::DOUBLE => 'd',
+                ParameterType::BOOL => 'b',
+            };
+        }
+
+        $this->parameters[] = [
+            'type' => $type,
+            'value' => $value,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Agrega un parámetro de tipo string.
+     *
+     * @param string $value Valor del parámetro
+     * @return $this
+     */
+    public function addString(string $value): self
+    {
+        return $this->addParameter(ParameterType::STRING, $value);
+    }
+
+    /**
+     * Agrega un parámetro de tipo entero.
+     *
+     * @param int $value Valor del parámetro
+     * @return $this
+     */
+    public function addInt(int $value): self
+    {
+        return $this->addParameter(ParameterType::INT, $value);
+    }
+
+    /**
+     * Agrega un parámetro de tipo decimal (double/float).
+     *
+     * @param float $value Valor del parámetro
+     * @return $this
+     */
+    public function addDouble(float $value): self
+    {
+        return $this->addParameter(ParameterType::DOUBLE, $value);
+    }
+
+    /**
+     * Agrega un parámetro booleano.
+     *
+     * Se adapta automáticamente según el motor:
+     * - PostgreSQL → bool
+     * - PDO → PARAM_BOOL
+     * - MySQL/SQL Server → int (1/0)
+     *
+     * @param bool $value
+     * @return $this
+     */
+    public function addBool(bool $value): self
+    {
+        return $this->addParameter(ParameterType::BOOL, $value);
+    }
+
+    /**
+     * Agrega un parámetro de tipo binario (BLOB).
+     *
+     * @param mixed $value Valor del parámetro
+     * @return $this
+     */
+    public function addBlob(mixed $value): self
+    {
+        return $this->addParameter(ParameterType::STRING, $value);
     }
 
     /**

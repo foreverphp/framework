@@ -114,8 +114,14 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
         try {
             $this->stmt = $this->conn->stmt_init();
 
-            if (!$this->stmt->prepare($this->query)) {
+            try {
+                $prepared = @$this->stmt->prepare($this->query);
+                if (!$prepared) {
+                    throw new \RuntimeException('prepare() failed');
+                }
+            } catch (\Throwable $e) {
                 $this->setMariaDBError();
+                $this->stmt = null;
                 return false;
             }
 

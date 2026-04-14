@@ -117,47 +117,6 @@ class QuerySQL
      * y el formato de retorno de los resultados.
      *
      * @param string $query Consulta SQL
-     * @param string $fetch Tipo de retorno: "num", "assoc", "both", "object"
-     * @return $this
-     */
-    /*public function query(string $query, string $fetch = 'num'): self
-     * {
-     * $this->query = $query;
-     *
-     * // Debe detectar que tipo de consulta se va a ejecutar
-     * $queryInLCase = strtolower($query);
-     *
-     * if (strpos($queryInLCase, 'insert') !== false) {
-     * $this->queryType = 'insert';
-     * } elseif (strpos($queryInLCase, 'select') !== false) {
-     * $this->queryType = 'select';
-     * } elseif (strpos($queryInLCase, 'update') !== false) {
-     * $this->queryType = 'update';
-     * } elseif (strpos($queryInLCase, 'delete') !== false) {
-     * $this->queryType = 'delete';
-     * } else {
-     * $this->queryType = 'other';
-     * }
-     *
-     * unset($queryInLCase);
-     *
-     * $this->queryReturn = match (strtolower($fetch)) {
-     * 'assoc' => 'assoc',
-     * 'both' => 'both',
-     * 'object' => 'object',
-     * default => 'num',
-     * };
-     *
-     * return $this;
-     * }*/
-
-    /**
-     * Define la consulta SQL a ejecutar.
-     *
-     * Detecta automáticamente el tipo de consulta (SELECT, INSERT, UPDATE, DELETE)
-     * y el formato de retorno de los resultados.
-     *
-     * @param string $query Consulta SQL
      * @param FetchMode|string $fetch Tipo de retorno
      * @return $this
      */
@@ -182,20 +141,6 @@ class QuerySQL
 
         return $this;
     }
-
-    /**
-     * Agrega un parámetro para consultas preparadas.
-     *
-     * @param string $type Tipo de dato (ej: "s", "i", "d", "b")
-     * @param mixed $value Valor del parámetro
-     * @return void
-     */
-    /*public function addParameter(string $type, mixed $value): void
-     * {
-     * $count = count($this->parameters);
-     *
-     * $this->parameters[$count] = ['type' => $type, 'value' => $value];
-     * }*/
 
     /**
      * Agrega un parámetro para consultas preparadas.
@@ -427,20 +372,47 @@ class QuerySQL
     }
 
     /**
-     * Ejecuta una inserción masiva (bulk insert).
+     * Ejecuta una inserción masiva (bulk insert) usando prepared statements.
      *
-     * @param string $query Consulta SQL base
-     * @param array $bulkData Datos a insertar
-     * @return void
+     * Prepara la consulta una sola vez y ejecuta el bind + execute por cada fila,
+     * lo que es más eficiente y seguro que construir el SQL dinámicamente.
      *
-     * @throws \Exception Si ocurre un error en la ejecución
+     * Ejemplo de uso:
+     * ```php
+     * $query = 'INSERT INTO obuma_categorias_producto
+     *               (id_categoria, codigo_categoria, nombre, posicion)
+     *           VALUES (?, ?, ?, ?)';
+     *
+     * $bulkData = [
+     *     ['types' => 'iisi', 'values' => [1, 100, 'Categoría A', 1]],
+     *     ['types' => 'iisi', 'values' => [2, 101, 'Categoría B', 2]],
+     * ];
+     *
+     * QuerySQL::executeInsertBulk($query, $bulkData);
+     * ```
+     *
+     * Tipos de parámetros soportados en 'types':
+     * - `i` → integer
+     * - `d` → double / float
+     * - `s` → string
+     * - `b` → bool
+     *
+     * @param string $query    Consulta SQL con placeholders `?` (debe ser un INSERT)
+     * @param array  $bulkData Arreglo de filas a insertar. Cada elemento debe tener:
+     *                         - `types`  (string) Cadena de tipos por parámetro (ej: `'iisi'`)
+     *                         - `values` (array)  Valores en el mismo orden que los `?`
+     *
+     * @return int
+     *
+     * @throws \Exception Si ocurre un error durante la ejecución en el motor de base de datos
      */
-    public function executeInsertBulk(string $query, array $bulkData): void
+    public function executeInsertBulk(string $query, array $bulkData): int
     {
+        $affectedRows = 0;
         $this->createInstance();
 
         if ($this->dbInstance !== null && $this->dbInstance->connect()) {
-            $this->dbInstance->executeInsertBulk($query, $bulkData);
+            $affectedRows = $this->dbInstance->executeInsertBulk($query, $bulkData);
         }
 
         // Agrego este control de error para lanzar una excepción para no tener que usar siempre QuerySQL::hasError
@@ -452,6 +424,8 @@ class QuerySQL
         if (!$this->useTransaction) {
             $this->releaseInstance();
         }
+
+        return $affectedRows;
     }
 
     /**

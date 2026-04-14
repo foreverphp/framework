@@ -13,7 +13,7 @@ use ForeverPHP\Database\Enums\ParameterType;
  * @method static void addParameter(ParameterType|string $type, mixed $value)
  * @method static \ForeverPHP\Database\QuerySQL unbuffered()
  * @method static mixed execute(string $returnType = 'array')
- * @method static bool executeInsertBulk(string $query, array $bulkData)
+ * @method static int executeInsertBulk(string $query, array $bulkData)
  * @method static void beginTransaction()
  * @method static void commit()
  * @method static void rollback()

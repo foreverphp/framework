@@ -191,8 +191,48 @@ class MariaDBEngine extends SQLEngine implements SQLEngineInterface
 
     public function executeInsertBulk(string $query, array $bulkData): int
     {
-        // No implementada
-        return 0;
+        // $query ejemplo: 'INSERT INTO tabla (col1, col2, col3, col4) VALUES (?, ?, ?, ?)'
+        // $bulkData ejemplo: [
+        //     ['types' => 'iisi', 'values' => [1, 2, 'nombre', 4]],
+        //     ['types' => 'iisi', 'values' => [5, 6, 'otro',  8]],
+        // ]
+
+        $this->stmt = $this->conn->stmt_init();
+
+        if (!$this->stmt->prepare($query)) {
+            $this->setMariaDBError();
+            return 0;
+        }
+
+        $totalAfectados = 0;
+
+        foreach ($bulkData as $fila) {
+            $types = $fila['types'];
+            $params = $fila['values'];
+
+            $bindParams = [$types, ...$params];
+            $refs = [];
+
+            foreach ($bindParams as $key => $value) {
+                $refs[$key] = &$bindParams[$key];
+            }
+
+            call_user_func_array([$this->stmt, 'bind_param'], $refs);
+
+            if ($this->stmt->execute()) {
+                $totalAfectados += $this->stmt->affected_rows;
+            } else {
+                $this->setMariaDBError();
+                $this->stmt->close();
+                $this->stmt = null;
+                return 0;
+            }
+        }
+
+        $this->stmt->close();
+        $this->stmt = null;
+
+        return $totalAfectados;
     }
 
     public function disconnect(): bool

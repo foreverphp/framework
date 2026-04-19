@@ -11,8 +11,8 @@
  * Nota este archivo se debe cargar al iniciar el framework
  */
 
-use ForeverPHP\Core\Helpers\GlobalHelpers;
 use ForeverPHP\Core\Helpers\ArrayHelpers;
+use ForeverPHP\Core\Helpers\GlobalHelpers;
 use ForeverPHP\Core\Helpers\StringHelpers;
 
 if (!function_exists('is_multi_array')) {
@@ -81,27 +81,27 @@ if (!function_exists('upper')) {
     }
 }
 
-/**
- * Valida si una constante esta definida
- *
- * @param string $name
- * @param mixed $default
- * @return mixed
- */
 if (!function_exists('safe_const')) {
+    /**
+     * Valida si una constante esta definida
+     *
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
+     */
     function safe_const(string $name, mixed $default = ''): mixed
     {
         return defined($name) ? constant($name) : $default;
     }
 }
 
-/**
- * Obtiene un secret desde el archivo de secrets.
- *
- * @param string $name
- * @return string
- */
 if (!function_exists('secret')) {
+    /**
+     * Obtiene un secret desde el archivo de secrets.
+     *
+     * @param string $name
+     * @return string
+     */
     function secret(string $name): ?string
     {
         static $cache = null;
@@ -127,5 +127,33 @@ if (!function_exists('secret')) {
         }
 
         return $cache[$name] ?? null;
+    }
+}
+
+if (!function_exists('join_lines')) {
+    /**
+     * Une múltiples valores en un string sin separador.
+     * Los valores no-string se convierten automáticamente a string.
+     *
+     * @param mixed ...$lines Los valores a unir (se convierten a string automáticamente)
+     * @return string
+     */
+    function join_lines(...$lines): string
+    {
+        return StringHelpers::joinLines(...$lines);
+    }
+}
+
+if (!function_exists('join_lines_with')) {
+    /**
+     * Une múltiples valores usando un separador.
+     *
+     * @param string $glue El separador entre cada valor
+     * @param mixed ...$lines Los valores a unir
+     * @return string
+     */
+    function join_lines_with(string $glue, ...$lines): string
+    {
+        return StringHelpers::joinLinesWith($glue, ...$lines);
     }
 }

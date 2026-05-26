@@ -29,7 +29,7 @@ class ClassLoader
         $class = static::normalizeClass($class);
 
         foreach (static::$directories as $directory) {
-            if (file_exists($path = $directory . DS . $class)) {
+            if (file_exists($path = $directory . safe_const('DS') . $class)) {
                 require_once $path;
 
                 return true;
@@ -51,7 +51,7 @@ class ClassLoader
             $class = substr($class, 1);
         }
 
-        return str_replace(['\\', '_'], DS, $class) . '.php';
+        return str_replace(['\\', '_'], safe_const('DS'), $class) . '.php';
     }
 
     /**

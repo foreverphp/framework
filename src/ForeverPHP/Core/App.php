@@ -49,9 +49,7 @@ class App
      */
     private static $instance;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Obtiene o crea la instancia singleton de App.
@@ -80,7 +78,7 @@ class App
 
     private function loadOptional($optional)
     {
-        $optionalPath = APPS_ROOT . DS . $optional . '.php';
+        $optionalPath = safe_const('APPS_ROOT') . safe_const('DS') . $optional . '.php';
 
         if (file_exists($optionalPath)) {
             require_once $optionalPath;
@@ -96,10 +94,10 @@ class App
         $this->loadOptional('middlewares');
 
         // Agrego los directorias al cargador de clases
-        ClassLoader::addDirectories(array(
-            APPS_ROOT . DS . $this->appName . DS . 'models',
-            APPS_ROOT . DS . $this->appName . DS . 'views',
-        ));
+        ClassLoader::addDirectories([
+            safe_const('APPS_ROOT') . safe_const('DS') . $this->appName . safe_const('DS') . 'models',
+            safe_const('APPS_ROOT') . safe_const('DS') . $this->appName . safe_const('DS') . 'views',
+        ]);
     }
 
     /**
@@ -108,7 +106,7 @@ class App
      * @param  string $name
      * @return bool
      */
-    public function existsMiddleware($name)
+    public function existsMiddleware(string $name): bool
     {
         if (array_key_exists($name, $this->middlewares)) {
             return true;
@@ -179,8 +177,12 @@ class App
         // Nombre del metodo a ejecutar
         $method = $route['method'];
 
-        Setup::toDefine('TEMPLATES_PATH', APPS_ROOT . DS . $this->appName . DS . 'Templates' . DS);
-        Setup::toDefine('STATIC_PATH', APPS_ROOT . DS . 'static' . DS);
+        Setup::toDefine(
+            'TEMPLATES_PATH',
+            safe_const('APPS_ROOT') . safe_const('DS') . $this->appName . safe_const('DS') . 'Templates'
+                . safe_const('DS'),
+        );
+        Setup::toDefine('STATIC_PATH', safe_const('APPS_ROOT') . safe_const('DS') . 'static' . safe_const('DS'));
 
         $viewPath = '';
         $view = $viewSegments[0];
@@ -199,8 +201,8 @@ class App
         // Verifico que la vista hereda de View
         if ($view instanceof \ForeverPHP\View\View) {
             throw new ViewException(sprintf(
-                "La vista (%s) no hereda de View.",
-                method_exists($view, '__toString') ? (string) $view : get_class($view)
+                'La vista (%s) no hereda de View.',
+                method_exists($view, '__toString') ? (string) $view : get_class($view),
             ));
         }
 
@@ -236,8 +238,16 @@ class App
      */
     public function importView($view, $appName = null)
     {
-        $appName = ($appName === null) ? $this->appName : $appName;
-        $importPath = APPS_ROOT . DS . $appName . DS . 'views' . DS . $view . '.php';
+        $appName = $appName === null ? $this->appName : $appName;
+        $importPath =
+            safe_const('APPS_ROOT')
+            . safe_const('DS')
+            . $appName
+            . safe_const('DS')
+            . 'views'
+            . safe_const('DS')
+            . $view
+            . '.php';
 
         if (file_exists($importPath)) {
             include_once $importPath;

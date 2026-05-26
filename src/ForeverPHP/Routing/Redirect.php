@@ -25,7 +25,7 @@ class Redirect
      * @param  array   $headers
      * @return \ForeverPHP\Http\RedirectResponse
      */
-    public function to($path, $status = 301, $headers = [])
+    public function to(string $path, int $status = 301, array $headers = []): RedirectResponse
     {
         return $this->makeRedirect($path, $status, $headers);
     }

@@ -27,9 +27,7 @@ class Request
     /** @var \ForeverPHP\Http\Request Instancia singleton */
     private static ?Request $instance = null;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Obtiene o crea la instancia singleton de Request.
@@ -71,8 +69,8 @@ class Request
                 break;
 
             case 'POST':
-                $requestParams = (str_contains($contentType, 'application/json'))
-                    ? json_decode(file_get_contents('php://input'), true) ?: []
+                $requestParams = str_contains($contentType, 'application/json')
+                    ? (json_decode(file_get_contents('php://input'), true) ?: [])
                     : $_POST;
                 break;
 
@@ -87,7 +85,7 @@ class Request
                  * (variable1=dato1&variable2=data2...) que evidentemente tendremos que
                  * transformarla a un array asociativo.
                  */
-                $input = file_get_contents("php://input");
+                $input = file_get_contents('php://input');
 
                 if (str_contains($contentType, 'application/json')) {
                     $requestParams = json_decode($input, true) ?: [];
@@ -127,11 +125,12 @@ class Request
             return;
         }
 
-        if ($params !== null) {
+        if ($params !== null && count($params) > 0) {
             $this->params = $params;
-        } else {
-            $this->loadRequest();
         }
+
+        // La separe para que siempre procese el Request para poder procesar parametros, $_GET, $_POST, etc.
+        $this->loadRequest();
 
         $this->registered = true;
     }
@@ -143,7 +142,7 @@ class Request
      */
     public function host(): Host
     {
-         return Host::getInstance();
+        return Host::getInstance();
     }
 
     /**
@@ -233,37 +232,25 @@ class Request
     }
 
     // Métodos pendientes de implementación
-    public function path()
-    {
-    }
-    public function url()
-    {
-    }
-    public function segment(int $number)
-    {
-    }
-    public function is(string $path)
-    {
-    }
-    public function header(string $name)
-    {
-    }
-    public function server(string $var)
-    {
-    }
-    public function secure()
-    {
-    }
-    public function ajax()
-    {
-    }
-    public function isJson()
-    {
-    }
-    public function wantsJson()
-    {
-    }
-    public function format(string $format)
-    {
-    }
+    public function path() {}
+
+    public function url() {}
+
+    public function segment(int $number) {}
+
+    public function is(string $path) {}
+
+    public function header(string $name) {}
+
+    public function server(string $var) {}
+
+    public function secure() {}
+
+    public function ajax() {}
+
+    public function isJson() {}
+
+    public function wantsJson() {}
+
+    public function format(string $format) {}
 }

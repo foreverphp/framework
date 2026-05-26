@@ -34,9 +34,7 @@ class Router
      */
     private static $instance;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Obtiene o crea la instancia singleton de Router.
@@ -125,9 +123,9 @@ class Router
      *
      * @param  string $appName
      */
-    public function fromApp($appName)
+    public function fromApp(string $appName)
     {
-        require_once APPS_ROOT . DS . $appName . DS . 'approutes.php';
+        require_once safe_const('APPS_ROOT') . safe_const('DS') . $appName . safe_const('DS') . 'approutes.php';
     }
 
     public function add($route, $view, $middlewares = null)
@@ -140,7 +138,7 @@ class Router
         if (is_string($view)) {
             if (!strpos($view, '@')) {
                 throw new RouterException(
-                    "Revise la ruta ($route) al parecer la ruta a la vista no esta correctamente escrita."
+                    "Revise la ruta ($route) al parecer la ruta a la vista no esta correctamente escrita.",
                 );
             }
 
@@ -275,12 +273,12 @@ class Router
                         $i++;
                     }
 
-                    // Se valida que realmente que vayan parametros en $paramsUrl
-                    if (count($paramsUrl) > 0) {
+                    // Se valida que realmente que vayan parametros en $paramsUrl y si no hay valido $_GET
+                    if (count($paramsUrl) > 0 || count($_GET) > 0) {
                         Request::register($paramsUrl);
                     }
 
-                    $routeContent = ($_routeContent['app'] != null) ? $_routeContent : $_routeContent['function'];
+                    $routeContent = $_routeContent['app'] != null ? $_routeContent : $_routeContent['function'];
 
                     /**
                      * Devuelvo la ruta compleja para obtener su nombre y
@@ -425,7 +423,7 @@ class Router
                 $app->load($appName);
 
                 // Cargo el autoload.php, archivo opcional
-                $autoloadPath = APPS_ROOT . DS . 'autoload.php';
+                $autoloadPath = safe_const('APPS_ROOT') . safe_const('DS') . 'autoload.php';
 
                 if (Storage::exists($autoloadPath)) {
                     include_once $autoloadPath;
@@ -448,7 +446,7 @@ class Router
                 $app->run($routeContent);
             } else {
                 throw new AppException(
-                    "La aplicación ($appName) a la que pertenece la vista no esta cargada en settings.php."
+                    "La aplicación ($appName) a la que pertenece la vista no esta cargada en settings.php.",
                 );
             }
         } elseif (is_callable($routeContent)) {

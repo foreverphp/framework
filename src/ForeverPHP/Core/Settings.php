@@ -23,9 +23,7 @@ class Settings
      */
     private static $instance;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Obtiene o crea la instancia singleton de Settings.
@@ -66,7 +64,7 @@ class Settings
      * @param  string $name Nombre del item.
      * @return boolean
      */
-    public function exists($name)
+    public function exists(string $name): bool
     {
         if (array_key_exists($name, $this->settings)) {
             return true;
@@ -82,7 +80,7 @@ class Settings
      * @param mixed  $value Valor a asignar al item
      * @return boolean
      */
-    public function set($name, $value = null): bool
+    public function set(string $name, mixed $value = null): bool
     {
         if ($value == null) {
             return false;
@@ -98,7 +96,7 @@ class Settings
      * @param  string $item Nombre del item a obtener.
      * @return mixed        Retorna el valor del item.
      */
-    public function get($name)
+    public function get(string $name): mixed
     {
         if ($this->exists($name)) {
             $value = $this->settings[$name];
@@ -125,6 +123,61 @@ class Settings
         }
 
         return false;
+    }
+
+    /**
+     * @param string $key
+     * @param string $default
+     * @return string
+     */
+    public static function getString(string $key, string $default = ''): string
+    {
+        $value = $this->get($key);
+        return is_string($value) ? $value : $default;
+    }
+
+    /**
+     * @param string $key
+     * @param int $default
+     * @return int
+     */
+    public static function getInt(string $key, int $default = 0): int
+    {
+        $value = $this->get($key);
+        return is_numeric($value) ? (int) $value : $default;
+    }
+
+    /**
+     * @param string $key
+     * @param float $default
+     * @return float
+     */
+    public static function getFloat(string $key, float $default = 0.0): float
+    {
+        $value = $this->get($key);
+        return is_numeric($value) ? (float) $value : $default;
+    }
+
+    /**
+     * @param string $key
+     * @param bool $default
+     * @return bool
+     */
+    public static function getBool(string $key, bool $default = false): bool
+    {
+        $value = $this->get($key);
+        return is_string($value) || is_numeric($value) ? (bool) $value : $default;
+    }
+
+    /**
+     * @param string $key
+     * @param array<array-key, mixed> $default
+     * @return array<array-key, mixed>
+     */
+    public static function getArray(string $key, array $default = []): array
+    {
+        $value = $this->get($key);
+        return is_array($value) ? $value : $default;
     }
 
     /**

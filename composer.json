@@ -21,5 +21,14 @@
     "psr-0": {
       "ForeverPHP": "src/"
     }
+  },
+  "require-dev": {
+    "clearlyip/mago-lsp": "^1.29",
+    "rector/rector": "^2.4"
+  },
+  "config": {
+    "allow-plugins": {
+      "clearlyip/mago-lsp": true
+    }
   }
 }

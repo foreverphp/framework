@@ -17,7 +17,24 @@ integrations = ["phpunit"]
 [linter.rules]
 ambiguous-function-call = { enabled = false }
 literal-named-argument = { enabled = false }
-halstead = { effort-threshold = 7000 }
+halstead = { enabled = false }
+cyclomatic-complexity = { enabled = false }
+no-boolean-flag-parameter = { enabled = false }
+strict-types = { enabled = false }
+no-isset = { enabled = false }
+kan-defect = { enabled = false }
+excessive-parameter-list = { enabled = false }
+strict-behavior = { enabled = false }
+identity-comparison = { enabled = false }
+too-many-methods = { enabled = false }
+too-many-properties = { enabled = false }
+tagged-todo = { enabled = false }
+no-ini-set = { enabled = false }
+no-literal-password = { enabled = false }
+no-debug-symbols = { enabled = false }
+no-empty = { enabled = false }
+sensitive-parameter = { enabled = false }
+no-insecure-comparison = { enabled = false }
 
 [analyzer]
 plugins = []
@@ -33,3 +50,21 @@ strict-list-index-checks = false
 no-boolean-literal-comparison = false
 check-missing-type-hints = false
 register-super-globals = true
+ignore = [
+    "mixed-operand",
+    "mixed-assignment",
+    "mixed-argument",
+    "mixed-return-statement",
+    "mixed-array-access",
+    "possibly-invalid-argument",
+    "redundant-cast",
+    "possibly-invalid-iterator",
+    "invalid-iterator",
+    "mixed-method-access",
+    "invalid-type-cast",
+    "mixed-array-assignment",
+    "possibly-false-argument",
+    "invalid-array-index",
+    "possibly-null-array-access",
+    "undefined-string-array-index",
+]

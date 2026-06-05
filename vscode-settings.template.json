@@ -1,0 +1,20 @@
+{
+  "customLocalFormatters.formatters": [
+    {
+      "command": "mago format --stdin-input",
+      "languages": ["php"]
+    }
+  ],
+
+  "[php]": {
+    "editor.defaultFormatter": "clearlyip.mago-vscode-extension",
+    "editor.formatOnSave": true
+  },
+  "[sql]": {
+    "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
+  },
+  "Prettier-SQL.keywordCase": "upper",
+  "Prettier-SQL.SQLFlavourOverride": "mariadb",
+  "Prettier-SQL.tabSizeOverride": 4,
+  "intelephense.diagnostics.enable": false
+}

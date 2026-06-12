@@ -193,7 +193,7 @@ class Request
      * @param string $default
      * @return string
      */
-    public static function getString(string $key, string $default = ''): string
+    public function getString(string $key, string $default = ''): string
     {
         $value = $this->get($key);
         return is_string($value) ? $value : $default;
@@ -204,7 +204,7 @@ class Request
      * @param int $default
      * @return int
      */
-    public static function getInt(string $key, int $default = 0): int
+    public function getInt(string $key, int $default = 0): int
     {
         $value = $this->get($key);
         return is_numeric($value) ? (int) $value : $default;
@@ -215,7 +215,7 @@ class Request
      * @param float $default
      * @return float
      */
-    public static function getFloat(string $key, float $default = 0.0): float
+    public function getFloat(string $key, float $default = 0.0): float
     {
         $value = $this->get($key);
         return is_numeric($value) ? (float) $value : $default;
@@ -226,7 +226,7 @@ class Request
      * @param bool $default
      * @return bool
      */
-    public static function getBool(string $key, bool $default = false): bool
+    public function getBool(string $key, bool $default = false): bool
     {
         $value = $this->get($key);
         return is_string($value) || is_numeric($value) ? (bool) $value : $default;
@@ -237,7 +237,7 @@ class Request
      * @param array<array-key, mixed> $default
      * @return array<array-key, mixed>
      */
-    public static function getArray(string $key, array $default = []): array
+    public function getArray(string $key, array $default = []): array
     {
         $value = $this->get($key);
         return is_array($value) ? $value : $default;
